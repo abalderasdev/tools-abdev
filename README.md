@@ -14,3 +14,14 @@ despliega por separado en Vercel apuntando **Root Directory** a esa carpeta.
 3. Cada proyecto trae su propio `vercel.json` con la configuración de salida.
 
 Ver el README de cada carpeta para los detalles.
+
+### El `vercel.json` de la raíz
+
+Existe solo como red de seguridad: si el proyecto de Vercel quedó apuntando a la
+raíz del repo en vez de a la carpeta del proyecto, sin él Vercel publica **todo el
+árbol** —incluidos `db/` y `docs/`— y la portada da 404.
+
+Mientras haya un solo proyecto, apunta a `Fresko-cumbres/public`. En cuanto pongas
+el **Root Directory** en `Fresko-cumbres`, Vercel lee `Fresko-cumbres/vercel.json`
+e ignora este; al agregar un segundo proyecto, cada uno necesita su Root Directory
+y este archivo se puede borrar.
