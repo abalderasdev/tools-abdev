@@ -1,0 +1,15 @@
+# dependencias
+node_modules/
+
+# vercel
+.vercel/
+
+# entorno / secretos
+.env
+.env.*
+!.env.example
+
+# empaquetados y temporales
+*.zip
+.DS_Store
+Thumbs.db
