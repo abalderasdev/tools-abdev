@@ -40,6 +40,19 @@
 
 begin;
 
+-- ---------------------------------------------------------------------
+--  Cristhian (014) y su esposa Leticia (015) COMPARTEN TELÉFONO: solo
+--  tienen un aparato. El índice único (campana, telefono) lo impedía.
+--
+--  Se relaja a índice normal. No se pierde la protección contra
+--  registros duplicados desde el formulario: registrar_candidato() ya
+--  busca el teléfono antes de insertar y devuelve {duplicado:true} en
+--  vez de crear otra fila.
+-- ---------------------------------------------------------------------
+drop index if exists public.idx_cand_tel_campana;
+create index if not exists idx_cand_tel_campana
+  on public.candidatos (campana, telefono);
+
 insert into public.candidatos
   (folio, nombre, telefono, edad, colonia, municipio, talla_playera,
    experiencia, disponible_completa, tiene_ine,
