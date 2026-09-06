@@ -17,7 +17,7 @@ Fresko-cumbres/
 │   └── index.html      ← el sitio (esto es lo único que se publica)
 ├── db/
 │   ├── 01_esquema.sql              respaldo del esquema (ya aplicado)
-│   └── 02_carga_folios_010_029.sql plantilla para los folios entregados a mano
+│   └── 02_carga_folios_whatsapp.sql  los folios 006-027 entregados por WhatsApp
 ├── docs/
 │   ├── manual-de-operacion.md      cómo operarlo el día de la capacitación
 │   └── mensajes-whatsapp.md        plantillas de mensajes
@@ -73,7 +73,8 @@ no leer ni modificar nada. Los datos se consultan desde el panel de Supabase.
 ## Cómo funciona
 
 - Cada registro recibe un folio consecutivo de 3 dígitos. El contador arranca en
-  **030** porque los 010–029 se entregaron por WhatsApp antes de tener el formulario.
+  **030** porque los folios previos se entregaron por WhatsApp antes de tener el
+  formulario. Ese rango llegó al 027, no al 029.
 - Si alguien captura el folio de quien lo invitó, se genera un bono de $50 en estado
   `pendiente`. Pasa a `por_pagar` **solo cuando el invitado asiste a la capacitación**.
 - El pase de confirmación incluye un botón que comparte el link con `?ref=SU_FOLIO`,
@@ -88,4 +89,5 @@ Ver `docs/manual-de-operacion.md` para las consultas del día de la capacitació
 
 - [ ] Definir el monto del bono de capacitación (hoy está en $0):
       `update parametros set bono_capacitacion = X where campana = 'FRESKO-CUMBRES-SEP26';`
-- [ ] Cargar los folios 010–029 con `db/02_carga_folios_010_029.sql`
+- [ ] Cargar los folios entregados por WhatsApp con `db/02_carga_folios_whatsapp.sql`
+- [ ] Avisar su nuevo folio a las 4 personas reasignadas (006, 007, 008, 009)

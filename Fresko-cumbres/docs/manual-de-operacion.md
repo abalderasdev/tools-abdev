@@ -14,9 +14,10 @@ Todas las consultas van en **SQL Editor** del panel.
    ```sql
    update parametros set bono_capacitacion = 150 where campana = 'FRESKO-CUMBRES-SEP26';
    ```
-2. **Cargar los folios 010–029** con el archivo `carga-folios-010-029.sql`.
-3. **Publicar `registro.html`** en Netlify Drop (netlify.com/drop, arrastrar y soltar).
-   Ya trae las llaves del proyecto, no hay que tocarle nada.
+2. **Cargar los folios de WhatsApp** con `db/02_carga_folios_whatsapp.sql` (rango 006–027).
+3. **Publicar el sitio.** Ya está en Vercel desde el repo `abalderasdev/tools-abdev`;
+   cada push a `main` redespliega solo. El archivo es `public/index.html` y ya
+   trae las llaves del proyecto, no hay que tocarle nada.
 
 ---
 
@@ -94,7 +95,7 @@ Para reusar todo en otra campaña, sin perder el historial:
 insert into parametros (campana, nombre_evento, pago_por_dia, bono_referido, meta_folios)
 values ('SIGUIENTE-ACTIVACION', 'Nombre del evento', 450, 50, 40);
 ```
-Y en `registro.html` cambias la constante `CAMPANA`.
+Y en `public/index.html` cambias la constante `CAMPANA`.
 
 ---
 
