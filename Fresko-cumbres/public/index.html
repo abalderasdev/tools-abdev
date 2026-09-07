@@ -460,7 +460,7 @@ $("#f").addEventListener("submit", async ev => {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.message || "error");
-    mostrarPase(data, p.nombre);
+    mostrarPase(data, p);
   } catch (e) {
     console.error(e);
     btn.disabled = false;
@@ -470,7 +470,8 @@ $("#f").addEventListener("submit", async ev => {
   }
 });
 
-function mostrarPase(d, nombre) {
+function mostrarPase(d, p) {
+  const nombre = p.nombre;
   const folio = d.folio, nom = nombre.split(" ")[0];
   $("#f").style.display = "none";
   $("#folioTxt").textContent = folio;
@@ -478,26 +479,29 @@ function mostrarPase(d, nombre) {
   $("#saludo").textContent = d.duplicado ? `${nom}, ya estabas registrado` : `Listo, ${nom}`;
   if (d.estatus === "lista_espera") $("#espera").style.display = "block";
 
+  const lugar = [p.colonia, p.municipio].filter(Boolean).join(", ");
   $("#waConf").href = `https://wa.me/${WHATSAPP}?text=` + encodeURIComponent(
-    `Hola Alberto, soy ${nombre}. Me registré para la activación de Cumbres. Mi folio es ${folio} y confirmo la capacitación del martes 8 de septiembre a las 4 p.m. en Fresko Cumbres.`
+    `Hola Alberto, soy ${nombre}. Ya me registré para la activación de Cumbres.\n\n` +
+    `Folio: ${folio}\n` +
+    `Edad: ${p.edad}\n` +
+    `Talla de playera: ${p.talla_playera}\n` +
+    `Vivo en: ${lugar}\n` +
+    (p.referido_por_folio ? `Me invitó el folio: ${p.referido_por_folio}\n` : ``) +
+    `\nConfirmo la capacitación del martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres. Llevo mi INE original.`
   );
 
   const MI_LIGA = `${LIGA}?ref=${folio}`;
   const INVITA =
-`Estoy trabajando en la activación de la inauguración del Fresko Cumbres y siguen contratando.
+`Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Cumbres y todavía hay lugares.
 
-Del 9 al 13 de septiembre, de 9:00 a 3:00 de la tarde.
-$400 por día, pagados a la mañana siguiente.
-$200 más por ir a la capacitación del martes.
-$50 diarios extra si no faltas ni llegas tarde.
-El uniforme lo pone la empresa.
+Son 5 días, del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $200 nada más por ir a la capacitación del martes. La playera y todo lo ponen ellos.
 
-Solo piden ser mayor de edad, INE vigente y poder los 5 días. No se necesita experiencia.
+No piden experiencia, nomás INE y que puedas los 5 días completos.
 
-Regístrate aquí y te dan tu folio al momento:
+Si le entras, regístrate aquí y te dan tu folio de una vez:
 ${MI_LIGA}
 
-La cita es el martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres, Av. Paseo de los Leones 1261, con tu INE original.`;
+La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. Llévate tu INE original.`;
 
   $("#waShare").href = "https://wa.me/?text=" + encodeURIComponent(INVITA);
 
