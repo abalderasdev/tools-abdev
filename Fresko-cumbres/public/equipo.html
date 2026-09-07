@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Acceso al panel · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;padding:22px;
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+.caja{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:28px 26px}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{margin:0 0 18px;color:var(--tinta-2);font-size:14.5px}
+label{display:block;font-weight:600;font-size:14.5px;margin:14px 0 6px}
+input{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+  border:1.5px solid var(--linea-2);border-radius:var(--radio)}
+input:disabled{background:var(--arena);color:var(--tinta-3)}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+button{width:100%;margin-top:20px;padding:14px;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font:inherit;font-weight:700;font-size:16.5px;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.msg{margin-top:14px;font-size:14px;font-weight:600;display:none;padding:12px;border-radius:10px;line-height:1.5}
+.msg.on{display:block}
+.msg.err{background:#FAE5E0;color:var(--error)}
+.msg.ok{background:#DCEFE2;color:#0B5D2E}
+.permisos{margin:16px 0 0;padding:14px;background:var(--arena);border-radius:12px;font-size:14px}
+.permisos b{display:block;margin-bottom:7px;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--tinta-3)}
+.permisos li{margin:3px 0}
+.permisos ul{margin:0;padding-left:19px}
+.pie{margin-top:16px;font-size:12.5px;color:var(--tinta-3);line-height:1.55}
+a{color:var(--verde);font-weight:600}
+</style>
+</head>
+<body>
+<div class="caja" id="caja">
+  <h1>Cargando…</h1>
+</div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+const TOKEN = new URLSearchParams(location.search).get("t");
+
+async function rpc(fn, body, token) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${token || SUPABASE_KEY}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.msg || `error ${r.status}`);
+  return d;
+}
+
+function error(titulo, texto) {
+  $("#caja").innerHTML = `<h1>${esc(titulo)}</h1><p class="sub">${texto}</p>`;
+}
+
+(async () => {
+  if (!TOKEN) return error("Enlace incompleto",
+    "Este enlace no trae el código de invitación. Pídele a Alberto que te mande uno nuevo.");
+  let inv;
+  try { inv = await rpc("ver_invitacion", { p_token: TOKEN }); }
+  catch (e) { return error("No se pudo verificar", esc(e.message)); }
+
+  if (inv.no_existe) return error("Invitación no encontrada",
+    "Ese enlace no corresponde a ninguna invitación. Pídele a Alberto que te mande uno nuevo.");
+  if (inv.usada) return error("Ya la usaste",
+    `Esta invitación ya se activó. Entra directo al panel con tu correo y contraseña en
+     <a href="/dash">el panel</a>.`);
+  if (inv.vencida) return error("Invitación vencida",
+    "Las invitaciones duran 7 días. Pídele a Alberto que te genere una nueva.");
+
+  $("#caja").innerHTML = `
+    <h1>Bienvenido${inv.nombre ? ", " + esc(inv.nombre.split(" ")[0]) : ""}</h1>
+    <p class="sub">Crea tu contraseña para entrar al panel de la activación.</p>
+    <form id="f">
+      <label for="correo">Tu correo</label>
+      <input id="correo" type="email" value="${esc(inv.correo)}" disabled>
+      <label for="p1">Contraseña nueva</label>
+      <input id="p1" type="password" autocomplete="new-password" minlength="8" required
+             placeholder="Mínimo 8 caracteres">
+      <label for="p2">Repítela</label>
+      <input id="p2" type="password" autocomplete="new-password" minlength="8" required>
+      <button type="submit" id="btn">Crear mi acceso</button>
+      <p class="msg" id="msg"></p>
+    </form>
+    <p class="pie">Al entrar aceptas cuidar los datos de los candidatos: son personales y solo
+      pueden usarse para esta activación.</p>`;
+
+  $("#f").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const b = $("#btn"), m = $("#msg");
+    const p1 = $("#p1").value, p2 = $("#p2").value;
+    m.className = "msg";
+    if (p1 !== p2) { m.className = "msg on err"; m.textContent = "Las contraseñas no coinciden."; return; }
+    if (p1.length < 8) { m.className = "msg on err"; m.textContent = "Usa al menos 8 caracteres."; return; }
+    b.disabled = true; b.textContent = "Creando tu acceso…";
+    try {
+      // 1) crear la cuenta; si ya existe, iniciar sesión con lo que escribió
+      let token = null;
+      const alta = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+        body: JSON.stringify({ email: inv.correo, password: p1 })
+      });
+      const da = await alta.json();
+      token = da.access_token || null;
+
+      if (!token) {
+        const ses = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+          body: JSON.stringify({ email: inv.correo, password: p1 })
+        });
+        const ds = await ses.json();
+        token = ds.access_token || null;
+        if (!token) throw new Error(
+          da.msg || ds.error_description ||
+          "Ya existe una cuenta con ese correo. Escribe la contraseña que usaste, o pídele a Alberto que la restablezca.");
+      }
+
+      // 2) conectar la cuenta con los permisos de la invitación
+      const r = await rpc("aceptar_invitacion", { p_token: TOKEN }, token);
+      if (!r.ok) {
+        const motivos = { YA_USADA:"Esta invitación ya se había usado.",
+          VENCIDA:"La invitación venció.", NO_EXISTE:"La invitación ya no existe.",
+          CORREO_DISTINTO:`Tu cuenta usa otro correo. Esta invitación es para ${esc(r.esperado||"")}.` };
+        throw new Error(motivos[r.motivo] || "No se pudo activar el acceso.");
+      }
+      m.className = "msg on ok";
+      m.innerHTML = "✓ Listo. Entrando al panel…";
+      setTimeout(() => { location.href = "/dash"; }, 1400);
+    } catch (e) {
+      m.className = "msg on err"; m.textContent = e.message;
+      b.disabled = false; b.textContent = "Crear mi acceso";
+    }
+  });
+})();
+</script>
+</body>
+</html>
