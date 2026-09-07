@@ -139,6 +139,13 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
   <div class="wrap">
     <div class="tiles" id="tiles"></div>
 
+    <h3>Canales</h3>
+    <p class="lede">De qué enlace llegó cada registro. <b>Precisión</b> es qué proporción llega con todos sus datos; <b>ritmo</b> es cuántos por hora desde el primer registro de ese canal.</p>
+    <div class="tw"><table style="min-width:720px"><thead><tr>
+      <th>Canal</th><th style="width:80px">Registros</th><th style="width:90px">Precisión</th>
+      <th style="width:90px">Ritmo</th><th style="width:150px">Actividad</th><th style="width:130px">Último</th>
+    </tr></thead><tbody id="canales"></tbody></table></div>
+
     <h3>Uniformes por talla</h3>
     <p class="lede" id="ledeTallas"></p>
     <div class="tallas" id="tallas"></div>
@@ -259,6 +266,35 @@ function pintar() {
     tile(activos.length, "Registrados") + tile(confirmados.length, "Confirmaron", "ok") +
     tile(faltan, "Faltan para la meta", "act") + tile(asistieron.length, "Asistieron el martes") +
     tile(huecos.length, "Datos incompletos", huecos.length ? "warn" : "") + tile(bajas.length, "Bajas");
+
+  /* ----- canales ----- */
+  const NOMBRE_CANAL = { fb:"Facebook", wa:"WhatsApp", tk:"TikTok", mmp:"Diana · MMP",
+                         referido:"Referido de un promotor", directo:"Directo / sin etiqueta" };
+  const porCanal = {};
+  activos.forEach((c) => {
+    const k = c.canal || "directo";
+    (porCanal[k] = porCanal[k] || []).push(c);
+  });
+  const completo = (c) => c.talla_playera && c.tiene_ine === true && c.edad && c.colonia;
+  const hhmm = (d) => d.toLocaleString("es-MX", { timeZone:"America/Monterrey", day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit", hour12:true });
+  const filasCanal = Object.entries(porCanal).sort((a,b) => b[1].length - a[1].length).map(([k, l]) => {
+    const fechas = l.map((c) => new Date(c.created_at)).sort((a,b) => a-b);
+    const horas = Math.max(0.25, (Date.now() - fechas[0].getTime()) / 3600000);
+    const prec = Math.round((l.filter(completo).length / l.length) * 100);
+    const ritmo = (l.length / horas).toFixed(1);
+    const barra = Math.round((l.length / activos.length) * 100);
+    return `<tr>
+      <td class="nom">${esc(NOMBRE_CANAL[k] || k)} ${k !== "directo" && k !== "referido" ? `<span class="mono" style="color:var(--tinta-3)">?c=${esc(k)}</span>` : ""}</td>
+      <td class="mono num" style="font-weight:700;font-size:15px">${l.length}</td>
+      <td class="mono num" style="color:${prec >= 80 ? "var(--verde)" : prec >= 50 ? "var(--tinta)" : "var(--error)"};font-weight:700">${prec}%</td>
+      <td class="mono num">${ritmo}<span style="color:var(--tinta-3)">/h</span></td>
+      <td><div style="height:9px;background:var(--linea);border-radius:99px;overflow:hidden">
+            <div style="width:${barra}%;height:100%;background:var(--naranja)"></div></div>
+          <span class="mono" style="font-size:11.5px;color:var(--tinta-3)">${barra}% del total</span></td>
+      <td class="mono" style="font-size:12px">${esc(hhmm(fechas[fechas.length-1]))}</td></tr>`;
+  }).join("");
+  $("#canales").innerHTML = filasCanal ||
+    `<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--tinta-3)">Todavía no hay registros con canal. Empieza a compartir los enlaces con <span class="mono">?c=</span>.</td></tr>`;
 
   const orden = ["CH","M","G","XG","XL"], tallas = {}; let sinTalla = 0;
   activos.forEach((c) => { if (c.talla_playera) tallas[c.talla_playera] = (tallas[c.talla_playera]||0)+1; else sinTalla++; });

@@ -378,8 +378,15 @@ $("#telefono").addEventListener("input", e => {
 });
 
 // Si llegan con ?ref=030 se llena solo
-const refUrl = new URLSearchParams(location.search).get("ref");
+const params = new URLSearchParams(location.search);
+const refUrl = params.get("ref");
 if (refUrl) { $("#refFolio").value = refUrl; $("#f4").checked = true; }
+
+// Canal de origen: de qué link llegó. Se guarda tal cual para medir qué
+// funciona. Si alguien llegó con ?ref= sin canal, el canal es "referido".
+const CANAL = (params.get("c") || (refUrl ? "referido" : "directo"))
+  .toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 24) || "directo";
+try { sessionStorage.setItem("fresko_canal", CANAL); } catch (e) {}
 
 let refValido = null;
 async function checarFolio() {
@@ -450,6 +457,7 @@ $("#f").addEventListener("submit", async ev => {
     referido_por_folio: refValido || val("#refFolio") || null,
     referido_por_nombre: val("#refNombre") || null,
     como_se_entero: radio("fuente"),
+    canal: CANAL,
     futuras_activaciones: $("#futuras").checked,
     acepta_aviso: true
   };
