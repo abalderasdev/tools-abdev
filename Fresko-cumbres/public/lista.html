@@ -87,6 +87,17 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
 .aviso.on{display:block}
 .aviso.err{background:#FAE5E0;color:var(--error)}
 .aviso.ok{background:#DCEFE2;color:#0B5D2E}
+.nuevo{margin-top:12px;padding:13px;background:transparent;color:var(--verde);
+  border:2px dashed var(--linea-2);border-radius:var(--radio);font-weight:700;font-size:15.5px}
+.alta{margin-top:16px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px}
+.alta h3{font-family:"Bricolage Grotesque",sans-serif;font-size:18px;margin:0}
+.alta-sub{margin:4px 0 6px;font-size:13.5px;color:var(--tinta-2)}
+.alta input,.alta select{font-size:16px;padding:12px;text-align:left;letter-spacing:0;font-family:inherit;font-weight:400}
+.alta select{width:100%;border:1.5px solid var(--linea-2);border-radius:var(--radio);background:var(--panel);color:var(--tinta)}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;gap:10px;align-items:center;margin-top:14px}
+.check input{width:22px;height:22px;accent-color:var(--verde);flex:none}
+.check label{margin:0;font-weight:400;font-size:15px}
 </style>
 </head>
 <body>
@@ -119,8 +130,31 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
              placeholder="Folio, nombre o teléfono" aria-label="Buscar por folio, nombre o teléfono">
       <p class="pista">Escribe los 3 dígitos del folio. Si no lo trae, busca por nombre.</p>
     </div>
+    <button class="nuevo" id="btnNuevo" type="button">+ Registrar a alguien nuevo</button>
     <div class="aviso" id="aviso"></div>
     <div class="res" id="res"></div>
+
+    <form class="alta" id="alta" style="display:none">
+      <h3>Alta en el momento</h3>
+      <p class="alta-sub">Para quien llega acompañando a alguien. Se le crea su folio y se le marca asistencia de una vez.</p>
+      <label for="aNombre">Nombre completo</label>
+      <input id="aNombre" type="text" autocomplete="off" required>
+      <label for="aTel">WhatsApp <span style="font-weight:400;color:var(--tinta-3)">(10 dígitos)</span></label>
+      <input id="aTel" type="tel" inputmode="numeric" maxlength="14" required>
+      <div class="dos">
+        <div><label for="aEdad">Edad</label><input id="aEdad" type="number" inputmode="numeric" min="18" max="70" required></div>
+        <div><label for="aTalla">Talla</label>
+          <select id="aTalla"><option>CH</option><option selected>M</option><option>G</option><option>XG</option><option>XL</option></select></div>
+      </div>
+      <label for="aColonia">Colonia</label>
+      <input id="aColonia" type="text" autocomplete="off">
+      <label for="aRef">Folio de quien lo invitó <span style="font-weight:400;color:var(--tinta-3)">(opcional)</span></label>
+      <input id="aRef" type="text" inputmode="numeric" maxlength="4" placeholder="Ej. 014">
+      <div class="check"><input type="checkbox" id="aIne" checked>
+        <label for="aIne">Trae su INE (original o copia)</label></div>
+      <button class="acc" type="submit" id="btnAlta">Dar de alta y registrar asistencia</button>
+      <button class="acc deshacer" type="button" id="btnCancelar">Cancelar</button>
+    </form>
 
     <h2>Ya registrados hoy <span id="contLleg" style="font-weight:400;color:var(--tinta-3)"></span></h2>
     <div class="llegados" id="llegados"></div>
@@ -241,6 +275,48 @@ $("#res").addEventListener("click", async (ev) => {
     if (marcar) { $("#q").value = ""; $("#res").innerHTML = ""; $("#q").focus(); }
   } catch (err) { avisar(err.message, "err"); }
   finally { (bM || bQ).disabled = false; }
+});
+
+/* ---- alta en el momento ---- */
+const alta = $("#alta");
+$("#btnNuevo").addEventListener("click", () => {
+  alta.style.display = "block";
+  $("#btnNuevo").style.display = "none";
+  $("#aNombre").value = $("#q").value.replace(/\d/g, "").trim();
+  $("#aNombre").focus();
+});
+$("#btnCancelar").addEventListener("click", () => {
+  alta.style.display = "none"; $("#btnNuevo").style.display = "block"; alta.reset();
+});
+
+alta.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnAlta");
+  const tel = $("#aTel").value.replace(/\D/g, "");
+  const nombre = $("#aNombre").value.trim();
+  if (nombre.split(" ").filter(Boolean).length < 2) { avisar("Escribe nombre y apellido.", "err"); return; }
+  if (tel.length !== 10) { avisar("El teléfono necesita 10 dígitos.", "err"); return; }
+  b.disabled = true; b.textContent = "Dando de alta…";
+  try {
+    const d = await rpc("alta_en_sitio", { p: {
+      nombre, telefono: tel,
+      edad: $("#aEdad").value,
+      talla_playera: $("#aTalla").value,
+      colonia: $("#aColonia").value.trim() || null,
+      tiene_ine: $("#aIne").checked,
+      disponible_completa: true,
+      referido_por_folio: $("#aRef").value.trim() || null
+    }});
+    if (!d || !d.folio) { avisar("No se pudo dar de alta.", "err"); return; }
+    const m = await rpc("marcar_asistencia", { p_folio: d.folio, p_asistio: true });
+    avisar(d.duplicado
+      ? `Ya estaba registrado con folio <b>${esc(d.folio)}</b>. Asistencia marcada.`
+      : `✓ Folio <b>${esc(d.folio)}</b> creado para ${esc(m.nombre || nombre)}. Asistencia marcada.`, "ok");
+    alta.reset(); alta.style.display = "none"; $("#btnNuevo").style.display = "block";
+    $("#q").value = ""; $("#res").innerHTML = "";
+    await refrescar();
+  } catch (e) { avisar(e.message, "err"); }
+  finally { b.disabled = false; b.textContent = "Dar de alta y registrar asistencia"; }
 });
 
 $("#fLogin").addEventListener("submit", async (ev) => {
