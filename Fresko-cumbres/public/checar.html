@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Mi asistencia · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
+  -webkit-text-size-adjust:100%;min-height:100dvh;display:flex;flex-direction:column}
+header{background:var(--verde);color:#fff;padding:20px 18px 18px}
+.head-in{max-width:440px;margin:0 auto}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:23px;margin:0;letter-spacing:-.02em}
+.sub{margin:5px 0 0;color:#BFE6CB;font-size:14px}
+main{flex:1;width:100%;max-width:440px;margin:0 auto;padding:20px 18px 40px}
+label{display:block;font-weight:600;font-size:14.5px;margin:0 0 7px}
+input{width:100%;padding:16px;font:inherit;font-size:26px;font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700;text-align:center;letter-spacing:.1em;color:var(--tinta);background:var(--panel);
+  border:2px solid var(--linea-2);border-radius:var(--radio)}
+input::placeholder{font-size:16px;letter-spacing:0;font-weight:400;color:var(--tinta-3)}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+button{font:inherit;cursor:pointer;width:100%;border:none;border-radius:var(--radio);font-weight:700}
+.entrada{margin-top:14px;padding:20px;background:var(--verde);color:#fff;font-size:19px}
+.salida{margin-top:10px;padding:17px;background:transparent;color:var(--tinta);border:2px solid var(--linea-2);font-size:17px}
+.pos{margin-top:10px;padding:15px;background:var(--naranja);color:#fff;font-size:16px}
+button:disabled{opacity:.55;cursor:default}
+.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px;margin-bottom:16px}
+.hola{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:22px;margin:0}
+.folio-txt{font-size:13.5px;color:var(--tinta-3);margin:2px 0 0}
+.estado{display:grid;gap:8px;margin-top:14px}
+.est{display:flex;gap:10px;align-items:center;font-size:15px;padding:9px 12px;border-radius:10px;background:var(--arena)}
+.est b{font-variant-numeric:tabular-nums}
+.est.ok{background:#DCEFE2;color:#0B5D2E;font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .est.ok{background:#1C3227;color:#6FBF89}}
+.aviso{margin-top:14px;padding:15px;border-radius:var(--radio);font-size:15px;font-weight:600;display:none;line-height:1.45}
+.aviso.on{display:block}
+.aviso.err{background:#FAE5E0;color:var(--error)}
+.aviso.ok{background:#DCEFE2;color:#0B5D2E}
+.aviso.info{background:#FBEEDC;color:#8A3708}
+.nota{margin-top:22px;font-size:13px;color:var(--tinta-3);line-height:1.6;
+  border-top:1px solid var(--linea);padding-top:14px}
+.nota b{color:var(--tinta-2)}
+.cargando{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;animation:g .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes g{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cargando{animation:none}}
+</style>
+</head>
+<body>
+
+<header><div class="head-in">
+  <h1>Mi asistencia</h1>
+  <p class="sub">Activación Fresko Cumbres · 9 al 13 de septiembre</p>
+</div></header>
+
+<main>
+  <div id="paso1">
+    <div class="tarjeta">
+      <label for="folio">Escribe tu folio</label>
+      <input id="folio" type="text" inputmode="numeric" maxlength="4" placeholder="Ej. 014" autocomplete="off">
+      <button class="entrada" id="btnBuscar" type="button">Continuar</button>
+    </div>
+    <p class="nota">Es el número que te dieron al registrarte. Si no lo tienes, escríbele a Alberto al 55 6180 0423.</p>
+  </div>
+
+  <div id="paso2" style="display:none">
+    <div class="tarjeta">
+      <p class="hola" id="hola"></p>
+      <p class="folio-txt" id="folioTxt"></p>
+      <div class="estado" id="estado"></div>
+    </div>
+    <button class="entrada" id="btnEntrada" type="button">Marcar mi entrada</button>
+    <button class="pos"    id="btnPos"     type="button" style="display:none">Reportar dónde estoy</button>
+    <button class="salida" id="btnSalida"  type="button">Marcar mi salida</button>
+    <div class="aviso" id="aviso"></div>
+    <p class="nota">
+      <b>Sobre tu ubicación.</b> Al marcar entrada o salida, tu teléfono comparte dónde estás
+      en ese momento, solo para confirmar que estás en tu punto de trabajo. No se registra nada
+      fuera de esos momentos, ni cuando cierras esta página. Al terminar la activación estos
+      datos se borran. Puedes negar el permiso: la entrada queda registrada igual, pero marcada
+      como sin ubicación.
+    </p>
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+let FOLIO = null;
+
+const hora = (t) => t ? new Date(t).toLocaleTimeString("es-MX",
+  { timeZone:"America/Monterrey", hour:"2-digit", minute:"2-digit", hour12:true }) : "";
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
+  return d;
+}
+
+function avisar(txt, tipo) {
+  const a = $("#aviso");
+  a.innerHTML = txt; a.className = "aviso on " + (tipo || "ok");
+}
+
+// Ubicación: se pide solo al marcar, nunca de fondo. Si la niegan, seguimos sin ella.
+function ubicacion() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    const t = setTimeout(() => resolve(null), 12000);
+    navigator.geolocation.getCurrentPosition(
+      (p) => { clearTimeout(t); resolve({ lat:p.coords.latitude, lon:p.coords.longitude, precision_m:p.coords.accuracy }); },
+      () => { clearTimeout(t); resolve(null); },
+      { enableHighAccuracy:true, timeout:11000, maximumAge:0 }
+    );
+  });
+}
+
+async function pintarEstado() {
+  const d = await rpc("quien_soy", { p_folio: FOLIO });
+  if (!d.ok) { avisar("No encontré ese folio. Revísalo.", "err"); return false; }
+  $("#hola").textContent = `Hola, ${d.nombre}`;
+  $("#folioTxt").textContent = `Folio ${FOLIO}`;
+  const filas = [];
+  filas.push(d.entrada
+    ? `<div class="est ok">✓ Entrada marcada a las <b>${esc(hora(d.entrada))}</b></div>`
+    : `<div class="est">Todavía no marcas tu entrada de hoy</div>`);
+  if (d.salida) filas.push(`<div class="est ok">✓ Salida marcada a las <b>${esc(hora(d.salida))}</b></div>`);
+  $("#estado").innerHTML = filas.join("");
+  $("#btnEntrada").style.display = d.entrada ? "none" : "block";
+  $("#btnPos").style.display = (d.entrada && !d.salida) ? "block" : "none";
+  $("#btnSalida").style.display = (d.entrada && !d.salida) ? "block" : "none";
+  return true;
+}
+
+$("#btnBuscar").addEventListener("click", async () => {
+  const f = $("#folio").value.trim();
+  if (f.length < 2) return;
+  FOLIO = f;
+  const b = $("#btnBuscar"); b.disabled = true; b.textContent = "Buscando…";
+  try {
+    if (await pintarEstado()) {
+      $("#paso1").style.display = "none";
+      $("#paso2").style.display = "block";
+      try { localStorage.setItem("fresko_folio", FOLIO); } catch(e){}
+    } else { $("#paso1").style.display = "block"; }
+  } catch (e) { alert(e.message); }
+  finally { b.disabled = false; b.textContent = "Continuar"; }
+});
+$("#folio").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#btnBuscar").click(); });
+
+async function marcar(tipo, boton, etiqueta) {
+  boton.disabled = true;
+  const original = boton.textContent;
+  boton.innerHTML = `<span class="cargando"></span>Obteniendo ubicación…`;
+  const u = await ubicacion();
+  boton.innerHTML = `<span class="cargando"></span>Guardando…`;
+  try {
+    const d = await rpc("checar", { p: Object.assign({ folio: FOLIO, tipo }, u || {}) });
+    if (!d.ok) {
+      if (d.motivo === "FUERA_DE_PUNTO") {
+        avisar(`Estás a <b>${d.distancia_m} metros</b> de ${esc(d.punto)}.<br>
+                Acércate a tu punto y vuelve a intentar.`, "err");
+      } else if (d.motivo === "DADO_DE_BAJA") {
+        avisar("Tu folio ya no está activo. Habla con Alberto.", "err");
+      } else {
+        avisar("No encontré ese folio.", "err");
+      }
+      return;
+    }
+    if (d.repetido) {
+      avisar(`Ya tenías tu ${etiqueta} marcada a las <b>${esc(hora(d.momento))}</b>.`, "info");
+    } else if (d.sin_ubicacion) {
+      avisar(`✓ ${etiqueta} registrada, pero <b>sin ubicación</b>. Si puedes, activa el permiso.`, "info");
+    } else {
+      avisar(`✓ ${etiqueta} registrada. ¡Buen día!`, "ok");
+    }
+    await pintarEstado();
+  } catch (e) { avisar(e.message, "err"); }
+  finally { boton.disabled = false; boton.textContent = original; }
+}
+
+$("#btnEntrada").addEventListener("click", (e) => marcar("entrada", e.currentTarget, "Entrada"));
+$("#btnSalida").addEventListener("click",  (e) => marcar("salida",  e.currentTarget, "Salida"));
+$("#btnPos").addEventListener("click",     (e) => marcar("posicion",e.currentTarget, "Posición"));
+
+// Folio de la URL (?f=014) o el de la última vez, para no teclearlo cada día.
+(async () => {
+  const q = new URLSearchParams(location.search).get("f");
+  let guardado = null;
+  try { guardado = localStorage.getItem("fresko_folio"); } catch(e){}
+  const f = q || guardado;
+  if (!f) return;
+  $("#folio").value = f;
+  FOLIO = f;
+  try {
+    if (await pintarEstado()) { $("#paso1").style.display = "none"; $("#paso2").style.display = "block"; }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

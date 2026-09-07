@@ -139,6 +139,8 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
   <div class="wrap">
     <div class="tiles" id="tiles"></div>
 
+    <div id="secHoy"></div>
+
     <h3>Canales</h3>
     <p class="lede">De qué enlace llegó cada registro. <b>Precisión</b> es qué proporción llega con todos sus datos; <b>ritmo</b> es cuántos por hora desde el primer registro de ese canal.</p>
     <div class="tw"><table style="min-width:720px"><thead><tr>
@@ -227,17 +229,21 @@ async function traer(tabla, qs, token) {
 }
 
 async function cargar(sesion) {
-  const [candidatos, bonos, parametros] = await Promise.all([
+  const hoy = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Monterrey" }))
+    .toISOString().slice(0, 10);
+  const [candidatos, bonos, parametros, asistencia] = await Promise.all([
     traer("candidatos", "select=*&order=folio.asc", sesion.access_token),
     traer("bonos", "select=*", sesion.access_token),
-    traer("parametros", `select=*&campana=eq.${CAMPANA}`, sesion.access_token)
+    traer("parametros", `select=*&campana=eq.${CAMPANA}`, sesion.access_token),
+    traer("asistencia", `select=*&dia=eq.${hoy}&order=momento.desc`, sesion.access_token).catch(() => [])
   ]);
+  DATOS.asistencia = asistencia;
   if (!candidatos.length && !parametros.length) {
     const err = new Error("Tu cuenta existe pero todavía no tiene acceso al panel. Pídele a Alberto que te dé de alta.");
     err.sinAcceso = true;
     throw err;
   }
-  DATOS = { candidatos, bonos, parametros: parametros[0] || {}, email: sesion.email };
+  DATOS = { candidatos, bonos, parametros: parametros[0] || {}, asistencia, email: sesion.email };
   pintar();
   $("#acceso").style.display = "none";
   $("#panel").style.display = "block";
@@ -266,6 +272,41 @@ function pintar() {
     tile(activos.length, "Registrados") + tile(confirmados.length, "Confirmaron", "ok") +
     tile(faltan, "Faltan para la meta", "act") + tile(asistieron.length, "Asistieron el martes") +
     tile(huecos.length, "Datos incompletos", huecos.length ? "warn" : "") + tile(bajas.length, "Bajas");
+
+  /* ----- jornada de hoy: entradas, salidas y dónde están ----- */
+  const asis = DATOS.asistencia || [];
+  const nombreDe = Object.fromEntries(candidatos.map((c) => [c.folio, c.nombre]));
+  if (asis.length) {
+    const porFolio = {};
+    asis.forEach((a) => { (porFolio[a.folio] = porFolio[a.folio] || {})[a.tipo] = a; });
+    const filas = Object.entries(porFolio).sort((a,b) => a[0].localeCompare(b[0])).map(([folio, r]) => {
+      const e = r.entrada, s = r.salida, p = r.posicion || r.entrada;
+      const hh = (x) => x ? new Date(x.momento).toLocaleTimeString("es-MX",{timeZone:"America/Monterrey",hour:"2-digit",minute:"2-digit",hour12:true}) : dash;
+      const mapa = (p && p.lat)
+        ? `<a href="https://maps.google.com/?q=${p.lat},${p.lon}" target="_blank" rel="noopener"
+             style="color:var(--verde);font-weight:600">ver en mapa</a>
+           <span class="vacio" style="font-size:11.5px">±${Math.round(p.precision_m||0)} m</span>`
+        : `<span class="alerta">sin ubicación</span>`;
+      return `<tr>
+        <td class="mono folio">${esc(folio)}</td>
+        <td class="nom">${esc(nombreDe[folio] || "")}</td>
+        <td class="mono num">${hh(e)}</td>
+        <td class="mono num">${hh(s)}</td>
+        <td>${s ? '<span class="badge b-registrado">terminó</span>' : e ? '<span class="badge b-confirmado">en turno</span>' : dash}</td>
+        <td>${mapa}</td></tr>`;
+    }).join("");
+    const enTurno = Object.values(porFolio).filter((r) => r.entrada && !r.salida).length;
+    const conUbic = asis.filter((a) => a.lat).length;
+    $("#secHoy").innerHTML = `
+      <h3>Jornada de hoy <span style="font-weight:400;color:var(--tinta-3);font-size:14px">${enTurno} en turno</span></h3>
+      <p class="lede">Marcas de entrada y salida. La ubicación se toma solo en ese momento; ${conUbic} de ${asis.length} marcas la traen.</p>
+      <div class="tw"><table style="min-width:640px"><thead><tr>
+        <th style="width:56px">Folio</th><th>Nombre</th><th style="width:80px">Entrada</th>
+        <th style="width:80px">Salida</th><th style="width:100px">Estado</th><th style="width:140px">Dónde marcó</th>
+      </tr></thead><tbody>${filas}</tbody></table></div>`;
+  } else {
+    $("#secHoy").innerHTML = "";
+  }
 
   /* ----- canales ----- */
   const NOMBRE_CANAL = { fb:"Facebook", wa:"WhatsApp", tk:"TikTok", mmp:"Diana · MMP",
