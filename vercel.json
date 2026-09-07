@@ -2,6 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "Fresko-cumbres/public",
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "dash.fresko-cumbres.abdev.click" }],
+      "destination": "/api/dash"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
