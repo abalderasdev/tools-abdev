@@ -84,14 +84,26 @@ function error(titulo, texto) {
   if (inv.no_existe) return error("Invitación no encontrada",
     "Ese enlace no corresponde a ninguna invitación. Pídele a Alberto que te mande uno nuevo.");
   if (inv.usada) return error("Ya la usaste",
-    `Esta invitación ya se activó. Entra directo al panel con tu correo y contraseña en
-     <a href="/dash">el panel</a>.`);
+    `Esta invitación ya se activó. Entra con tu correo y contraseña en
+     <a href="${inv.rol === "admin" ? "/dash" : "/lista"}">${inv.rol === "admin" ? "el panel" : "pasar lista"}</a>.`);
   if (inv.vencida) return error("Invitación vencida",
     "Las invitaciones duran 7 días. Pídele a Alberto que te genere una nueva.");
 
+  const esAdmin = inv.rol === "admin";
+  const DESTINO = esAdmin ? "/dash" : "/lista";
+
   $("#caja").innerHTML = `
     <h1>Bienvenido${inv.nombre ? ", " + esc(inv.nombre.split(" ")[0]) : ""}</h1>
-    <p class="sub">Crea tu contraseña para entrar al panel de la activación.</p>
+    <p class="sub">Crea tu contraseña para entrar.</p>
+    <div class="permisos">
+      <b>Tu acceso</b>
+      ${esAdmin
+        ? `<ul><li>Panel completo de la activación</li><li>Asistencias, pagos y estados de cuenta</li>
+             <li>Pasar lista y ver los puestos del día</li><li>Invitar a más gente</li></ul>`
+        : `<ul><li>Pasar lista y dar de alta gente en el momento</li>
+             <li>Completar datos faltantes y tomar la foto de la INE</li>
+             <li>Armar los equipos y moverlos</li><li>Ver quién está en su puesto cada día</li></ul>`}
+    </div>
     <form id="f">
       <label for="correo">Tu correo</label>
       <input id="correo" type="email" value="${esc(inv.correo)}" disabled>
@@ -145,8 +157,8 @@ function error(titulo, texto) {
         throw new Error(motivos[r.motivo] || "No se pudo activar el acceso.");
       }
       m.className = "msg on ok";
-      m.innerHTML = "✓ Listo. Entrando al panel…";
-      setTimeout(() => { location.href = "/dash"; }, 1400);
+      m.innerHTML = esAdmin ? "✓ Listo. Entrando al panel…" : "✓ Listo. Entrando a pasar lista…";
+      setTimeout(() => { location.href = DESTINO; }, 1400);
     } catch (e) {
       m.className = "msg on err"; m.textContent = e.message;
       b.disabled = false; b.textContent = "Crear mi acceso";

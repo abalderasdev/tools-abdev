@@ -176,37 +176,35 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
   </div></div>
 
   <div class="wrap" id="vEquipo" style="display:none">
-    <h3>Dar acceso al panel</h3>
-    <p class="lede">Genera un enlace, mándaselo a la persona y ella crea su contraseña. Marca solo lo que necesite ver.</p>
+    <h3>Dar acceso</h3>
+    <p class="lede">Genera un enlace, mándaselo a la persona y ella crea su contraseña. Hay dos niveles, nada más.</p>
     <form class="card" id="fInvitar" style="max-width:520px">
       <label for="iNombre">Nombre</label>
       <input id="iNombre" type="text" autocomplete="off" required>
       <label for="iCorreo">Correo</label>
       <input id="iCorreo" type="email" autocomplete="off" required>
-      <p style="margin:16px 0 8px;font-weight:600;font-size:14.5px">¿A qué tiene acceso?</p>
+      <p style="margin:16px 0 8px;font-weight:600;font-size:14.5px">¿Qué nivel le toca?</p>
       <div class="permisos">
-        <label class="perm"><input type="checkbox" id="pCand" checked>
-          <span><b>Candidatos</b><br>Lista de registrados, tallas y datos de contacto</span></label>
-        <label class="perm"><input type="checkbox" id="pDin">
-          <span><b>Asistencias y dinero</b><br>Cuánto se debe pagar por día y estado de cuenta</span></label>
-        <label class="perm"><input type="checkbox" id="pLis">
-          <span><b>Pasar lista</b><br>Marcar asistencia y dar de alta gente en el momento</span></label>
-        <label class="perm"><input type="checkbox" id="pAdm">
-          <span><b>Administrador</b><br>Puede invitar y quitar acceso a otras personas</span></label>
+        <label class="perm"><input type="radio" name="rol" value="equipo" id="rEquipo" checked>
+          <span><b>Equipo</b><br>Pasa lista, da de alta gente, completa datos, toma la foto de INE,
+            arma los equipos y ve los puestos del día. No entra al dashboard.</span></label>
+        <label class="perm"><input type="radio" name="rol" value="admin" id="rAdmin">
+          <span><b>Administrador</b><br>Todo lo del equipo, más el dashboard completo: dinero,
+            estados de cuenta e invitar a otras personas.</span></label>
       </div>
       <button class="btn-inv" type="submit" id="btnInvitar">Generar enlace de acceso</button>
       <div class="aviso-inv" id="avisoInv"></div>
     </form>
 
     <h3>Quién tiene acceso</h3>
-    <div class="tw"><table style="min-width:640px"><thead><tr>
-      <th>Nombre</th><th>Correo</th><th style="width:90px">Candidatos</th><th style="width:80px">Dinero</th>
-      <th style="width:90px">Lista</th><th style="width:90px">Admin</th>
+    <div class="tw"><table style="min-width:460px"><thead><tr>
+      <th>Nombre</th><th>Correo</th><th style="width:140px">Nivel</th>
     </tr></thead><tbody id="filasEquipo"></tbody></table></div>
 
     <h3>Invitaciones enviadas</h3>
-    <div class="tw"><table style="min-width:560px"><thead><tr>
-      <th>Nombre</th><th>Correo</th><th style="width:100px">Estado</th><th>Enlace</th>
+    <div class="tw"><table style="min-width:660px"><thead><tr>
+      <th>Nombre</th><th>Correo</th><th style="width:140px">Nivel</th>
+      <th style="width:100px">Estado</th><th>Enlace</th>
     </tr></thead><tbody id="filasInv"></tbody></table></div>
   </div>
 
@@ -335,6 +333,20 @@ async function traer(tabla, qs, token) {
 }
 
 async function cargar(sesion) {
+  // Si todavía no hay ningún administrador, la primera persona que entra lo reclama.
+  // Es inofensivo cuando ya existe uno: devuelve YA_HAY_ADMIN y no cambia nada.
+  try { await rpcCon(sesion, "reclamar_primer_admin"); } catch (e) {}
+
+  try { PERMISOS = await rpcCon(sesion, "mis_permisos"); } catch (e) { PERMISOS = {}; }
+  if (!PERMISOS.rol) {
+    const err = new Error("Tu cuenta existe pero todavía no tiene acceso. Pídele a Alberto que te invite.");
+    err.sinAcceso = true; throw err;
+  }
+  if (!PERMISOS.admin) {
+    const err = new Error("Tu acceso es de equipo: entra por la pantalla de pasar lista.");
+    err.aLista = true; throw err;
+  }
+
   const hoy = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Monterrey" }))
     .toISOString().slice(0, 10);
   const [candidatos, bonos, parametros, asistencia] = await Promise.all([
@@ -343,26 +355,8 @@ async function cargar(sesion) {
     traer("parametros", `select=*&campana=eq.${CAMPANA}`, sesion.access_token),
     traer("asistencia", `select=*&dia=eq.${hoy}&order=momento.desc`, sesion.access_token).catch(() => [])
   ]);
-  DATOS.asistencia = asistencia;
-  if (!candidatos.length && !parametros.length) {
-    // ¿Es el primer administrador? Si no hay ninguno, puede reclamarlo aquí
-    // y evitarse el paso manual en el SQL de Supabase.
-    let puede = false;
-    try {
-      const p = await rpcCon(sesion, "reclamar_primer_admin");
-      puede = p && p.ok;
-    } catch (e) {}
-    if (puede) return cargar(sesion);
-    const err = new Error("Tu cuenta existe pero todavía no tiene acceso al panel. Pídele a Alberto que te invite desde la pestaña Equipo.");
-    err.sinAcceso = true;
-    throw err;
-  }
-  try { PERMISOS = await rpcCon(sesion, "mis_permisos"); } catch (e) { PERMISOS = {}; }
   DATOS = { candidatos, bonos, parametros: parametros[0] || {}, asistencia, email: sesion.email };
-  // Las pestañas se muestran según lo que la persona tenga permitido.
-  if (PERMISOS.admin)  $("#pesEquipo").style.display = "block";
-  if (!PERMISOS.dinero) document.querySelectorAll('.pes[data-v="dinero"], .pes[data-v="cuentas"]')
-    .forEach((b) => b.style.display = "none");
+  $("#pesEquipo").style.display = "block";
   pintar();
   $("#acceso").style.display = "none";
   $("#panel").style.display = "block";
@@ -623,7 +617,9 @@ function filtrarCuentas(t) {
 $("#qc").addEventListener("input", (e) => filtrarCuentas(e.target.value.trim()));
 
 /* ---------------- equipo ---------------- */
-const si = (b) => b ? '<span class="si">sí</span>' : '<span class="no">—</span>';
+const nivel = (r) => r === "admin"
+  ? '<span class="badge b-confirmado">Administrador</span>'
+  : '<span class="badge b-lista_espera">Equipo</span>';
 
 async function pintarEquipo() {
   const s = leerSesion();
@@ -635,9 +631,8 @@ async function pintarEquipo() {
   ]);
   $("#filasEquipo").innerHTML = gente.length ? gente.map((g) => `<tr>
     <td class="nom">${esc(g.nombre || "—")}</td><td>${esc(g.correo || "—")}</td>
-    <td class="num">${si(g.ver_candidatos)}</td><td class="num">${si(g.ver_dinero)}</td>
-    <td class="num">${si(g.pasar_lista)}</td><td class="num">${si(g.admin)}</td></tr>`).join("")
-    : `<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--tinta-3)">Solo tú por ahora.</td></tr>`;
+    <td>${nivel(g.rol)}</td></tr>`).join("")
+    : `<tr><td colspan="3" style="padding:20px;text-align:center;color:var(--tinta-3)">Solo tú por ahora.</td></tr>`;
 
   const liga = (t) => `${location.origin}/equipo?t=${t}`;
   $("#filasInv").innerHTML = invs.length ? invs.map((i) => {
@@ -645,9 +640,9 @@ async function pintarEquipo() {
       : (new Date(i.expira_en) <= new Date() ? '<span class="badge b-baja">vencida</span>'
       : '<span class="badge b-lista_espera">pendiente</span>');
     return `<tr><td class="nom">${esc(i.nombre || "—")}</td><td>${esc(i.correo)}</td>
-      <td>${estado}</td>
+      <td>${nivel(i.rol)}</td><td>${estado}</td>
       <td>${i.usada_en ? dash : `<span class="mono" style="font-size:11.5px;word-break:break-all">${esc(liga(i.token))}</span>`}</td></tr>`;
-  }).join("") : `<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--tinta-3)">Todavía no has invitado a nadie.</td></tr>`;
+  }).join("") : `<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--tinta-3)">Todavía no has invitado a nadie.</td></tr>`;
 }
 
 $("#fInvitar").addEventListener("submit", async (ev) => {
@@ -655,17 +650,17 @@ $("#fInvitar").addEventListener("submit", async (ev) => {
   const b = $("#btnInvitar"), a = $("#avisoInv");
   b.disabled = true; b.textContent = "Generando…";
   try {
+    const rol = $("#rAdmin").checked ? "admin" : "equipo";
     const d = await rpc("crear_invitacion", { p: {
-      nombre: $("#iNombre").value.trim(), correo: $("#iCorreo").value.trim().toLowerCase(),
-      ver_candidatos: $("#pCand").checked, ver_dinero: $("#pDin").checked,
-      pasar_lista: $("#pLis").checked, admin: $("#pAdm").checked
+      nombre: $("#iNombre").value.trim(), correo: $("#iCorreo").value.trim().toLowerCase(), rol
     }});
     const url = `${location.origin}/equipo?t=${d.token}`;
     a.className = "aviso-inv on";
-    a.innerHTML = `Enlace listo. Mándaselo a ${esc($("#iNombre").value.trim())}:<br><br>
+    a.innerHTML = `Enlace listo para ${esc($("#iNombre").value.trim())} como
+      <b>${rol === "admin" ? "administrador" : "equipo"}</b>:<br><br>
       <span class="mono">${esc(url)}</span><br><br>Vence en 7 días y solo funciona una vez.`;
     try { await navigator.clipboard.writeText(url); a.innerHTML += "<br>✓ Copiado al portapapeles."; } catch (e) {}
-    $("#fInvitar").reset(); $("#pCand").checked = true;
+    $("#fInvitar").reset(); $("#rEquipo").checked = true;
     await pintarEquipo();
   } catch (e) { a.className = "aviso-inv on err"; a.textContent = e.message; }
   finally { b.disabled = false; b.textContent = "Generar enlace de acceso"; }
@@ -695,6 +690,7 @@ $("#fLogin").addEventListener("submit", async (ev) => {
     guardarSesion(s);
     await cargar(s);
   } catch (e) {
+    if (e.aLista) { location.href = "/lista"; return; }
     if (e.sinAcceso) borrarSesion();
     msg.textContent = e.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : e.message;
     msg.classList.add("on");
@@ -715,7 +711,8 @@ $("#q").addEventListener("input", (e) => { busca = e.target.value.trim(); pintar
 (async () => {
   const s = leerSesion();
   if (!s) return;
-  try { await cargar(s); } catch (e) { borrarSesion(); }
+  try { await cargar(s); }
+  catch (e) { if (e.aLista) location.href = "/lista"; else borrarSesion(); }
 })();
 </script>
 </body>

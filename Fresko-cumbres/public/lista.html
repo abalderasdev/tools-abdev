@@ -19,11 +19,15 @@
   --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
   --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
 }}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--arena);color:var(--tinta);
   font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
   -webkit-text-size-adjust:100%}
-.wrap{max-width:520px;margin:0 auto;padding:0 16px 40px}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 48px}
 
 /* acceso */
 #acceso{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -32,9 +36,9 @@ body{margin:0;background:var(--arena);color:var(--tinta);
 .caja h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
 .caja .sub{margin:0 0 18px;color:var(--tinta-2);font-size:14px}
 label{display:block;font-weight:600;font-size:14.5px;margin:12px 0 6px}
-input{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+input,select{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
   border:1.5px solid var(--linea-2);border-radius:var(--radio)}
-input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+input:focus,select:focus{outline:2px solid var(--verde-2);outline-offset:1px}
 button{font:inherit;cursor:pointer}
 .principal{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;
   border-radius:var(--radio);font-weight:700;font-size:16.5px}
@@ -43,16 +47,17 @@ button{font:inherit;cursor:pointer}
 
 /* cabecera */
 #app{display:none}
-header{background:var(--verde);color:#fff;padding:16px;position:sticky;top:0;z-index:5}
+header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
 .head-in{max-width:520px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .marcador{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1;
   font-variant-numeric:tabular-nums}
 .marcador small{font-size:14px;font-weight:400;color:#BFE6CB}
 .h-tit{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFE6CB;font-weight:600}
-.salir{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
-  padding:6px 13px;font-size:13px;font-weight:600}
+.h-der{display:flex;gap:8px;align-items:center}
+.salir,.enlace{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:6px 13px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block}
 
-/* buscador grande */
+/* buscador */
 .buscador{margin-top:18px}
 #q{font-size:26px;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;text-align:center;
   letter-spacing:.08em;padding:16px;border-width:2px}
@@ -63,10 +68,12 @@ header{background:var(--verde);color:#fff;padding:16px;position:sticky;top:0;z-i
 .res{margin-top:14px;display:grid;gap:10px}
 .tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px 15px}
 .tarjeta.ya{border-color:var(--verde);background:color-mix(in srgb, var(--verde) 8%, var(--panel))}
-.fila1{display:flex;gap:12px;align-items:baseline;justify-content:space-between}
+.fila1{display:flex;gap:12px;align-items:center;justify-content:space-between}
 .folio{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;color:var(--verde);
   font-variant-numeric:tabular-nums;line-height:1}
-.nom{font-weight:700;font-size:16.5px;margin:4px 0 0}
+.eqTag{font-size:12.5px;font-weight:700;border-radius:99px;padding:4px 11px;color:#fff;white-space:nowrap}
+.eqTag.nada{background:transparent;color:var(--tinta-3);border:1.5px dashed var(--linea-2);font-weight:600}
+.nom{font-weight:700;font-size:16.5px;margin:5px 0 0}
 .datos{margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px}
 .dato{font-size:13px;background:var(--arena);border:1px solid var(--linea);border-radius:99px;padding:3px 10px}
 .dato.mal{background:#FAE5E0;border-color:#E9B4A8;color:var(--error);font-weight:700}
@@ -76,28 +83,61 @@ header{background:var(--verde);color:#fff;padding:16px;position:sticky;top:0;z-i
 .marca{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--verde);font-weight:700;font-size:15px}
 .vacio{padding:26px 10px;text-align:center;color:var(--tinta-3);font-size:15px}
 
+/* herramientas dentro de la tarjeta */
+.herr{margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);display:grid;gap:10px}
+.rotulo{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--tinta-3);font-weight:700;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta);border-radius:99px;
+  padding:8px 14px;font-size:14px;font-weight:600}
+.chip[aria-pressed="true"]{color:#fff;border-color:transparent}
+.mini{display:flex;gap:8px;flex-wrap:wrap}
+.mini button{flex:1;min-width:132px;padding:11px;border-radius:var(--radio);border:1.5px solid var(--linea-2);
+  background:var(--panel);color:var(--tinta);font-weight:600;font-size:14.5px}
+.mini button.hecho{border-color:var(--verde);color:var(--verde)}
+.editor{display:none;gap:10px;background:var(--arena);border:1px solid var(--linea);
+  border-radius:var(--radio);padding:13px}
+.editor.on{display:grid}
+.editor label{margin:0 0 4px}
+.editor input,.editor select{padding:11px;font-size:16px}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.guardar{background:var(--verde);color:#fff;border:none;border-radius:var(--radio);padding:12px;font-weight:700;font-size:15.5px}
+
 /* llegados */
 h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px}
 .llegados{display:grid;gap:6px}
-.lleg{display:flex;gap:10px;align-items:baseline;background:var(--panel);border:1px solid var(--linea);
+.lleg{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--linea);
   border-radius:10px;padding:9px 12px;font-size:14.5px}
 .lleg b{font-family:"Bricolage Grotesque",sans-serif;color:var(--verde);font-variant-numeric:tabular-nums}
-.lleg .hora{margin-left:auto;font-size:12.5px;color:var(--tinta-3);font-variant-numeric:tabular-nums}
+.lleg .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.punto{width:9px;height:9px;border-radius:99px;flex:none;background:var(--linea-2)}
+.lleg .hora{margin-left:auto;font-size:12.5px;color:var(--tinta-3);font-variant-numeric:tabular-nums;flex:none}
 .aviso{margin-top:10px;padding:12px 14px;border-radius:var(--radio);font-size:14px;font-weight:600;display:none}
 .aviso.on{display:block}
 .aviso.err{background:#FAE5E0;color:var(--error)}
 .aviso.ok{background:#DCEFE2;color:#0B5D2E}
-.nuevo{margin-top:12px;padding:13px;background:transparent;color:var(--verde);
+.nuevo{margin-top:12px;padding:13px;background:transparent;color:var(--verde);width:100%;
   border:2px dashed var(--linea-2);border-radius:var(--radio);font-weight:700;font-size:15.5px}
 .alta{margin-top:16px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px}
 .alta h3{font-family:"Bricolage Grotesque",sans-serif;font-size:18px;margin:0}
 .alta-sub{margin:4px 0 6px;font-size:13.5px;color:var(--tinta-2)}
 .alta input,.alta select{font-size:16px;padding:12px;text-align:left;letter-spacing:0;font-family:inherit;font-weight:400}
-.alta select{width:100%;border:1.5px solid var(--linea-2);border-radius:var(--radio);background:var(--panel);color:var(--tinta)}
-.dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .check{display:flex;gap:10px;align-items:center;margin-top:14px}
 .check input{width:22px;height:22px;accent-color:var(--verde);flex:none}
 .check label{margin:0;font-weight:400;font-size:15px}
+
+/* equipos */
+.eqPanel{margin-top:14px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
+  padding:6px 15px 15px}
+.eqPanel summary{cursor:pointer;padding:11px 0;font-weight:700;font-size:15.5px;list-style:none;
+  display:flex;justify-content:space-between;align-items:center}
+.eqPanel summary::-webkit-details-marker{display:none}
+.eqPanel summary::after{content:"▾";color:var(--tinta-3);font-size:13px}
+.eqPanel[open] summary::after{content:"▴"}
+.eqFila{display:flex;gap:9px;align-items:center;padding:8px 0;border-top:1px solid var(--linea)}
+.eqFila .clave{width:30px;height:30px;border-radius:9px;color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:15px;flex:none}
+.eqFila input{padding:9px 11px;font-size:15px}
+.eqFila .n{font-size:12.5px;color:var(--tinta-3);flex:none;font-variant-numeric:tabular-nums;min-width:18px;text-align:right}
 </style>
 </head>
 <body>
@@ -105,7 +145,7 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
 <div id="acceso">
   <form class="caja" id="fLogin">
     <h1>Pasar lista</h1>
-    <p class="sub">Capacitación · Fresko Cumbres</p>
+    <p class="sub">Activación Fresko Cumbres</p>
     <label for="email">Correo</label>
     <input type="email" id="email" autocomplete="username" required>
     <label for="pass">Contraseña</label>
@@ -121,7 +161,10 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
       <div class="h-tit">Han llegado</div>
       <div class="marcador"><span id="cont">0</span><small> de <span id="total">0</span></small></div>
     </div>
-    <button class="salir" id="btnSalir" type="button">Salir</button>
+    <div class="h-der">
+      <a class="enlace" href="/puestos">Puestos</a>
+      <button class="salir" id="btnSalir" type="button">Salir</button>
+    </div>
   </div></header>
 
   <div class="wrap">
@@ -148,6 +191,8 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
       </div>
       <label for="aColonia">Colonia</label>
       <input id="aColonia" type="text" autocomplete="off">
+      <label for="aEquipo">Equipo</label>
+      <select id="aEquipo"><option value="">Sin equipo por ahora</option></select>
       <label for="aRef">Folio de quien lo invitó <span style="font-weight:400;color:var(--tinta-3)">(opcional)</span></label>
       <input id="aRef" type="text" inputmode="numeric" maxlength="4" placeholder="Ej. 014">
       <div class="check"><input type="checkbox" id="aIne" checked>
@@ -156,10 +201,19 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
       <button class="acc deshacer" type="button" id="btnCancelar">Cancelar</button>
     </form>
 
+    <details class="eqPanel" id="eqPanel">
+      <summary>Equipos <span id="eqResumen" style="font-weight:400;color:var(--tinta-3);font-size:13px"></span></summary>
+      <p class="alta-sub" style="margin:2px 0 8px">Cada equipo escoge su nombre. Escríbelo aquí y se guarda al salir del campo.</p>
+      <div id="eqLista"></div>
+      <button class="nuevo" id="btnEqNuevo" type="button" style="margin-top:10px;padding:10px;font-size:14.5px">+ Agregar otro equipo</button>
+    </details>
+
     <h2>Ya registrados hoy <span id="contLleg" style="font-weight:400;color:var(--tinta-3)"></span></h2>
     <div class="llegados" id="llegados"></div>
   </div>
 </div>
+
+<input type="file" id="fotoIne" accept="image/*" capture="environment" style="display:none">
 
 <script>
 const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
@@ -168,7 +222,8 @@ const CLAVE = "fresko_lista_sesion";
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
-let SESION = null, TODOS = [];
+const sel = (id) => document.getElementById(id);
+let SESION = null, TODOS = [], EQUIPOS = [], ULTIMA = [];
 
 const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
 const leer = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
@@ -206,13 +261,58 @@ async function tabla(qs) {
 
 function avisar(txt, tipo) {
   const a = $("#aviso");
-  a.textContent = txt; a.className = "aviso on " + (tipo || "ok");
+  a.innerHTML = txt; a.className = "aviso on " + (tipo || "ok");
   clearTimeout(avisar._t);
-  avisar._t = setTimeout(() => a.classList.remove("on"), 3500);
+  avisar._t = setTimeout(() => a.classList.remove("on"), 4000);
 }
 
+const eqDe = (id) => EQUIPOS.find((e) => e.id === id) || null;
+
+/* ---------- equipos ---------- */
+async function cargarEquipos() {
+  EQUIPOS = await rpc("equipos_lista");
+  const s = $("#aEquipo"), antes = s.value;
+  s.innerHTML = `<option value="">Sin equipo por ahora</option>` +
+    EQUIPOS.map((e) => `<option value="${e.id}">${esc(e.nombre)}</option>`).join("");
+  s.value = antes;
+  $("#eqResumen").textContent = `· ${EQUIPOS.length}`;
+  $("#eqLista").innerHTML = EQUIPOS.map((e) => `
+    <div class="eqFila">
+      <span class="clave" style="background:${esc(e.color || "#5A6B60")}">${esc(e.clave)}</span>
+      <input data-eq="${e.id}" value="${esc(e.nombre)}" maxlength="28" aria-label="Nombre del equipo ${esc(e.clave)}">
+      <span class="n">${e.integrantes}</span>
+    </div>`).join("");
+}
+
+$("#eqLista").addEventListener("change", async (ev) => {
+  const i = ev.target.closest("[data-eq]");
+  if (!i) return;
+  const id = Number(i.dataset.eq), nombre = i.value.trim();
+  const antes = (eqDe(id) || {}).nombre || "";
+  if (!nombre || nombre === antes) { i.value = antes; return; }
+  try {
+    const d = await rpc("renombrar_equipo", { p: { id, nombre } });
+    if (!d.ok) {
+      avisar(d.motivo === "NOMBRE_INVALIDO" ? "El nombre debe tener entre 2 y 28 letras." : "No se pudo renombrar.", "err");
+      i.value = antes; return;
+    }
+    avisar(`✓ Ahora se llama <b>${esc(nombre)}</b>`, "ok");
+    await cargarEquipos(); await repintar(); await refrescar();
+  } catch (e) { avisar(e.message, "err"); i.value = antes; }
+});
+
+$("#btnEqNuevo").addEventListener("click", async () => {
+  try {
+    const d = await rpc("crear_equipo", { p: {} });
+    if (!d.ok) return avisar("No se pudo crear el equipo.", "err");
+    avisar(`✓ ${esc(d.nombre)} creado`, "ok");
+    await cargarEquipos();
+  } catch (e) { avisar(e.message, "err"); }
+});
+
+/* ---------- listado del día ---------- */
 async function refrescar() {
-  TODOS = await tabla("select=folio,nombre,talla_playera,tiene_ine,estatus,asistio_capacitacion,hora_registro_cita,referido_por_folio&estatus=neq.baja&order=folio.asc");
+  TODOS = await tabla("select=folio,nombre,estatus,asistio_capacitacion,hora_registro_cita,equipo_id&estatus=neq.baja&order=folio.asc");
   const llegados = TODOS.filter((c) => c.asistio_capacitacion);
   $("#cont").textContent = llegados.length;
   $("#total").textContent = TODOS.length;
@@ -222,62 +322,207 @@ async function refrescar() {
     const h = c.hora_registro_cita
       ? new Date(c.hora_registro_cita).toLocaleTimeString("es-MX",{timeZone:"America/Monterrey",hour:"2-digit",minute:"2-digit",hour12:true})
       : "";
-    return `<div class="lleg"><b>${esc(c.folio)}</b> ${esc(c.nombre)}<span class="hora">${esc(h)}</span></div>`;
+    const e = eqDe(c.equipo_id);
+    return `<div class="lleg"><span class="punto"${e ? ` style="background:${esc(e.color)}"` : ""}
+        title="${esc(e ? e.nombre : "Sin equipo")}"></span><b>${esc(c.folio)}</b>
+      <span class="nm">${esc(c.nombre)}</span><span class="hora">${esc(h)}</span></div>`;
   }).join("") : `<div class="vacio">Todavía no llega nadie.</div>`;
 }
 
+/* ---------- tarjetas ---------- */
+const ETIQ = { edad:"edad", talla:"talla", colonia:"colonia", equipo:"equipo", foto_ine:"foto de INE" };
+
 function pintarResultados(lista) {
-  if (!lista.length) { $("#res").innerHTML = `<div class="vacio">No encontré a nadie con eso.</div>`; return; }
-  $("#res").innerHTML = lista.map((c) => {
-    const problemas = [];
-    if (c.tiene_ine !== true) problemas.push(`<span class="dato mal">sin INE confirmada</span>`);
-    const datos = [
-      c.talla ? `<span class="dato">Talla ${esc(c.talla)}</span>` : `<span class="dato mal">sin talla</span>`,
-      c.edad ? `<span class="dato">${c.edad} años</span>` : "",
-      c.invitado_por ? `<span class="dato">Lo invitó ${esc(c.invitado_por)}</span>` : "",
-      ...problemas
-    ].filter(Boolean).join("");
-    return `<div class="tarjeta ${c.asistio ? "ya" : ""}" data-folio="${esc(c.folio)}">
-      <div class="fila1"><div class="folio">${esc(c.folio)}</div></div>
-      <div class="nom">${esc(c.nombre)}</div>
-      <div class="datos">${datos}</div>
-      ${c.asistio
-        ? `<div class="marca">✓ Ya registrado</div>
-           <button class="acc deshacer" data-quitar="${esc(c.folio)}" type="button">Deshacer</button>`
-        : `<button class="acc" data-marcar="${esc(c.folio)}" type="button">Registrar asistencia</button>`}
-    </div>`;
-  }).join("");
+  ULTIMA = lista || [];
+  if (!ULTIMA.length) { $("#res").innerHTML = `<div class="vacio">No encontré a nadie con eso.</div>`; return; }
+  $("#res").innerHTML = ULTIMA.map(tarjeta).join("");
+}
+async function repintar() {
+  const t = $("#q").value.trim();
+  if (t.length >= 2) pintarResultados(await rpc("buscar_candidato", { p_texto: t }));
 }
 
-let tBusca;
-$("#q").addEventListener("input", (e) => {
-  clearTimeout(tBusca);
-  const t = e.target.value.trim();
+function tarjeta(c) {
+  const e = eqDe(c.equipo_id);
+  const faltan = (c.faltan || []).filter((f) => f !== "equipo");
+  const datos = [
+    c.talla ? `<span class="dato">Talla ${esc(c.talla)}</span>` : "",
+    c.edad ? `<span class="dato">${c.edad} años</span>` : "",
+    c.colonia ? `<span class="dato">${esc(c.colonia)}</span>` : "",
+    c.invitado_por ? `<span class="dato">Lo invitó ${esc(c.invitado_por)}</span>` : "",
+    faltan.length ? `<span class="dato mal">falta ${esc(faltan.map((f) => ETIQ[f] || f).join(", "))}</span>` : ""
+  ].filter(Boolean).join("");
+
+  const chips = EQUIPOS.map((x) => `<button class="chip" type="button" data-eqset="${esc(c.folio)}" data-id="${x.id}"
+      aria-pressed="${x.id === c.equipo_id}"
+      ${x.id === c.equipo_id ? `style="background:${esc(x.color)}"` : ""}>${esc(x.nombre)}</button>`).join("") +
+    `<button class="chip" type="button" data-eqset="${esc(c.folio)}" data-id=""
+      aria-pressed="${!c.equipo_id}"${!c.equipo_id ? ` style="background:#5A6B60"` : ""}>Sin equipo</button>`;
+
+  const f = esc(c.folio);
+  const herr = !c.asistio ? "" : `
+    <div class="herr">
+      <div><div class="rotulo">Equipo</div><div class="chips">${chips}</div></div>
+      <div class="mini">
+        <button type="button" data-editar="${f}">Completar datos</button>
+        <button type="button" data-ine="${f}" class="${c.tiene_foto_ine ? "hecho" : ""}">${c.tiene_foto_ine ? "✓ INE guardada" : "📷 Foto de INE"}</button>
+      </div>
+      <div class="editor" id="ed-${f}">
+        <div class="dos">
+          <div><label for="ed-edad-${f}">Edad</label>
+            <input id="ed-edad-${f}" type="number" inputmode="numeric" min="15" max="80" value="${c.edad || ""}"></div>
+          <div><label for="ed-talla-${f}">Talla</label>
+            <select id="ed-talla-${f}">
+              ${["","CH","M","G","XG","XL"].map((t) => `<option value="${t}"${t === (c.talla||"") ? " selected" : ""}>${t || "—"}</option>`).join("")}
+            </select></div>
+        </div>
+        <div><label for="ed-col-${f}">Colonia</label>
+          <input id="ed-col-${f}" type="text" value="${esc(c.colonia || "")}"></div>
+        <div><label for="ed-tel-${f}">WhatsApp</label>
+          <input id="ed-tel-${f}" type="tel" inputmode="numeric" maxlength="14" value="${esc(c.telefono || "")}"></div>
+        <button class="guardar" type="button" data-guardar="${f}">Guardar datos</button>
+      </div>
+    </div>`;
+
+  return `<div class="tarjeta ${c.asistio ? "ya" : ""}" data-folio="${f}">
+    <div class="fila1">
+      <div class="folio">${f}</div>
+      <span class="eqTag ${e ? "" : "nada"}"${e ? ` style="background:${esc(e.color)}"` : ""}>${esc(e ? e.nombre : "sin equipo")}</span>
+    </div>
+    <div class="nom">${esc(c.nombre)}</div>
+    <div class="datos">${datos}</div>
+    ${c.asistio
+      ? `<div class="marca">✓ Ya registrado</div>${herr}
+         <button class="acc deshacer" data-quitar="${f}" type="button">Deshacer asistencia</button>`
+      : `<button class="acc" data-marcar="${f}" type="button">Registrar asistencia</button>`}
+  </div>`;
+}
+
+/* ---------- acciones ---------- */
+$("#q").addEventListener("input", (ev) => {
+  clearTimeout($("#q")._t);
+  const t = ev.target.value.trim();
   if (t.length < 2) { $("#res").innerHTML = ""; return; }
-  tBusca = setTimeout(async () => {
+  $("#q")._t = setTimeout(async () => {
     try { pintarResultados(await rpc("buscar_candidato", { p_texto: t })); }
     catch (err) { avisar(err.message, "err"); }
   }, 220);
 });
 
 $("#res").addEventListener("click", async (ev) => {
-  const bM = ev.target.closest("[data-marcar]"), bQ = ev.target.closest("[data-quitar]");
-  if (!bM && !bQ) return;
-  const folio = (bM || bQ).dataset.marcar || (bM || bQ).dataset.quitar;
-  const marcar = !!bM;
-  (bM || bQ).disabled = true;
-  try {
-    const d = await rpc("marcar_asistencia", { p_folio: folio, p_asistio: marcar });
-    if (!d.ok) { avisar(d.motivo === "NO_EXISTE" ? `No existe el folio ${folio}` : "No se pudo", "err"); return; }
-    avisar(marcar ? `✓ ${d.nombre} — registrado` : `Se quitó la asistencia de ${d.nombre}`, marcar ? "ok" : "err");
-    await refrescar();
-    pintarResultados(await rpc("buscar_candidato", { p_texto: $("#q").value.trim() }));
-    if (marcar) { $("#q").value = ""; $("#res").innerHTML = ""; $("#q").focus(); }
-  } catch (err) { avisar(err.message, "err"); }
-  finally { (bM || bQ).disabled = false; }
+  const b = ev.target.closest("button");
+  if (!b) return;
+  const d = b.dataset;
+
+  if (d.marcar || d.quitar) {
+    const folio = d.marcar || d.quitar, marcar = !!d.marcar;
+    b.disabled = true;
+    try {
+      const r = await rpc("marcar_asistencia", { p_folio: folio, p_asistio: marcar });
+      if (!r.ok) { avisar(r.motivo === "NO_EXISTE" ? `No existe el folio ${esc(folio)}` : "No se pudo", "err"); return; }
+      const falt = (r.faltan || []).map((x) => ETIQ[x] || x);
+      avisar(marcar
+        ? `✓ ${esc(r.nombre)} registrado${falt.length ? ` — falta ${esc(falt.join(", "))}` : ""}`
+        : `Se quitó la asistencia de ${esc(r.nombre)}`, marcar ? "ok" : "err");
+      await refrescar(); await cargarEquipos(); await repintar();
+    } catch (e) { avisar(e.message, "err"); }
+    finally { b.disabled = false; }
+    return;
+  }
+
+  if ("eqset" in d) {
+    b.disabled = true;
+    try {
+      const r = await rpc("asignar_equipo", { p: { folio: d.eqset, equipo_id: d.id || null } });
+      if (!r.ok) { avisar("No se pudo cambiar de equipo.", "err"); return; }
+      avisar(r.equipo ? `✓ ${esc(r.nombre)} → ${esc(r.equipo)}` : `${esc(r.nombre)} quedó sin equipo`, "ok");
+      await refrescar(); await cargarEquipos(); await repintar();
+    } catch (e) { avisar(e.message, "err"); }
+    finally { b.disabled = false; }
+    return;
+  }
+
+  if (d.editar) { const ed = sel("ed-" + d.editar); if (ed) ed.classList.toggle("on"); return; }
+
+  if (d.guardar) {
+    const f = d.guardar;
+    b.disabled = true; b.textContent = "Guardando…";
+    try {
+      const r = await rpc("completar_datos", { p: {
+        folio: f,
+        edad: sel("ed-edad-" + f).value,
+        talla: sel("ed-talla-" + f).value,
+        colonia: sel("ed-col-" + f).value,
+        telefono: sel("ed-tel-" + f).value
+      }});
+      if (!r.ok) {
+        const m = { EDAD_INVALIDA:"Esa edad no se ve bien.", TELEFONO_INVALIDO:"El teléfono necesita 10 dígitos.",
+                    NO_EXISTE:"Ese folio no existe." };
+        avisar(m[r.motivo] || "No se pudo guardar.", "err"); return;
+      }
+      const n = Object.keys(r.cambios || {}).length;
+      avisar(n ? `✓ Datos de ${esc(r.nombre)} actualizados` : "No había nada que cambiar", n ? "ok" : "err");
+      await repintar();
+    } catch (e) { avisar(e.message, "err"); }
+    finally { b.disabled = false; b.textContent = "Guardar datos"; }
+    return;
+  }
+
+  if (d.ine) pedirFoto(d.ine);
 });
 
-/* ---- alta en el momento ---- */
+/* ---------- foto de INE ---------- */
+let FOLIO_FOTO = null;
+function pedirFoto(folio) { FOLIO_FOTO = folio; $("#fotoIne").value = ""; $("#fotoIne").click(); }
+
+function encoger(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1400;
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      cv.toBlob((b) => b ? resolve(b) : reject(new Error("No se pudo procesar la foto")), "image/jpeg", 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("No se pudo leer la foto")); };
+    img.src = url;
+  });
+}
+
+$("#fotoIne").addEventListener("change", async (ev) => {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file || !FOLIO_FOTO) return;
+  const folio = FOLIO_FOTO; FOLIO_FOTO = null;
+  avisar("Subiendo la foto…", "ok");
+  try {
+    const blob = await encoger(file);
+    const path = `${folio}/${Date.now()}.jpg`;
+    const up = await fetch(`${SUPABASE_URL}/storage/v1/object/ine/${path}`, {
+      method:"POST",
+      headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"image/jpeg" },
+      body: blob
+    });
+    if (!up.ok) {
+      const t = await up.text();
+      throw new Error(up.status === 403
+        ? "No tienes permiso para subir fotos."
+        : `No se pudo subir (${up.status}) ${t.slice(0,80)}`);
+    }
+    const r = await rpc("registrar_ine", { p: { folio, path } });
+    if (!r.ok) {
+      const m = { NO_ASISTIO:"Primero márcale asistencia y luego toma la foto.", NO_EXISTE:"Ese folio no existe." };
+      avisar(m[r.motivo] || "No se pudo guardar la foto.", "err"); return;
+    }
+    avisar(`✓ INE de ${esc(r.nombre)} guardada`, "ok");
+    await repintar();
+  } catch (e) { avisar(e.message, "err"); }
+});
+
+/* ---------- alta en el momento ---------- */
 const alta = $("#alta");
 $("#btnNuevo").addEventListener("click", () => {
   alta.style.display = "block";
@@ -305,6 +550,7 @@ alta.addEventListener("submit", async (ev) => {
       colonia: $("#aColonia").value.trim() || null,
       tiene_ine: $("#aIne").checked,
       disponible_completa: true,
+      equipo_id: $("#aEquipo").value || null,
       referido_por_folio: $("#aRef").value.trim() || null
     }});
     if (!d || !d.folio) { avisar("No se pudo dar de alta.", "err"); return; }
@@ -313,12 +559,13 @@ alta.addEventListener("submit", async (ev) => {
       ? `Ya estaba registrado con folio <b>${esc(d.folio)}</b>. Asistencia marcada.`
       : `✓ Folio <b>${esc(d.folio)}</b> creado para ${esc(m.nombre || nombre)}. Asistencia marcada.`, "ok");
     alta.reset(); alta.style.display = "none"; $("#btnNuevo").style.display = "block";
-    $("#q").value = ""; $("#res").innerHTML = "";
-    await refrescar();
+    $("#q").value = d.folio;
+    await refrescar(); await cargarEquipos(); await repintar();
   } catch (e) { avisar(e.message, "err"); }
   finally { b.disabled = false; b.textContent = "Dar de alta y registrar asistencia"; }
 });
 
+/* ---------- sesión ---------- */
 $("#fLogin").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const b = $("#btnEntrar"), m = $("#msgLogin");
@@ -335,6 +582,8 @@ $("#fLogin").addEventListener("submit", async (ev) => {
 $("#btnSalir").addEventListener("click", () => { borrar(); location.reload(); });
 
 async function arrancar() {
+  try { await rpc("reclamar_primer_admin"); } catch (e) {}
+  await cargarEquipos();
   await refrescar();
   $("#acceso").style.display = "none";
   $("#app").style.display = "block";

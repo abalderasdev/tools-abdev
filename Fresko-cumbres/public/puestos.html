@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Puestos del día · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 48px}
+button{font:inherit;cursor:pointer}
+label{display:block;font-weight:600;font-size:14.5px;margin:12px 0 6px}
+input,select{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+  border:1.5px solid var(--linea-2);border-radius:var(--radio)}
+input:focus,select:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+
+#acceso{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
+.caja{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:26px 24px}
+.caja h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.caja .sub{margin:0 0 18px;color:var(--tinta-2);font-size:14px}
+.principal{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:16.5px}
+.msg{margin-top:12px;font-size:14px;font-weight:600;color:var(--error);display:none}
+.msg.on{display:block}
+
+#app{display:none}
+header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+.head-in{max-width:560px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.h-tit{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFE6CB;font-weight:600}
+.marcador{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1;
+  font-variant-numeric:tabular-nums}
+.marcador small{font-size:14px;font-weight:400;color:#BFE6CB}
+.h-der{display:flex;gap:8px;align-items:center}
+.salir,.enlace{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:6px 13px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block}
+
+.barra{display:flex;gap:10px;align-items:end;margin-top:16px}
+.barra > div{flex:1}
+.barra label{margin-top:0}
+.recargar{padding:13px 16px;border-radius:var(--radio);border:1.5px solid var(--linea-2);
+  background:var(--panel);color:var(--tinta);font-weight:600;white-space:nowrap}
+
+.tot{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.tot div{background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:11px 12px}
+.tot .n{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;line-height:1.1;
+  font-variant-numeric:tabular-nums}
+.tot .r{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-3);font-weight:700}
+.tot .falta .n{color:var(--error)}
+.tot .pres .n{color:var(--verde)}
+
+.equipo{margin-top:14px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
+  overflow:hidden}
+.eqCab{display:flex;align-items:center;gap:10px;padding:13px 15px;color:#fff}
+.eqCab h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:0;flex:1}
+.eqCab .cuenta{font-size:13.5px;font-weight:700;background:rgba(0,0,0,.22);border-radius:99px;padding:3px 11px;
+  font-variant-numeric:tabular-nums}
+.persona{display:flex;gap:11px;align-items:center;padding:11px 15px;border-top:1px solid var(--linea);font-size:15px}
+.persona b{font-family:"Bricolage Grotesque",sans-serif;color:var(--verde);font-variant-numeric:tabular-nums;flex:none}
+.persona .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.persona .est{font-size:12.5px;font-weight:700;border-radius:99px;padding:3px 10px;flex:none;
+  font-variant-numeric:tabular-nums}
+.est.si{background:#DCEFE2;color:#0B5D2E}
+.est.no{background:#FAE5E0;color:var(--error)}
+.persona.falto{background:color-mix(in srgb, var(--error) 4%, var(--panel))}
+.sup{font-size:13px;color:var(--tinta-2);padding:0 15px 11px 15px;margin-top:-4px}
+.sup b{color:var(--verde)}
+.btnSup{border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta);border-radius:99px;
+  padding:6px 12px;font-size:13px;font-weight:600;flex:none}
+.vacio{padding:22px 15px;text-align:center;color:var(--tinta-3);font-size:14.5px}
+
+dialog{border:none;border-radius:18px;padding:0;max-width:420px;width:calc(100% - 32px);
+  background:var(--panel);color:var(--tinta)}
+dialog::backdrop{background:rgba(10,20,14,.55)}
+.dlg{padding:22px}
+.dlg h3{font-family:"Bricolage Grotesque",sans-serif;font-size:19px;margin:0 0 4px}
+.dlg p{margin:0 0 12px;font-size:14px;color:var(--tinta-2)}
+.cand{display:grid;gap:7px;max-height:44vh;overflow:auto;margin-top:10px}
+.cand button{display:flex;gap:10px;align-items:center;text-align:left;width:100%;
+  border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta);
+  border-radius:12px;padding:11px 13px;font-size:14.5px}
+.cand button b{font-family:"Bricolage Grotesque",sans-serif;color:var(--verde);font-variant-numeric:tabular-nums}
+.cerrar{width:100%;margin-top:14px;padding:12px;border-radius:var(--radio);border:1.5px solid var(--linea-2);
+  background:transparent;color:var(--tinta-2);font-weight:600}
+.aviso{margin-top:12px;padding:12px 14px;border-radius:var(--radio);font-size:14px;font-weight:600;display:none}
+.aviso.on{display:block}
+.aviso.err{background:#FAE5E0;color:var(--error)}
+.aviso.ok{background:#DCEFE2;color:#0B5D2E}
+</style>
+</head>
+<body>
+
+<div id="acceso">
+  <form class="caja" id="fLogin">
+    <h1>Puestos del día</h1>
+    <p class="sub">Activación Fresko Cumbres</p>
+    <label for="email">Correo</label>
+    <input type="email" id="email" autocomplete="username" required>
+    <label for="pass">Contraseña</label>
+    <input type="password" id="pass" autocomplete="current-password" required>
+    <button class="principal" type="submit" id="btnEntrar">Entrar</button>
+    <p class="msg" id="msgLogin"></p>
+  </form>
+</div>
+
+<div id="app">
+  <header><div class="head-in">
+    <div>
+      <div class="h-tit">En su puesto</div>
+      <div class="marcador"><span id="nPres">0</span><small> de <span id="nPlant">0</span></small></div>
+    </div>
+    <div class="h-der">
+      <a class="enlace" href="/lista">Lista</a>
+      <button class="salir" id="btnSalir" type="button">Salir</button>
+    </div>
+  </div></header>
+
+  <div class="wrap">
+    <div class="barra">
+      <div><label for="dia">Día</label><input id="dia" type="date"></div>
+      <button class="recargar" id="btnRecargar" type="button">Actualizar</button>
+    </div>
+
+    <div class="tot">
+      <div class="pres"><div class="n" id="tPres">0</div><div class="r">Presentes</div></div>
+      <div class="falta"><div class="n" id="tFalta">0</div><div class="r">Faltaron</div></div>
+      <div><div class="n" id="tCub">0</div><div class="r">Cubiertos</div></div>
+    </div>
+
+    <div class="aviso" id="aviso"></div>
+    <div id="equipos"></div>
+  </div>
+</div>
+
+<dialog id="dlgSup">
+  <form class="dlg" method="dialog">
+    <h3 id="dTit">Suplir puesto</h3>
+    <p id="dSub"></p>
+    <label for="dQ">¿Quién lo cubre?</label>
+    <input id="dQ" type="text" inputmode="numeric" autocomplete="off" placeholder="Folio, nombre o teléfono">
+    <div class="cand" id="dCand"></div>
+    <button class="cerrar" type="submit" value="cancelar">Cancelar</button>
+  </form>
+</dialog>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const CLAVE = "fresko_lista_sesion";
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+let SESION = null, DATOS = null, AUSENTE = null;
+
+const hoyMty = () => new Date(new Date().toLocaleString("en-US", { timeZone:"America/Monterrey" }))
+  .toISOString().slice(0, 10);
+const hora = (t) => t ? new Date(t).toLocaleTimeString("es-MX",
+  { timeZone:"America/Monterrey", hour:"2-digit", minute:"2-digit", hour12:true }) : "";
+
+const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
+const leerSes = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
+  return (s && s.access_token && s.expira > Date.now()+30000) ? s : null; } catch(e){ return null; } };
+const borrar = () => { try { sessionStorage.removeItem(CLAVE); } catch(e){} };
+
+async function entrar(email, password) {
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error_description || d.msg || "No se pudo iniciar sesión");
+  return { access_token:d.access_token, expira: Date.now() + (d.expires_in||3600)*1000 };
+}
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
+  return d;
+}
+
+function avisar(txt, tipo) {
+  const a = $("#aviso");
+  a.innerHTML = txt; a.className = "aviso on " + (tipo || "ok");
+  clearTimeout(avisar._t);
+  avisar._t = setTimeout(() => a.classList.remove("on"), 4000);
+}
+
+function persona(p, color) {
+  const sup = p.suplido_por
+    ? `<div class="sup">Lo cubre <b>${esc(p.suplente || p.suplido_por)}</b> (folio ${esc(p.suplido_por)})</div>` : "";
+  const cubre = p.cubre_a
+    ? `<div class="sup">Está cubriendo a <b>${esc(p.cubre_a_nombre || p.cubre_a)}</b></div>` : "";
+  const boton = p.presente
+    ? `<span class="est si">${esc(hora(p.entrada))}</span>`
+    : `<span class="est no">faltó</span>
+       <button class="btnSup" type="button" data-sup="${esc(p.folio)}"
+               data-nombre="${esc(p.nombre)}">${p.suplido_por ? "Cambiar" : "Suplir"}</button>`;
+  return `<div class="persona ${p.presente ? "" : "falto"}">
+      <b>${esc(p.folio)}</b><span class="nm">${esc(p.nombre)}</span>${boton}
+    </div>${sup}${cubre}`;
+}
+
+function pintar(d) {
+  DATOS = d;
+  const t = d.totales || {};
+  $("#nPres").textContent = t.presentes || 0;
+  $("#nPlant").textContent = t.plantilla || 0;
+  $("#tPres").textContent = t.presentes || 0;
+  $("#tFalta").textContent = t.faltantes || 0;
+  $("#tCub").textContent = t.cubiertos || 0;
+
+  if (!t.plantilla) {
+    $("#equipos").innerHTML = `<div class="equipo"><div class="vacio">
+      Todavía no hay nadie con asistencia a la capacitación. En cuanto pases lista el martes,
+      aquí aparecen los equipos.</div></div>`;
+    return;
+  }
+
+  const equipos = (d.equipos || []).map((e) => `
+    <section class="equipo">
+      <div class="eqCab" style="background:${esc(e.color || "#5A6B60")}">
+        <h2>${esc(e.nombre)}</h2>
+        <span class="cuenta">${e.presentes}/${e.presentes + e.faltantes}</span>
+      </div>
+      ${(e.integrantes || []).length
+        ? e.integrantes.map((p) => persona(p, e.color)).join("")
+        : `<div class="vacio">Nadie asignado a este equipo todavía.</div>`}
+    </section>`).join("");
+
+  const sueltos = (d.sin_equipo || []).length ? `
+    <section class="equipo">
+      <div class="eqCab" style="background:#5A6B60">
+        <h2>Sin equipo</h2>
+        <span class="cuenta">${d.sin_equipo.filter((p) => p.presente).length}/${d.sin_equipo.length}</span>
+      </div>
+      ${d.sin_equipo.map((p) => persona(p)).join("")}
+    </section>` : "";
+
+  $("#equipos").innerHTML = equipos + sueltos;
+}
+
+async function cargar() {
+  const d = await rpc("estado_puestos", { p_dia: $("#dia").value || null });
+  pintar(d);
+}
+
+/* ---------- suplencias ---------- */
+$("#equipos").addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-sup]");
+  if (!b) return;
+  AUSENTE = { folio: b.dataset.sup, nombre: b.dataset.nombre };
+  $("#dTit").textContent = "Suplir a " + AUSENTE.nombre;
+  $("#dSub").textContent = `Folio ${AUSENTE.folio} · ${$("#dia").value}`;
+  $("#dQ").value = ""; $("#dCand").innerHTML = "";
+  $("#dlgSup").showModal();
+  setTimeout(() => $("#dQ").focus(), 60);
+});
+
+$("#dQ").addEventListener("input", (ev) => {
+  clearTimeout($("#dQ")._t);
+  const t = ev.target.value.trim();
+  if (t.length < 2) { $("#dCand").innerHTML = ""; return; }
+  $("#dQ")._t = setTimeout(async () => {
+    try {
+      const lista = (await rpc("buscar_candidato", { p_texto: t }))
+        .filter((c) => c.folio !== AUSENTE.folio);
+      $("#dCand").innerHTML = lista.length ? lista.map((c) => `
+        <button type="button" data-elige="${esc(c.folio)}" data-nombre="${esc(c.nombre)}">
+          <b>${esc(c.folio)}</b><span>${esc(c.nombre)}</span>
+        </button>`).join("") : `<div class="vacio">No encontré a nadie con eso.</div>`;
+    } catch (e) { $("#dCand").innerHTML = `<div class="vacio">${esc(e.message)}</div>`; }
+  }, 220);
+});
+
+$("#dCand").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("[data-elige]");
+  if (!b || !AUSENTE) return;
+  b.disabled = true;
+  try {
+    const r = await rpc("suplir_puesto", { p: {
+      dia: $("#dia").value || null,
+      folio_ausente: AUSENTE.folio,
+      folio_suplente: b.dataset.elige
+    }});
+    if (!r.ok) {
+      const m = { YA_LLEGO:"Esa persona sí llegó, ya no hace falta suplirla.",
+                  MISMO_FOLIO:"Es el mismo folio.", NO_EXISTE:"Uno de los folios no existe.",
+                  FOLIO_INVALIDO:"Folio inválido." };
+      avisar(m[r.motivo] || "No se pudo registrar la suplencia.", "err");
+    } else {
+      avisar(`✓ ${esc(r.suplente)} cubre a ${esc(r.ausente)}`, "ok");
+    }
+    $("#dlgSup").close();
+    await cargar();
+  } catch (e) { avisar(e.message, "err"); $("#dlgSup").close(); }
+  finally { b.disabled = false; }
+});
+
+/* ---------- sesión ---------- */
+$("#btnRecargar").addEventListener("click", () => cargar().catch((e) => avisar(e.message, "err")));
+$("#dia").addEventListener("change", () => cargar().catch((e) => avisar(e.message, "err")));
+$("#btnSalir").addEventListener("click", () => { borrar(); location.reload(); });
+
+$("#fLogin").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnEntrar"), m = $("#msgLogin");
+  b.disabled = true; b.textContent = "Entrando…"; m.classList.remove("on");
+  try {
+    SESION = await entrar($("#email").value.trim(), $("#pass").value);
+    guardar(SESION); await arrancar();
+  } catch (e) {
+    m.textContent = e.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : e.message;
+    m.classList.add("on");
+  } finally { b.disabled = false; b.textContent = "Entrar"; }
+});
+
+async function arrancar() {
+  if (!$("#dia").value) $("#dia").value = hoyMty();
+  await cargar();
+  $("#acceso").style.display = "none";
+  $("#app").style.display = "block";
+  setInterval(() => cargar().catch(()=>{}), 45000);
+}
+
+(async () => {
+  $("#dia").value = hoyMty();
+  const s = leerSes();
+  if (!s) return;
+  SESION = s;
+  try { await arrancar(); } catch (e) { borrar(); }
+})();
+</script>
+</body>
+</html>
