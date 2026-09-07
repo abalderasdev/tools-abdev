@@ -103,6 +103,22 @@ tr.baja{opacity:.5}
  :root:not([data-theme="light"]) .b-asistio_cita{background:#1C3227;color:#6FBF89}
  :root:not([data-theme="light"]) .b-registrado{background:#1B2833;color:#7FA8CC}
  :root:not([data-theme="light"]) .b-baja{background:#3A211B;color:#E2705A}}
+.pestanas-wrap{border-bottom:1px solid var(--linea);background:var(--panel);position:sticky;top:0;z-index:4}
+.pestanas{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto}
+.pes{background:none;border:none;border-bottom:3px solid transparent;padding:13px 14px;font:inherit;
+  font-weight:600;font-size:14.5px;color:var(--tinta-3);cursor:pointer;white-space:nowrap}
+.pes[aria-selected="true"]{color:var(--verde);border-bottom-color:var(--naranja)}
+.card.dia{cursor:pointer;transition:border-color .15s}
+.card.dia:hover,.card.dia[aria-expanded="true"]{border-color:var(--verde)}
+.card.dia .fecha{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-3);font-weight:700}
+.card.dia .cuantos{font-size:13.5px;color:var(--tinta-2);margin-top:4px}
+.tot-fila{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  background:var(--verde);color:#fff;border-radius:var(--radio);padding:15px 18px;margin-top:14px}
+.tot-fila .n{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:27px;font-variant-numeric:tabular-nums}
+td.dinero{text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13.5px}
+td.dinero.cero{color:var(--tinta-3)}
+td.total{text-align:right;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-variant-numeric:tabular-nums;color:var(--verde);font-size:14.5px}
 footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:var(--tinta-3);font-size:12.5px;line-height:1.6}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -136,7 +152,33 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
     </div>
   </div></header>
 
-  <div class="wrap">
+  <div class="pestanas-wrap"><div class="pestanas" role="tablist">
+    <button class="pes" data-v="reclutamiento" aria-selected="true" role="tab" type="button">Reclutamiento</button>
+    <button class="pes" data-v="dinero" aria-selected="false" role="tab" type="button">Asistencias y dinero</button>
+    <button class="pes" data-v="cuentas" aria-selected="false" role="tab" type="button">Estado de cuenta</button>
+  </div></div>
+
+  <div class="wrap" id="vDinero" style="display:none">
+    <h3>Lo que se debe pagar</h3>
+    <p class="lede">Cada tarjeta es un día. Tócala para ver quién estuvo y a qué hora.</p>
+    <div class="cards" id="cardsDias"></div>
+    <div id="detalleDia"></div>
+  </div>
+
+  <div class="wrap" id="vCuentas" style="display:none">
+    <h3>Estado de cuenta por persona</h3>
+    <p class="lede">Lo acumulado hasta hoy. La puntualidad solo entra al completar los 5 días.</p>
+    <div class="barra-busca">
+      <input type="search" id="qc" placeholder="Buscar por folio o nombre…" aria-label="Buscar persona">
+    </div>
+    <div class="tw"><table style="min-width:780px"><thead><tr>
+      <th style="width:56px">Folio</th><th>Nombre</th><th style="width:52px">Días</th>
+      <th style="width:90px">Jornadas</th><th style="width:90px">Capacitación</th>
+      <th style="width:90px">Referidos</th><th style="width:95px">Puntualidad</th><th style="width:95px">Total</th>
+    </tr></thead><tbody id="filasCuentas"></tbody></table></div>
+  </div>
+
+  <div class="wrap" id="vReclutamiento">
     <div class="tiles" id="tiles"></div>
 
     <div id="secHoy"></div>
@@ -407,6 +449,113 @@ function pintarTabla() {
       <td>${inv}</td><td class="notas">${c.notas_internas?esc(c.notas_internas):dash}</td></tr>`;
   }).join("") : `<tr><td colspan="10" style="padding:26px;text-align:center;color:var(--tinta-3)">Nadie coincide con esa búsqueda.</td></tr>`;
 }
+
+/* ---------------- pestañas: dinero y estado de cuenta ---------------- */
+async function rpc(fn, body) {
+  const s = leerSesion();
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
+  return d;
+}
+const fecha = (s) => new Date(s + "T12:00:00").toLocaleDateString("es-MX",
+  { weekday:"long", day:"numeric", month:"long" });
+
+async function pintarDinero() {
+  const d = await rpc("resumen_dias");
+  const c = d.capacitacion, js = d.jornadas || [];
+  const total = (c.total || 0) + js.reduce((s,j) => s + (j.total||0), 0);
+  const tarjeta = (id, titulo, sub, monto, extra) => `
+    <div class="card dia" data-dia="${id}" aria-expanded="false">
+      <div class="fecha">${esc(titulo)}</div>
+      <div class="big">${pesos(monto)}</div>
+      <div class="cuantos">${esc(sub)}</div>${extra||""}</div>`;
+  $("#cardsDias").innerHTML =
+    tarjeta("capacitacion", "Capacitación · martes 8",
+      `${c.asistieron} ${c.asistieron===1?"persona":"personas"} × ${pesos(c.monto_persona)}`, c.total) +
+    (js.length ? js.map((j) => tarjeta(j.dia, fecha(j.dia),
+      `${j.asistieron} ${j.asistieron===1?"persona":"personas"} × ${pesos(j.monto_persona)}` +
+      (j.con_salida < j.asistieron ? ` · ${j.asistieron-j.con_salida} sin salida` : ""),
+      j.total)).join("")
+     : `<div class="card"><div class="fecha">Jornadas</div>
+        <p style="margin:8px 0 0;color:var(--tinta-2);font-size:14px">
+        Todavía no hay días trabajados. Aparecerán aquí conforme la gente marque entrada.</p></div>`);
+  $("#cardsDias").insertAdjacentHTML("afterend", "");
+  const prev = document.querySelector(".tot-fila"); if (prev) prev.remove();
+  $("#cardsDias").insertAdjacentHTML("afterend",
+    `<div class="tot-fila"><span>Total comprometido hasta hoy<br>
+      <span style="font-size:13px;color:#BFE6CB">Sin contar puntualidad ni referidos, que se pagan al final</span></span>
+      <span class="n">${pesos(total)}</span></div>`);
+}
+
+$("#cardsDias").addEventListener("click", async (ev) => {
+  const card = ev.target.closest("[data-dia]");
+  if (!card) return;
+  const dia = card.dataset.dia;
+  const abierto = card.getAttribute("aria-expanded") === "true";
+  document.querySelectorAll("[data-dia]").forEach((x) => x.setAttribute("aria-expanded","false"));
+  if (abierto) { $("#detalleDia").innerHTML = ""; return; }
+  card.setAttribute("aria-expanded","true");
+  if (dia === "capacitacion") {
+    const l = DATOS.candidatos.filter((c) => c.asistio_capacitacion);
+    $("#detalleDia").innerHTML = `<h3>Quién asistió a la capacitación</h3>
+      <div class="tw"><table style="min-width:520px"><thead><tr>
+        <th style="width:56px">Folio</th><th>Nombre</th><th style="width:110px">Teléfono</th><th style="width:90px">Hora</th>
+      </tr></thead><tbody>${l.map((c) => `<tr><td class="mono folio">${esc(c.folio)}</td>
+        <td class="nom">${esc(c.nombre)}</td><td class="mono">${tel(c.telefono)}</td>
+        <td class="mono num">${c.hora_registro_cita ? esc(new Date(c.hora_registro_cita).toLocaleTimeString("es-MX",{timeZone:"America/Monterrey",hour:"2-digit",minute:"2-digit",hour12:true})) : dash}</td></tr>`).join("")}</tbody></table></div>`;
+    return;
+  }
+  const l = await rpc("detalle_dia", { p_dia: dia });
+  const hh = (t) => t ? new Date(t).toLocaleTimeString("es-MX",{timeZone:"America/Monterrey",hour:"2-digit",minute:"2-digit",hour12:true}) : dash;
+  $("#detalleDia").innerHTML = `<h3>${esc(fecha(dia))}</h3>
+    <div class="tw"><table style="min-width:620px"><thead><tr>
+      <th style="width:56px">Folio</th><th>Nombre</th><th style="width:80px">Entrada</th>
+      <th style="width:80px">Salida</th><th style="width:120px">Dónde marcó</th>
+    </tr></thead><tbody>${l.map((r) => `<tr>
+      <td class="mono folio">${esc(r.folio)}</td><td class="nom">${esc(r.nombre)}</td>
+      <td class="mono num">${esc(hh(r.entrada))}</td><td class="mono num">${esc(hh(r.salida))}</td>
+      <td>${r.lat ? `<a href="https://maps.google.com/?q=${r.lat},${r.lon}" target="_blank" rel="noopener" style="color:var(--verde);font-weight:600">mapa</a>` : `<span class="alerta">sin ubicación</span>`}</td>
+    </tr>`).join("")}</tbody></table></div>`;
+});
+
+let CUENTAS = [];
+async function pintarCuentas() {
+  const s = leerSesion();
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/v_estado_cuenta?select=*&order=folio.asc`, {
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}` }
+  });
+  CUENTAS = r.ok ? await r.json() : [];
+  filtrarCuentas("");
+}
+function filtrarCuentas(t) {
+  const q = t.toLowerCase();
+  const l = q ? CUENTAS.filter((c) => (c.folio+" "+c.nombre).toLowerCase().includes(q)) : CUENTAS;
+  const money = (n) => `<td class="dinero ${Number(n)?"":"cero"}">${Number(n) ? pesos(n) : "—"}</td>`;
+  $("#filasCuentas").innerHTML = l.length ? l.map((c) => `<tr>
+    <td class="mono folio">${esc(c.folio)}</td><td class="nom">${esc(c.nombre)}</td>
+    <td class="mono num">${c.dias_trabajados}</td>
+    ${money(c.por_jornadas)}${money(c.por_capacitacion)}${money(c.por_referidos)}${money(c.por_puntualidad)}
+    <td class="total">${pesos(c.total)}</td></tr>`).join("")
+    : `<tr><td colspan="8" style="padding:22px;text-align:center;color:var(--tinta-3)">Nadie coincide.</td></tr>`;
+}
+$("#qc").addEventListener("input", (e) => filtrarCuentas(e.target.value.trim()));
+
+document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", async () => {
+  document.querySelectorAll(".pes").forEach((x) => x.setAttribute("aria-selected", String(x===b)));
+  const v = b.dataset.v;
+  $("#vReclutamiento").style.display = v === "reclutamiento" ? "block" : "none";
+  $("#vDinero").style.display        = v === "dinero"        ? "block" : "none";
+  $("#vCuentas").style.display       = v === "cuentas"       ? "block" : "none";
+  try {
+    if (v === "dinero")  await pintarDinero();
+    if (v === "cuentas") await pintarCuentas();
+  } catch (e) { alert(e.message); }
+}));
 
 /* ---------------- eventos ---------------- */
 $("#fLogin").addEventListener("submit", async (ev) => {
