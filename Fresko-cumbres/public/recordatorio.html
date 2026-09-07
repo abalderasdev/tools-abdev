@@ -145,7 +145,7 @@ const PRUEBA = ["030", "031"];
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
-let SESION = null, GENTE = [], META = 70, VISTA = "pendientes";
+let SESION = null, GENTE = [], VISTA = "pendientes";
 
 const leerMarcas = () => { try { return JSON.parse(localStorage.getItem(MARCADAS) || "{}"); } catch(e){ return {}; } };
 const marcar = (k) => { try { const m = leerMarcas(); m[k] = Date.now(); localStorage.setItem(MARCADAS, JSON.stringify(m)); } catch(e){} };
@@ -195,7 +195,7 @@ function msgPendiente(c) {
     `Confírmame tu lugar aquí, es un solo clic 👇`,
     `${SITIO}/confirmo?f=${c.folio}`,
     ``,
-    `Son ${META} vacantes y ya vamos ${GENTE.length} registrados. En cuanto le des clic, tu lugar queda apartado.`,
+    `En cuanto le des clic, tu lugar queda apartado.`,
     ``,
     `— Alberto Balderas`
   );
@@ -302,10 +302,9 @@ document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", () 
 async function cargar() {
   const [gente, par] = await Promise.all([
     traer("v_confirmacion?select=folio,nombre,telefono,confirmo&order=folio.asc"),
-    traer("parametros?select=meta_folios&campana=eq.FRESKO-CUMBRES-SEP26").catch(() => [])
+    Promise.resolve([])
   ]);
   GENTE = gente.filter((c) => !PRUEBA.includes(c.folio));
-  if (par && par[0] && par[0].meta_folios) META = par[0].meta_folios;
   const conf = GENTE.filter((c) => c.confirmo).length;
   $("#nConf").textContent = conf;
   $("#nTot").textContent = GENTE.length;
