@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Registro · Activación Cumbres</title>
-<meta name="description" content="Regístrate para la activación en calle del 9 al 13 de septiembre en Cumbres, Monterrey. $400 por día, bono por capacitación y $50 por cada amigo que invites.">
+<meta name="description" content="Regístrate para la activación en calle del 9 al 13 de septiembre en Cumbres, Monterrey. $400 por día, $200 por la capacitación, $50 diarios de puntualidad y $50 por cada amigo que invites.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -108,6 +108,12 @@ button.enviar:disabled{opacity:.55;cursor:progress}
   line-height:1.1}
 .invita p{margin:0 0 16px;font-size:15.5px}
 .invita .acc{background:#fff;color:var(--naranja)}
+.invita .acc-2{width:100%;margin-top:9px;font:inherit;font-weight:700;font-size:16.5px;
+  background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.75);cursor:pointer}
+.invita .acc-2:active{background:rgba(255,255,255,.15)}
+.invita .copiado{display:none;margin:11px 0 0;font-size:15px;font-weight:700;text-align:center}
+.invita .copiado.on{display:block}
+.uniforme-nota{margin:10px 0 0;font-size:14.5px;color:#6C7A70}
 .espera{margin-top:18px;background:#FFE9D9;border:1.5px solid var(--naranja);color:#8A3708;
   padding:16px;border-radius:var(--radio);font-size:15px;display:none}
 .llevar{margin:22px 0 0;padding:18px;background:#fff;border-radius:var(--radio);
@@ -130,7 +136,8 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
     <p class="sub">Regístrate, recibe tu folio y te esperamos en la capacitación.</p>
     <div class="hechos">
       <span class="hecho pago">$400 por día</span>
-      <span class="hecho">Bono por capacitación</span>
+      <span class="hecho">$200 por la capacitación</span>
+      <span class="hecho">$50 diarios por puntualidad</span>
       <span class="hecho">$50 por cada amigo que invites</span>
       <span class="hecho">9 al 13 de sept · 9 a 3</span>
     </div>
@@ -240,6 +247,7 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
           <input type="radio" name="talla" id="s2" value="M" checked><label for="s2">M</label>
           <input type="radio" name="talla" id="s3" value="G"><label for="s3">G</label>
           <input type="radio" name="talla" id="s4" value="XG"><label for="s4">XG</label>
+          <input type="radio" name="talla" id="s5" value="XL"><label for="s5">XL</label>
         </div>
       </div>
 
@@ -254,7 +262,8 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
 
       <div class="nota-bono">
         La capacitación es el <b>martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres</b>.
-        Quien asiste se lleva el <b>bono de capacitación</b> ese mismo día.
+        Quien asiste se lleva <b>$200 ese mismo día</b>. El sueldo de cada jornada se paga
+        a la mañana siguiente, y los <b>$50 diarios de puntualidad</b> se entregan el último día.
       </div>
 
       <div class="campo" id="c-compromisos">
@@ -319,8 +328,13 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
 
     <div class="invita">
       <h4>Gana $50 por cada amigo que invites</h4>
-      <p>Comparte tu folio <b id="folioInvita">000</b>. Por cada persona que se registre con él <b>y llegue el martes</b>, te damos $50 extra.</p>
+      <p>Tu enlace ya lleva tu folio <b id="folioInvita">000</b>: quien se registre con él queda
+        ligado a ti solo. Por cada persona que llegue el martes, te damos <b>$50 extra</b>,
+        y se te pagan el último día. No tiene tope.</p>
       <a class="acc" id="waShare" href="#">Invitar por WhatsApp</a>
+      <button type="button" class="acc acc-2" id="shareRedes">Compartir en redes</button>
+      <button type="button" class="acc acc-2" id="copiarLiga">Copiar mi enlace</button>
+      <p class="copiado" id="copiado">Enlace copiado ✓</p>
     </div>
 
     <div class="llevar">
@@ -328,8 +342,9 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
       <ul>
         <li>INE original</li>
         <li>Tu folio (toma captura de esta pantalla)</li>
-        <li>Ropa cómoda y tenis</li>
+        <li>Pantalón de mezclilla azul y tenis</li>
       </ul>
+      <p class="uniforme-nota">La playera, la gorra y el mandil te los damos nosotros.</p>
     </div>
   </div>
 
@@ -467,11 +482,60 @@ function mostrarPase(d, nombre) {
     `Hola Alberto, soy ${nombre}. Me registré para la activación de Cumbres. Mi folio es ${folio} y confirmo la capacitación del martes 8 de septiembre a las 4 p.m. en Fresko Cumbres.`
   );
 
-  $("#waShare").href = "https://wa.me/?text=" + encodeURIComponent(
-    `¡Hay chamba! Activación en Cumbres del 9 al 13 de septiembre, de 9 a 3, $400 por día más bonos.\n\n` +
-    `Regístrate aquí: ${LIGA}?ref=${folio}\n\n` +
-    `Pon mi folio ${folio} cuando te pregunte quién te invitó. La cita es el martes 8 de septiembre a las 4 p.m. en Fresko Cumbres, con tu INE.`
-  );
+  const MI_LIGA = `${LIGA}?ref=${folio}`;
+  const INVITA =
+`Estoy trabajando en la activación de la inauguración del Fresko Cumbres y siguen contratando.
+
+Del 9 al 13 de septiembre, de 9:00 a 3:00 de la tarde.
+$400 por día, pagados a la mañana siguiente.
+$200 más por ir a la capacitación del martes.
+$50 diarios extra si no faltas ni llegas tarde.
+El uniforme lo pone la empresa.
+
+Solo piden ser mayor de edad, INE vigente y poder los 5 días. No se necesita experiencia.
+
+Regístrate aquí y te dan tu folio al momento:
+${MI_LIGA}
+
+La cita es el martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres, Av. Paseo de los Leones 1261, con tu INE original.`;
+
+  $("#waShare").href = "https://wa.me/?text=" + encodeURIComponent(INVITA);
+
+  const $copiado = $("#copiado");
+  const avisarCopiado = (txt) => {
+    $copiado.textContent = txt;
+    $copiado.classList.add("on");
+    setTimeout(() => $copiado.classList.remove("on"), 2600);
+  };
+
+  const btnRedes = $("#shareRedes");
+  if (navigator.share) {
+    btnRedes.addEventListener("click", async () => {
+      try {
+        await navigator.share({ title: "Activación Fresko Cumbres", text: INVITA, url: MI_LIGA });
+      } catch (e) { /* el usuario canceló: no hay nada que hacer */ }
+    });
+  } else {
+    // Escritorio sin API de compartir: el botón copia el mensaje completo
+    btnRedes.textContent = "Copiar mensaje para redes";
+    btnRedes.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(INVITA);
+        avisarCopiado("Mensaje copiado ✓ pégalo en Facebook, Instagram o donde quieras");
+      } catch (e) {
+        avisarCopiado("No se pudo copiar. Selecciona el enlace de arriba a mano.");
+      }
+    });
+  }
+
+  $("#copiarLiga").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(MI_LIGA);
+      avisarCopiado("Enlace copiado ✓");
+    } catch (e) {
+      avisarCopiado(MI_LIGA);
+    }
+  });
 
   $("#calLink").href =
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
