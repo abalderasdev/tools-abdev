@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Pasar lista · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 40px}
+
+/* acceso */
+#acceso{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
+.caja{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:26px 24px}
+.caja h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.caja .sub{margin:0 0 18px;color:var(--tinta-2);font-size:14px}
+label{display:block;font-weight:600;font-size:14.5px;margin:12px 0 6px}
+input{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+  border:1.5px solid var(--linea-2);border-radius:var(--radio)}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+button{font:inherit;cursor:pointer}
+.principal{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:16.5px}
+.msg{margin-top:12px;font-size:14px;font-weight:600;color:var(--error);display:none}
+.msg.on{display:block}
+
+/* cabecera */
+#app{display:none}
+header{background:var(--verde);color:#fff;padding:16px;position:sticky;top:0;z-index:5}
+.head-in{max-width:520px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.marcador{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1;
+  font-variant-numeric:tabular-nums}
+.marcador small{font-size:14px;font-weight:400;color:#BFE6CB}
+.h-tit{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFE6CB;font-weight:600}
+.salir{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:6px 13px;font-size:13px;font-weight:600}
+
+/* buscador grande */
+.buscador{margin-top:18px}
+#q{font-size:26px;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;text-align:center;
+  letter-spacing:.08em;padding:16px;border-width:2px}
+#q::placeholder{font-size:17px;letter-spacing:0;font-weight:400;color:var(--tinta-3)}
+.pista{margin:8px 0 0;font-size:13px;color:var(--tinta-3);text-align:center}
+
+/* resultados */
+.res{margin-top:14px;display:grid;gap:10px}
+.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px 15px}
+.tarjeta.ya{border-color:var(--verde);background:color-mix(in srgb, var(--verde) 8%, var(--panel))}
+.fila1{display:flex;gap:12px;align-items:baseline;justify-content:space-between}
+.folio{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;color:var(--verde);
+  font-variant-numeric:tabular-nums;line-height:1}
+.nom{font-weight:700;font-size:16.5px;margin:4px 0 0}
+.datos{margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.dato{font-size:13px;background:var(--arena);border:1px solid var(--linea);border-radius:99px;padding:3px 10px}
+.dato.mal{background:#FAE5E0;border-color:#E9B4A8;color:var(--error);font-weight:700}
+.acc{width:100%;margin-top:12px;padding:15px;border:none;border-radius:var(--radio);
+  font-weight:700;font-size:17px;background:var(--naranja);color:#fff}
+.acc.deshacer{background:transparent;color:var(--tinta-2);border:1.5px solid var(--linea-2);font-size:15px;padding:11px}
+.marca{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--verde);font-weight:700;font-size:15px}
+.vacio{padding:26px 10px;text-align:center;color:var(--tinta-3);font-size:15px}
+
+/* llegados */
+h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px}
+.llegados{display:grid;gap:6px}
+.lleg{display:flex;gap:10px;align-items:baseline;background:var(--panel);border:1px solid var(--linea);
+  border-radius:10px;padding:9px 12px;font-size:14.5px}
+.lleg b{font-family:"Bricolage Grotesque",sans-serif;color:var(--verde);font-variant-numeric:tabular-nums}
+.lleg .hora{margin-left:auto;font-size:12.5px;color:var(--tinta-3);font-variant-numeric:tabular-nums}
+.aviso{margin-top:10px;padding:12px 14px;border-radius:var(--radio);font-size:14px;font-weight:600;display:none}
+.aviso.on{display:block}
+.aviso.err{background:#FAE5E0;color:var(--error)}
+.aviso.ok{background:#DCEFE2;color:#0B5D2E}
+</style>
+</head>
+<body>
+
+<div id="acceso">
+  <form class="caja" id="fLogin">
+    <h1>Pasar lista</h1>
+    <p class="sub">Capacitación · Fresko Cumbres</p>
+    <label for="email">Correo</label>
+    <input type="email" id="email" autocomplete="username" required>
+    <label for="pass">Contraseña</label>
+    <input type="password" id="pass" autocomplete="current-password" required>
+    <button class="principal" type="submit" id="btnEntrar">Entrar</button>
+    <p class="msg" id="msgLogin"></p>
+  </form>
+</div>
+
+<div id="app">
+  <header><div class="head-in">
+    <div>
+      <div class="h-tit">Han llegado</div>
+      <div class="marcador"><span id="cont">0</span><small> de <span id="total">0</span></small></div>
+    </div>
+    <button class="salir" id="btnSalir" type="button">Salir</button>
+  </div></header>
+
+  <div class="wrap">
+    <div class="buscador">
+      <input id="q" type="text" inputmode="numeric" autocomplete="off"
+             placeholder="Folio, nombre o teléfono" aria-label="Buscar por folio, nombre o teléfono">
+      <p class="pista">Escribe los 3 dígitos del folio. Si no lo trae, busca por nombre.</p>
+    </div>
+    <div class="aviso" id="aviso"></div>
+    <div class="res" id="res"></div>
+
+    <h2>Ya registrados hoy <span id="contLleg" style="font-weight:400;color:var(--tinta-3)"></span></h2>
+    <div class="llegados" id="llegados"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const CLAVE = "fresko_lista_sesion";
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+let SESION = null, TODOS = [];
+
+const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
+const leer = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
+  return (s && s.access_token && s.expira > Date.now()+30000) ? s : null; } catch(e){ return null; } };
+const borrar = () => { try { sessionStorage.removeItem(CLAVE); } catch(e){} };
+
+async function entrar(email, password) {
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error_description || d.msg || "No se pudo iniciar sesión");
+  return { access_token:d.access_token, expira: Date.now() + (d.expires_in||3600)*1000 };
+}
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
+  return d;
+}
+
+async function tabla(qs) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/candidatos?${qs}`, {
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}` }
+  });
+  if (!r.ok) throw new Error(`candidatos ${r.status}`);
+  return r.json();
+}
+
+function avisar(txt, tipo) {
+  const a = $("#aviso");
+  a.textContent = txt; a.className = "aviso on " + (tipo || "ok");
+  clearTimeout(avisar._t);
+  avisar._t = setTimeout(() => a.classList.remove("on"), 3500);
+}
+
+async function refrescar() {
+  TODOS = await tabla("select=folio,nombre,talla_playera,tiene_ine,estatus,asistio_capacitacion,hora_registro_cita,referido_por_folio&estatus=neq.baja&order=folio.asc");
+  const llegados = TODOS.filter((c) => c.asistio_capacitacion);
+  $("#cont").textContent = llegados.length;
+  $("#total").textContent = TODOS.length;
+  $("#contLleg").textContent = llegados.length ? `· ${llegados.length}` : "";
+  llegados.sort((a,b) => new Date(b.hora_registro_cita||0) - new Date(a.hora_registro_cita||0));
+  $("#llegados").innerHTML = llegados.length ? llegados.map((c) => {
+    const h = c.hora_registro_cita
+      ? new Date(c.hora_registro_cita).toLocaleTimeString("es-MX",{timeZone:"America/Monterrey",hour:"2-digit",minute:"2-digit",hour12:true})
+      : "";
+    return `<div class="lleg"><b>${esc(c.folio)}</b> ${esc(c.nombre)}<span class="hora">${esc(h)}</span></div>`;
+  }).join("") : `<div class="vacio">Todavía no llega nadie.</div>`;
+}
+
+function pintarResultados(lista) {
+  if (!lista.length) { $("#res").innerHTML = `<div class="vacio">No encontré a nadie con eso.</div>`; return; }
+  $("#res").innerHTML = lista.map((c) => {
+    const problemas = [];
+    if (c.tiene_ine !== true) problemas.push(`<span class="dato mal">sin INE confirmada</span>`);
+    const datos = [
+      c.talla ? `<span class="dato">Talla ${esc(c.talla)}</span>` : `<span class="dato mal">sin talla</span>`,
+      c.edad ? `<span class="dato">${c.edad} años</span>` : "",
+      c.invitado_por ? `<span class="dato">Lo invitó ${esc(c.invitado_por)}</span>` : "",
+      ...problemas
+    ].filter(Boolean).join("");
+    return `<div class="tarjeta ${c.asistio ? "ya" : ""}" data-folio="${esc(c.folio)}">
+      <div class="fila1"><div class="folio">${esc(c.folio)}</div></div>
+      <div class="nom">${esc(c.nombre)}</div>
+      <div class="datos">${datos}</div>
+      ${c.asistio
+        ? `<div class="marca">✓ Ya registrado</div>
+           <button class="acc deshacer" data-quitar="${esc(c.folio)}" type="button">Deshacer</button>`
+        : `<button class="acc" data-marcar="${esc(c.folio)}" type="button">Registrar asistencia</button>`}
+    </div>`;
+  }).join("");
+}
+
+let tBusca;
+$("#q").addEventListener("input", (e) => {
+  clearTimeout(tBusca);
+  const t = e.target.value.trim();
+  if (t.length < 2) { $("#res").innerHTML = ""; return; }
+  tBusca = setTimeout(async () => {
+    try { pintarResultados(await rpc("buscar_candidato", { p_texto: t })); }
+    catch (err) { avisar(err.message, "err"); }
+  }, 220);
+});
+
+$("#res").addEventListener("click", async (ev) => {
+  const bM = ev.target.closest("[data-marcar]"), bQ = ev.target.closest("[data-quitar]");
+  if (!bM && !bQ) return;
+  const folio = (bM || bQ).dataset.marcar || (bM || bQ).dataset.quitar;
+  const marcar = !!bM;
+  (bM || bQ).disabled = true;
+  try {
+    const d = await rpc("marcar_asistencia", { p_folio: folio, p_asistio: marcar });
+    if (!d.ok) { avisar(d.motivo === "NO_EXISTE" ? `No existe el folio ${folio}` : "No se pudo", "err"); return; }
+    avisar(marcar ? `✓ ${d.nombre} — registrado` : `Se quitó la asistencia de ${d.nombre}`, marcar ? "ok" : "err");
+    await refrescar();
+    pintarResultados(await rpc("buscar_candidato", { p_texto: $("#q").value.trim() }));
+    if (marcar) { $("#q").value = ""; $("#res").innerHTML = ""; $("#q").focus(); }
+  } catch (err) { avisar(err.message, "err"); }
+  finally { (bM || bQ).disabled = false; }
+});
+
+$("#fLogin").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnEntrar"), m = $("#msgLogin");
+  b.disabled = true; b.textContent = "Entrando…"; m.classList.remove("on");
+  try {
+    SESION = await entrar($("#email").value.trim(), $("#pass").value);
+    guardar(SESION); await arrancar();
+  } catch (e) {
+    m.textContent = e.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : e.message;
+    m.classList.add("on");
+  } finally { b.disabled = false; b.textContent = "Entrar"; }
+});
+
+$("#btnSalir").addEventListener("click", () => { borrar(); location.reload(); });
+
+async function arrancar() {
+  await refrescar();
+  $("#acceso").style.display = "none";
+  $("#app").style.display = "block";
+  $("#q").focus();
+  setInterval(() => refrescar().catch(()=>{}), 30000);
+}
+
+(async () => {
+  const s = leer();
+  if (!s) return;
+  SESION = s;
+  try { await arrancar(); } catch (e) { borrar(); }
+})();
+</script>
+</body>
+</html>
