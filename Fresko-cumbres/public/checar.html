@@ -55,6 +55,24 @@ button:disabled{opacity:.55;cursor:default}
 .nota{margin-top:22px;font-size:13px;color:var(--tinta-3);line-height:1.6;
   border-top:1px solid var(--linea);padding-top:14px}
 .nota b{color:var(--tinta-2)}
+.cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.otro{width:auto;background:transparent;color:var(--tinta-2);border:1.5px solid var(--linea-2);
+  border-radius:99px;padding:7px 14px;font-size:13.5px;font-weight:600;flex:none}
+.avance h3{font-family:"Bricolage Grotesque",sans-serif;font-size:16px;margin:0 0 3px}
+.avance .lede{margin:0 0 14px;font-size:13.5px;color:var(--tinta-2)}
+.gran{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:34px;line-height:1;
+  color:var(--verde);font-variant-numeric:tabular-nums}
+.gran small{font-size:14px;font-weight:400;color:var(--tinta-3);font-family:"Archivo",sans-serif}
+.dias{display:flex;gap:7px;margin:16px 0 6px}
+.dia{flex:1;text-align:center;padding:9px 2px;border-radius:10px;background:var(--arena);
+  border:1.5px solid var(--linea);font-size:12px;font-weight:700;color:var(--tinta-3)}
+.dia.hecho{background:var(--verde);border-color:var(--verde);color:#fff}
+.barra{height:10px;background:var(--linea);border-radius:99px;overflow:hidden;margin-top:12px}
+.barra i{display:block;height:100%;background:var(--naranja);border-radius:99px;transition:width .6s}
+.linea{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px dashed var(--linea);font-size:14.5px}
+.linea:first-of-type{border-top:none}
+.linea b{font-variant-numeric:tabular-nums}
+.linea .gris{color:var(--tinta-3)}
 .cargando{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);
   border-top-color:#fff;border-radius:50%;animation:g .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes g{to{transform:rotate(360deg)}}
@@ -75,15 +93,22 @@ button:disabled{opacity:.55;cursor:default}
       <input id="folio" type="text" inputmode="numeric" maxlength="4" placeholder="Ej. 014" autocomplete="off">
       <button class="entrada" id="btnBuscar" type="button">Continuar</button>
     </div>
-    <p class="nota">Es el número que te dieron al registrarte. Si no lo tienes, escríbele a Alberto al 55 6180 0423.</p>
+    <p class="nota">Es el número que te dieron al registrarte. Si no lo tienes, escríbele a Alberto al 55 6180 0423.<br><br>
+      <b>¿Un compañero no trae celular?</b> Puede checar desde este mismo teléfono: cuando termines, toca
+      «No soy yo» y escribe su folio. Cada quien marca desde donde esté parado, así que tiene que estar
+      contigo en el punto.</p>
   </div>
 
   <div id="paso2" style="display:none">
     <div class="tarjeta">
-      <p class="hola" id="hola"></p>
-      <p class="folio-txt" id="folioTxt"></p>
+      <div class="cab"><div>
+        <p class="hola" id="hola"></p>
+        <p class="folio-txt" id="folioTxt"></p>
+      </div><button class="otro" id="btnOtro" type="button">No soy yo</button></div>
       <div class="estado" id="estado"></div>
     </div>
+
+    <div class="tarjeta avance" id="avance"></div>
     <button class="entrada" id="btnEntrada" type="button">Marcar mi entrada</button>
     <button class="pos"    id="btnPos"     type="button" style="display:none">Reportar dónde estoy</button>
     <button class="salida" id="btnSalida"  type="button">Marcar mi salida</button>
@@ -151,7 +176,40 @@ async function pintarEstado() {
   $("#btnEntrada").style.display = d.entrada ? "none" : "block";
   $("#btnPos").style.display = (d.entrada && !d.salida) ? "block" : "none";
   $("#btnSalida").style.display = (d.entrada && !d.salida) ? "block" : "none";
+  pintarAvance(d);
   return true;
+}
+
+const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-MX");
+
+function pintarAvance(d) {
+  const dias = d.dias_trabajados || 0;
+  const puntTotal = d.bono_puntualidad_total || 0;
+  const puntPend = d.puntualidad_pendiente || 0;
+  const pct = puntTotal ? Math.round((puntPend / puntTotal) * 100) : 0;
+  const cuadros = [1,2,3,4,5].map((i) =>
+    `<div class="dia ${i <= dias ? "hecho" : ""}">${i <= dias ? "✓" : "D" + i}</div>`).join("");
+
+  const lineas = [];
+  if (d.asistio_capacitacion) lineas.push(`<div class="linea"><span>Capacitación</span><b>${pesos(d.bono_capacitacion)}</b></div>`);
+  if (dias) lineas.push(`<div class="linea"><span>${dias} ${dias===1?"día":"días"} trabajados</span><b>${pesos((d.pago_por_dia||0)*dias)}</b></div>`);
+  if (d.invitados) {
+    lineas.push(`<div class="linea"><span>Invitaste a ${d.invitados}${d.invitados_que_llegaron < d.invitados ? ` <span class="gris">(${d.invitados_que_llegaron} ya llegaron)</span>` : ""}</span><b>${pesos((d.bono_referido||0)*d.invitados_que_llegaron)}</b></div>`);
+  }
+  lineas.push(`<div class="linea"><span class="gris">Puntualidad, si completas los 5 días</span><b class="gris">${pesos(puntTotal)}</b></div>`);
+
+  $("#avance").innerHTML = `
+    <h3>Tu avance</h3>
+    <p class="lede">Llevas ganado hasta hoy</p>
+    <div class="gran">${pesos(d.ganado)}</div>
+    <div class="dias">${cuadros}</div>
+    <p class="lede" style="margin:2px 0 0;font-size:13px">
+      ${dias >= 5
+        ? `¡Completaste los 5 días! Se te suman <b>${pesos(puntTotal)}</b> de puntualidad.`
+        : `Llevas <b>${pesos(puntPend)}</b> de puntualidad. Si asistes los 5 días completos se te entregan <b>${pesos(puntTotal)}</b> el último día.`}
+    </p>
+    <div class="barra"><i style="width:${pct}%"></i></div>
+    <div style="margin-top:14px">${lineas.join("")}</div>`;
 }
 
 $("#btnBuscar").addEventListener("click", async () => {
@@ -200,6 +258,17 @@ async function marcar(tipo, boton, etiqueta) {
   } catch (e) { avisar(e.message, "err"); }
   finally { boton.disabled = false; boton.textContent = original; }
 }
+
+// Teléfono compartido: quien no trae celular checa desde el de un compañero.
+$("#btnOtro").addEventListener("click", () => {
+  try { localStorage.removeItem("fresko_folio"); } catch(e){}
+  FOLIO = null;
+  $("#folio").value = "";
+  $("#aviso").className = "aviso";
+  $("#paso2").style.display = "none";
+  $("#paso1").style.display = "block";
+  $("#folio").focus();
+});
 
 $("#btnEntrada").addEventListener("click", (e) => marcar("entrada", e.currentTarget, "Entrada"));
 $("#btnSalida").addEventListener("click",  (e) => marcar("salida",  e.currentTarget, "Salida"));
