@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Recordatorios de la cita · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --lima:#A8DC1E; --naranja:#F2681F; --wa:#25D366;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 48px}
+button,a.btn{font:inherit;cursor:pointer;text-decoration:none}
+label{display:block;font-weight:600;font-size:14.5px;margin:12px 0 6px}
+input{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+  border:1.5px solid var(--linea-2);border-radius:var(--radio)}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+
+#acceso{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
+.caja{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:26px 24px}
+.caja h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.caja .sub{margin:0 0 18px;color:var(--tinta-2);font-size:14px}
+.principal{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:16.5px}
+.msg{margin-top:12px;font-size:14px;font-weight:600;color:var(--error);display:none}
+.msg.on{display:block}
+
+#app{display:none}
+header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+.head-in{max-width:560px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.h-tit{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFE6CB;font-weight:600}
+.marcador{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1;
+  font-variant-numeric:tabular-nums}
+.marcador small{font-size:14px;font-weight:400;color:#BFE6CB}
+.h-der{display:flex;gap:8px;align-items:center}
+.salir,.enlace{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:6px 13px;font-size:13px;font-weight:600;display:inline-block}
+
+.pestanas{display:flex;gap:6px;margin-top:16px;overflow-x:auto;padding-bottom:2px}
+.pes{background:var(--panel);border:1.5px solid var(--linea-2);color:var(--tinta-2);border-radius:99px;
+  padding:9px 15px;font-weight:600;font-size:14px;white-space:nowrap}
+.pes[aria-selected="true"]{background:var(--verde);border-color:var(--verde);color:#fff}
+.pes .n{font-variant-numeric:tabular-nums}
+
+.explica{margin:14px 0 0;padding:13px 15px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:var(--radio);font-size:14px;color:var(--tinta-2);line-height:1.55}
+.explica b{color:var(--tinta)}
+
+.lista{margin-top:12px;display:grid;gap:9px}
+.fila{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:12px 14px}
+.fila.hecho{border-color:var(--verde);background:color-mix(in srgb, var(--verde) 7%, var(--panel))}
+.f1{display:flex;gap:11px;align-items:center}
+.folio{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px;color:var(--verde);
+  font-variant-numeric:tabular-nums;flex:none;min-width:34px}
+.nm{flex:1;font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tel{font-size:12.5px;color:var(--tinta-3);font-variant-numeric:tabular-nums;flex:none}
+.acciones{display:flex;gap:7px;margin-top:10px}
+.acciones a,.acciones button{flex:1;text-align:center;padding:10px;border-radius:10px;font-weight:700;
+  font-size:14px;border:none}
+.b-wa{background:var(--wa);color:#0A2E17}
+.b-ref{background:transparent;color:var(--verde);border:1.5px solid var(--linea-2)!important}
+.marcada{margin-top:8px;font-size:13px;color:var(--verde);font-weight:700;display:none}
+.fila.hecho .marcada{display:block}
+.vacio{padding:30px 14px;text-align:center;color:var(--tinta-3);font-size:15px;
+  background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio)}
+.aviso{margin-top:12px;padding:12px 14px;border-radius:var(--radio);font-size:14px;font-weight:600;display:none}
+.aviso.on{display:block}
+.aviso.err{background:#FAE5E0;color:var(--error)}
+.aviso.ok{background:#DCEFE2;color:#0B5D2E}
+.pie{margin-top:18px;font-size:12.5px;color:var(--tinta-3);line-height:1.6}
+</style>
+</head>
+<body>
+
+<div id="acceso">
+  <form class="caja" id="fLogin">
+    <h1>Recordatorios</h1>
+    <p class="sub">Activación Fresko Cumbres</p>
+    <label for="email">Correo</label>
+    <input type="email" id="email" autocomplete="username" required>
+    <label for="pass">Contraseña</label>
+    <input type="password" id="pass" autocomplete="current-password" required>
+    <button class="principal" type="submit" id="btnEntrar">Entrar</button>
+    <p class="msg" id="msgLogin"></p>
+  </form>
+</div>
+
+<div id="app">
+  <header><div class="head-in">
+    <div>
+      <div class="h-tit">Confirmados</div>
+      <div class="marcador"><span id="nConf">0</span><small> de <span id="nTot">0</span></small></div>
+    </div>
+    <div class="h-der">
+      <a class="enlace" href="/lista">Lista</a>
+      <button class="salir" id="btnSalir" type="button">Salir</button>
+    </div>
+  </div></header>
+
+  <div class="wrap">
+    <div class="pestanas">
+      <button class="pes" data-v="pendientes" aria-selected="true" type="button">
+        Por confirmar <span class="n" id="cPend"></span></button>
+      <button class="pes" data-v="confirmados" aria-selected="false" type="button">
+        Ya confirmaron <span class="n" id="cConf"></span></button>
+      <button class="pes" data-v="referidos" aria-selected="false" type="button">
+        Mandar su enlace</button>
+    </div>
+
+    <p class="explica" id="explica"></p>
+    <div class="aviso" id="aviso"></div>
+    <div class="lista" id="lista"></div>
+    <p class="pie">Cada botón abre WhatsApp con el mensaje ya escrito. Tú le das enviar.
+      La fila se marca en verde cuando ya la abriste, para que no repitas.</p>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const CLAVE = "fresko_lista_sesion";
+const MARCADAS = "fresko_recordatorio_enviados";
+const SITIO = "https://fresko-cumbres.abdev.click";
+const MAPA = "https://maps.app.goo.gl/mzTuCMgBJn88jzTW6";
+const PRUEBA = ["030", "031"];
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+let SESION = null, GENTE = [], META = 70, VISTA = "pendientes";
+
+const leerMarcas = () => { try { return JSON.parse(localStorage.getItem(MARCADAS) || "{}"); } catch(e){ return {}; } };
+const marcar = (k) => { try { const m = leerMarcas(); m[k] = Date.now(); localStorage.setItem(MARCADAS, JSON.stringify(m)); } catch(e){} };
+
+const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
+const leerSes = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
+  return (s && s.access_token && s.expira > Date.now()+30000) ? s : null; } catch(e){ return null; } };
+const borrar = () => { try { sessionStorage.removeItem(CLAVE); } catch(e){} };
+
+async function entrar(email, password) {
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error_description || d.msg || "No se pudo iniciar sesión");
+  return { access_token:d.access_token, expira: Date.now() + (d.expires_in||3600)*1000 };
+}
+
+async function traer(qs) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${qs}`, {
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}` }
+  });
+  if (!r.ok) throw new Error(`No se pudo leer la lista (${r.status})`);
+  return r.json();
+}
+
+function avisar(txt, tipo) {
+  const a = $("#aviso");
+  a.textContent = txt; a.className = "aviso on " + (tipo || "ok");
+  clearTimeout(avisar._t);
+  avisar._t = setTimeout(() => a.classList.remove("on"), 4000);
+}
+
+/* ---------- los tres mensajes ---------- */
+const pila = (...l) => l.filter((x) => x !== null).join("\n");
+const nombrePila = (n) => String(n || "").trim().split(/\s+/)[0] || "";
+
+function msgPendiente(c) {
+  return pila(
+    `¡Hola ${nombrePila(c.nombre)}! Te recuerdo tu cita de mañana 👇`,
+    ``,
+    `🗓️ Martes 8 de septiembre, 4:00 p.m.`,
+    `📍 Fresko Cumbres — Av. Paseo de los Leones 1261, Cumbres Mediterráneo`,
+    `🪪 Tu INE original y tu folio ${c.folio}`,
+    ``,
+    `Confírmame tu lugar aquí, es un solo clic 👇`,
+    `${SITIO}/confirmo?f=${c.folio}`,
+    ``,
+    `Son ${META} vacantes y ya vamos ${GENTE.length} registrados. En cuanto le des clic, tu lugar queda apartado.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
+function msgConfirmado(c) {
+  return pila(
+    `¡Hola ${nombrePila(c.nombre)}! Ya te tenemos considerado ✅ Mañana te esperamos.`,
+    ``,
+    `🗓️ Martes 8 de septiembre, 4:00 p.m.`,
+    `📍 Fresko Cumbres — Av. Paseo de los Leones 1261, Cumbres Mediterráneo`,
+    MAPA,
+    `🪪 Lleva tu INE original y tu folio ${c.folio}`,
+    `👖 Pantalón de mezclilla azul y tenis — playera, gorra y mandil los ponemos nosotros`,
+    ``,
+    `Si te vas en camión: Ruta 40, esquina Pedro Infante y Leones.`,
+    ``,
+    `Ese mismo día te pagamos $200 por asistir a la capacitación. ¡Nos vemos!`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
+function msgReferido(c) {
+  return pila(
+    `¡Hola ${nombrePila(c.nombre)}! Todavía tenemos lugares y quiero que le saques provecho 🙌`,
+    ``,
+    `Este es TU enlace personal 👇`,
+    `${SITIO}/?ref=${c.folio}`,
+    ``,
+    `Compártelo por WhatsApp, Facebook, TikTok, donde quieras. Quien se registre por ahí queda ligado a tu folio ${c.folio} y te pagamos $50 por cada persona que además llegue a la capacitación.`,
+    ``,
+    `Ese bono se te entrega el último día, junto con tu pago. Entre más compartas, más ganas.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
+const wa = (tel, texto) =>
+  `https://wa.me/52${String(tel||"").replace(/\D/g,"").slice(-10)}?text=${encodeURIComponent(texto)}`;
+
+/* ---------- pintar ---------- */
+const TEXTOS = {
+  pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
+  confirmados: "Estas ya confirmaron. El mensaje les dice que <b>ya las tienes consideradas</b> y les repite la hora, el lugar y qué llevar.",
+  referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no."
+};
+
+function pintar() {
+  $("#explica").innerHTML = TEXTOS[VISTA];
+  const marcas = leerMarcas();
+  let l;
+  if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
+  else if (VISTA === "confirmados") l = GENTE.filter((c) => c.confirmo);
+  else l = GENTE;
+
+  if (!l.length) {
+    $("#lista").innerHTML = `<div class="vacio">${
+      VISTA === "pendientes" ? "¡Ya confirmaron todos! 🎉" : "Todavía nadie por aquí."}</div>`;
+    return;
+  }
+
+  $("#lista").innerHTML = l.map((c) => {
+    const texto = VISTA === "pendientes" ? msgPendiente(c)
+                : VISTA === "confirmados" ? msgConfirmado(c) : msgReferido(c);
+    const clave = `${VISTA}:${c.folio}`;
+    return `<div class="fila ${marcas[clave] ? "hecho" : ""}" data-clave="${esc(clave)}">
+      <div class="f1">
+        <span class="folio">${esc(c.folio)}</span>
+        <span class="nm">${esc(c.nombre)}</span>
+        <span class="tel">${esc(c.telefono)}</span>
+      </div>
+      <div class="acciones">
+        <a class="b-wa" href="${esc(wa(c.telefono, texto))}" target="_blank" rel="noopener"
+           data-abrir="${esc(clave)}">Abrir en WhatsApp</a>
+        <button class="b-ref" type="button" data-copiar="${esc(clave)}">Copiar</button>
+      </div>
+      <div class="marcada">✓ Ya lo abriste</div>
+    </div>`;
+  }).join("");
+}
+
+$("#lista").addEventListener("click", async (ev) => {
+  const a = ev.target.closest("[data-abrir]");
+  if (a) { marcar(a.dataset.abrir); a.closest(".fila").classList.add("hecho"); return; }
+
+  const b = ev.target.closest("[data-copiar]");
+  if (!b) return;
+  const folio = b.dataset.copiar.split(":")[1];
+  const c = GENTE.find((x) => x.folio === folio);
+  if (!c) return;
+  const texto = VISTA === "pendientes" ? msgPendiente(c)
+              : VISTA === "confirmados" ? msgConfirmado(c) : msgReferido(c);
+  try { await navigator.clipboard.writeText(texto); avisar(`Mensaje de ${c.folio} copiado ✓`, "ok"); }
+  catch (e) { avisar("No se pudo copiar en este navegador.", "err"); }
+});
+
+document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".pes").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  VISTA = b.dataset.v;
+  pintar();
+}));
+
+async function cargar() {
+  const [gente, par] = await Promise.all([
+    traer("v_confirmacion?select=folio,nombre,telefono,confirmo&order=folio.asc"),
+    traer("parametros?select=meta_folios&campana=eq.FRESKO-CUMBRES-SEP26").catch(() => [])
+  ]);
+  GENTE = gente.filter((c) => !PRUEBA.includes(c.folio));
+  if (par && par[0] && par[0].meta_folios) META = par[0].meta_folios;
+  const conf = GENTE.filter((c) => c.confirmo).length;
+  $("#nConf").textContent = conf;
+  $("#nTot").textContent = GENTE.length;
+  $("#cConf").textContent = conf;
+  $("#cPend").textContent = GENTE.length - conf;
+  pintar();
+}
+
+$("#fLogin").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnEntrar"), m = $("#msgLogin");
+  b.disabled = true; b.textContent = "Entrando…"; m.classList.remove("on");
+  try {
+    SESION = await entrar($("#email").value.trim(), $("#pass").value);
+    guardar(SESION); await arrancar();
+  } catch (e) {
+    m.textContent = e.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : e.message;
+    m.classList.add("on");
+  } finally { b.disabled = false; b.textContent = "Entrar"; }
+});
+
+$("#btnSalir").addEventListener("click", () => { borrar(); location.reload(); });
+
+async function arrancar() {
+  await cargar();
+  $("#acceso").style.display = "none";
+  $("#app").style.display = "block";
+}
+
+(async () => {
+  const s = leerSes();
+  if (!s) return;
+  SESION = s;
+  try { await arrancar(); } catch (e) { borrar(); }
+})();
+</script>
+</body>
+</html>
