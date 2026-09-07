@@ -55,3 +55,26 @@ create or replace view v_confirmacion as
    where estatus <> 'baja';
 
 alter view v_confirmacion set (security_invoker = on);
+
+-- Abrir el enlace ya NO confirma: primero se lee la cita (sin escribir) y la
+-- persona tiene que tocar el botón. Si alguien abre el enlace por error o
+-- curiosidad, no queda confirmado a nombre de otro.
+create or replace function public.ver_cita(p jsonb) returns jsonb
+language plpgsql stable security definer set search_path to 'public' as $fn$
+declare v_f text := normalizar_folio(p->>'folio'); v_c record;
+begin
+  if v_f is null then return jsonb_build_object('ok', false, 'motivo','FOLIO_INVALIDO'); end if;
+  select * into v_c from candidatos where folio = v_f;
+  if v_c.folio is null then return jsonb_build_object('ok', false, 'motivo','NO_EXISTE'); end if;
+  if v_c.estatus = 'baja' then return jsonb_build_object('ok', false, 'motivo','DADO_DE_BAJA'); end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'ya_estaba', v_c.confirmo_en is not null,
+    'folio', v_f,
+    'nombre', split_part(v_c.nombre, ' ', 1),
+    'nombre_completo', v_c.nombre,
+    'talla', v_c.talla_playera);
+end; $fn$;
+
+grant execute on function public.ver_cita(jsonb) to anon, authenticated;

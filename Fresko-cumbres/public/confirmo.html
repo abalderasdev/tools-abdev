@@ -46,6 +46,11 @@ button,a.btn{font:inherit;cursor:pointer;text-decoration:none;display:block;text
 .folio-chip{display:inline-block;margin-top:14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.28);
   border-radius:99px;padding:7px 16px;font-size:14px;font-weight:700;letter-spacing:.06em;
   font-variant-numeric:tabular-nums;position:relative;z-index:1}
+.sello.pendiente{padding-top:30px}
+.btn-si{width:100%;margin-top:20px;background:var(--lima);color:#0B3D1E;border:none;
+  border-radius:var(--radio);padding:17px;font-weight:800;font-size:18px;
+  font-family:"Bricolage Grotesque",sans-serif;position:relative;z-index:1}
+.btn-si:disabled{opacity:.7}
 
 /* tarjeta de la cita */
 .cita{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
@@ -140,14 +145,20 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
     "&location=" + encodeURIComponent("Fresko Cumbres, Av. Paseo de los Leones 1261, Cumbres Mediterráneo, Monterrey") +
     "&details=" + encodeURIComponent("Lleva tu INE original. Pantalón de mezclilla azul y tenis.");
 
+  const hecho = d.confirmado === true;
+
   $("#app").innerHTML = `
-    <div class="sello">
-      <div class="palomita">✓</div>
-      <h1>${d.ya_estaba ? "Ya estabas confirmado" : "¡Listo, " + esc(d.nombre) + "!"}</h1>
-      <p>${d.ya_estaba
-        ? "Tu lugar sigue apartado. Te esperamos mañana."
-        : "Tu lugar quedó apartado para la capacitación."}</p>
+    <div class="sello ${hecho ? "" : "pendiente"}">
+      ${hecho ? `<div class="palomita">✓</div>` : ``}
+      <h1>${hecho
+        ? (d.ya_estaba ? "Ya estabas confirmado" : "¡Listo, " + esc(d.nombre) + "!")
+        : "Hola, " + esc(d.nombre)}</h1>
+      <p>${hecho
+        ? (d.ya_estaba ? "Tu lugar sigue apartado. Te esperamos mañana."
+                       : "Tu lugar quedó apartado para la capacitación.")
+        : "Confirma que sí vas a la capacitación para apartarte el lugar."}</p>
       <div class="folio-chip">FOLIO ${esc(d.folio)}</div>
+      ${hecho ? `` : `<button class="btn-si" type="button" id="siVoy">✅ Sí voy, apártame el lugar</button>`}
     </div>
 
     <div class="cita">
@@ -172,7 +183,7 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
       <a class="btn btn-cal" href="${esc(cal)}" target="_blank" rel="noopener">Agendar recordatorio</a>
     </div>
 
-    <div class="invita">
+    <div class="invita" ${hecho ? "" : `style="display:none"`} id="invita">
       <h2>¿Conoces a alguien que quiera entrar?</h2>
       <p>Este es tu enlace. Quien se registre por ahí queda ligado a tu folio, y te pagamos
          <b>$50 por cada persona</b> que llegue el martes. Se te entrega el último día.</p>
@@ -210,14 +221,29 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
       catch (e) { aviso("No se pudo copiar."); }
     });
   }
+
+  // Solo cuando la persona toca el botón se escribe la confirmación.
+  const si = $("#siVoy");
+  if (si) si.addEventListener("click", async () => {
+    si.disabled = true; si.textContent = "Apartando tu lugar…";
+    try {
+      const r = await rpc("confirmar_cita", { p: { folio: d.folio, origen: "enlace" } });
+      if (!r.ok) throw new Error(r.motivo || "");
+      pintar(Object.assign({}, r, { confirmado: true }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (e) {
+      si.disabled = false;
+      si.textContent = "No se pudo. Toca otra vez";
+    }
+  });
 }
 
 (async () => {
   if (!FOLIO) return error("Falta tu folio",
     "Este enlace no trae folio. Pídele a Alberto que te mande el tuyo por WhatsApp.");
   let d;
-  try { d = await rpc("confirmar_cita", { p: { folio: FOLIO, origen: "enlace" } }); }
-  catch (e) { return error("No se pudo confirmar",
+  try { d = await rpc("ver_cita", { p: { folio: FOLIO } }); }
+  catch (e) { return error("No se pudo abrir tu cita",
     "Falló la conexión. Revisa tu internet y vuelve a abrir el enlace."); }
 
   if (!d.ok) {
@@ -226,9 +252,9 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
       NO_EXISTE: "No encontramos ese folio. Puede que el enlace esté mal escrito.",
       DADO_DE_BAJA: "Tu folio ya no está activo. Escríbele a Alberto por WhatsApp."
     };
-    return error("Algo no cuadra", m[d.motivo] || "No se pudo confirmar tu lugar.");
+    return error("Algo no cuadra", m[d.motivo] || "No se pudo abrir tu cita.");
   }
-  pintar(d);
+  pintar(Object.assign({}, d, { confirmado: d.ya_estaba }));
 })();
 </script>
 </body>
