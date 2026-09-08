@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0B5D2E">
-<title>Recordatorios de la cita · Fresko Cumbres</title>
+<title>Recordatorios de la cita · Fresko Valle de Cumbres</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -60,6 +60,8 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
   padding:9px 15px;font-weight:600;font-size:14px;white-space:nowrap}
 .pes[aria-selected="true"]{background:var(--verde);border-color:var(--verde);color:#fff}
 .pes .n{font-variant-numeric:tabular-nums}
+.pes.urgente{border-color:var(--naranja);color:var(--naranja)}
+.pes.urgente[aria-selected="true"]{background:var(--naranja);border-color:var(--naranja);color:#fff}
 
 .explica{margin:14px 0 0;padding:13px 15px;background:var(--panel);border:1px solid var(--linea);
   border-radius:var(--radio);font-size:14px;color:var(--tinta-2);line-height:1.55}
@@ -94,7 +96,7 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 <div id="acceso">
   <form class="caja" id="fLogin">
     <h1>Recordatorios</h1>
-    <p class="sub">Activación Fresko Cumbres</p>
+    <p class="sub">Activación Fresko Valle de Cumbres</p>
     <label for="email">Correo</label>
     <input type="email" id="email" autocomplete="username" required>
     <label for="pass">Contraseña</label>
@@ -124,6 +126,8 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
         Ya confirmaron <span class="n" id="cConf"></span></button>
       <button class="pes" data-v="referidos" aria-selected="false" type="button">
         Mandar su enlace</button>
+      <button class="pes urgente" data-v="ubicacion" aria-selected="false" type="button">
+        ⚠️ Aviso de ubicación</button>
     </div>
 
     <p class="explica" id="explica"></p>
@@ -140,7 +144,7 @@ const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
 const CLAVE = "fresko_lista_sesion";
 const MARCADAS = "fresko_recordatorio_enviados";
 const SITIO = "https://fresko-cumbres.abdev.click";
-const MAPA = "https://maps.app.goo.gl/mzTuCMgBJn88jzTW6";
+const MAPA = "https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7";
 const PRUEBA = ["030", "031"];
 
 const $ = (s) => document.querySelector(s);
@@ -189,7 +193,7 @@ function msgPendiente(c) {
     `¡Hola ${nombrePila(c.nombre)}! Te recuerdo tu cita de mañana 👇`,
     ``,
     `🗓️ Martes 8 de septiembre, 4:00 p.m.`,
-    `📍 Fresko Cumbres — Av. Paseo de los Leones 1261, Cumbres Mediterráneo`,
+    `📍 Fresko Valle de Cumbres — Mitras Poniente, 66035`,
     `🪪 Tu INE original y tu folio ${c.folio}`,
     ``,
     `Confírmame tu lugar aquí, es un solo clic 👇`,
@@ -206,12 +210,12 @@ function msgConfirmado(c) {
     `¡Hola ${nombrePila(c.nombre)}! Ya te tenemos considerado ✅ Mañana te esperamos.`,
     ``,
     `🗓️ Martes 8 de septiembre, 4:00 p.m.`,
-    `📍 Fresko Cumbres — Av. Paseo de los Leones 1261, Cumbres Mediterráneo`,
+    `📍 Fresko Valle de Cumbres — Mitras Poniente, 66035`,
     MAPA,
     `🪪 Lleva tu INE original y tu folio ${c.folio}`,
     `👖 Pantalón de mezclilla azul y tenis — playera, gorra y mandil los ponemos nosotros`,
     ``,
-    `Si te vas en camión: Ruta 40, esquina Pedro Infante y Leones.`,
+    `Si te vas en camión: Ruta Cumbres C29, bájate en Plaza Puerta de Hierro y camina 500 m sobre Av. Paseo de los Leones.`,
     ``,
     `Ese mismo día te pagamos $200 por asistir a la capacitación. ¡Nos vemos!`,
     ``,
@@ -234,6 +238,28 @@ function msgReferido(c) {
   );
 }
 
+function msgUbicacion(c) {
+  return pila(
+    `⚠️ ${nombrePila(c.nombre)}, corrijo la dirección — por favor léelo antes de salir.`,
+    ``,
+    `Hay dos tiendas Fresko y te había pasado la que NO es. La capacitación es en:`,
+    ``,
+    `📍 FRESKO VALLE DE CUMBRES`,
+    `Mitras Poniente, C.P. 66035, Monterrey`,
+    MAPA,
+    ``,
+    `Ábrelo en el mapa. Si tu GPS te manda a Cumbres Mediterráneo, ese es el equivocado.`,
+    ``,
+    `🚌 En camión: Ruta Cumbres C29. Bájate en Plaza Puerta de Hierro y camina 500 metros sobre Av. Paseo de los Leones.`,
+    ``,
+    `🗓️ Hoy martes 8 de septiembre, 4:00 p.m.`,
+    `🪪 Lleva tu INE original y tu folio ${c.folio}.`,
+    ``,
+    `Una disculpa por el cambio. Nos vemos allá 🙌`,
+    `— Alberto Balderas`
+  );
+}
+
 const wa = (tel, texto) =>
   `https://wa.me/52${String(tel||"").replace(/\D/g,"").slice(-10)}?text=${encodeURIComponent(texto)}`;
 
@@ -241,8 +267,16 @@ const wa = (tel, texto) =>
 const TEXTOS = {
   pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
   confirmados: "Estas ya confirmaron. El mensaje les dice que <b>ya las tienes consideradas</b> y les repite la hora, el lugar y qué llevar.",
-  referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no."
+  referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no.",
+  ubicacion: "⚠️ Aclara <b>a cuál Fresko</b> tienen que llegar. Va para <b>todos</b>, hayan confirmado o no."
 };
+
+function mensajeDe(c) {
+  if (VISTA === "pendientes")   return msgPendiente(c);
+  if (VISTA === "confirmados")  return msgConfirmado(c);
+  if (VISTA === "ubicacion")    return msgUbicacion(c);
+  return msgReferido(c);
+}
 
 function pintar() {
   $("#explica").innerHTML = TEXTOS[VISTA];
@@ -259,8 +293,7 @@ function pintar() {
   }
 
   $("#lista").innerHTML = l.map((c) => {
-    const texto = VISTA === "pendientes" ? msgPendiente(c)
-                : VISTA === "confirmados" ? msgConfirmado(c) : msgReferido(c);
+    const texto = mensajeDe(c);
     const clave = `${VISTA}:${c.folio}`;
     return `<div class="fila ${marcas[clave] ? "hecho" : ""}" data-clave="${esc(clave)}">
       <div class="f1">
@@ -287,8 +320,7 @@ $("#lista").addEventListener("click", async (ev) => {
   const folio = b.dataset.copiar.split(":")[1];
   const c = GENTE.find((x) => x.folio === folio);
   if (!c) return;
-  const texto = VISTA === "pendientes" ? msgPendiente(c)
-              : VISTA === "confirmados" ? msgConfirmado(c) : msgReferido(c);
+  const texto = mensajeDe(c);
   try { await navigator.clipboard.writeText(texto); avisar(`Mensaje de ${c.folio} copiado ✓`, "ok"); }
   catch (e) { avisar("No se pudo copiar en este navegador.", "err"); }
 });

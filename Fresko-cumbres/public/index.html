@@ -261,7 +261,7 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
       </div>
 
       <div class="nota-bono">
-        La capacitación es el <b>martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres</b>.
+        La capacitación es el <b>martes 8 de septiembre a las 4:00 p.m. en Fresko Valle de Cumbres</b>.
         Quien asiste se lleva <b>$200 ese mismo día</b>. El sueldo de cada jornada se paga
         a la mañana siguiente, y los <b>$50 diarios de puntualidad</b> se entregan el último día.
       </div>
@@ -312,7 +312,7 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
         <h3 id="saludo">Te esperamos</h3>
         <div class="dato"><b>Día</b><span>Martes 8 de septiembre</span></div>
         <div class="dato"><b>Hora</b><span>4:00 p.m. — llega 15 min antes</span></div>
-        <div class="dato"><b>Lugar</b><span>Fresko Cumbres, Monterrey</span></div>
+        <div class="dato"><b>Lugar</b><span>Fresko Valle de Cumbres, Monterrey</span></div>
         <div class="dato"><b>Contacto</b><span>Alberto Balderas · 55 6180 0423</span></div>
       </div>
       <div class="pase-pie">
@@ -495,12 +495,12 @@ function mostrarPase(d, p) {
     `Talla de playera: ${p.talla_playera}\n` +
     `Vivo en: ${lugar}\n` +
     (p.referido_por_folio ? `Me invitó el folio: ${p.referido_por_folio}\n` : ``) +
-    `\nConfirmo la capacitación del martes 8 de septiembre a las 4:00 p.m. en Fresko Cumbres. Llevo mi INE original.`
+    `\nConfirmo la capacitación del martes 8 de septiembre a las 4:00 p.m. en Fresko Valle de Cumbres. Llevo mi INE original.`
   );
 
   const MI_LIGA = `${LIGA}?ref=${folio}`;
   const INVITA =
-`Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Cumbres y todavía hay lugares.
+`Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Valle de Cumbres y todavía hay lugares.
 
 Son 5 días, del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $200 nada más por ir a la capacitación del martes. La playera y todo lo ponen ellos.
 
@@ -509,7 +509,7 @@ No piden experiencia, nomás INE y que puedas los 5 días completos.
 Si le entras, regístrate aquí y te dan tu folio de una vez:
 ${MI_LIGA}
 
-La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. Llévate tu INE original.`;
+La cita es el martes 8 a las 4 de la tarde en el Fresko Valle de Cumbres, en Mitras Poniente. Llévate tu INE original.`;
 
   $("#waShare").href = "https://wa.me/?text=" + encodeURIComponent(INVITA);
 
@@ -524,7 +524,7 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
   if (navigator.share) {
     btnRedes.addEventListener("click", async () => {
       try {
-        await navigator.share({ title: "Activación Fresko Cumbres", text: INVITA, url: MI_LIGA });
+        await navigator.share({ title: "Activación Fresko Valle de Cumbres", text: INVITA, url: MI_LIGA });
       } catch (e) { /* el usuario canceló: no hay nada que hacer */ }
     });
   } else {
@@ -553,7 +553,7 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" + encodeURIComponent(`Capacitación activación Cumbres · folio ${folio}`) +
     "&dates=20260908T220000Z/20260908T230000Z" +
-    "&location=" + encodeURIComponent("Fresko Cumbres, Monterrey, N.L.") +
+    "&location=" + encodeURIComponent("Fresko Valle de Cumbres, Monterrey, N.L.") +
     "&details=" + encodeURIComponent(`Folio ${folio}. Lleva tu INE original. Contacto: Alberto Balderas 55 6180 0423.`);
 
   const pase = $("#pase");

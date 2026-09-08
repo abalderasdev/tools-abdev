@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0B5D2E">
-<title>Confirmar mi lugar · Fresko Cumbres</title>
+<title>Confirmar mi lugar · Fresko Valle de Cumbres</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -102,7 +102,7 @@ button,a.btn{font:inherit;cursor:pointer;text-decoration:none;display:block;text
 const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
 const SITIO = "https://fresko-cumbres.abdev.click";
-const MAPA = "https://maps.app.goo.gl/mzTuCMgBJn88jzTW6";
+const MAPA = "https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7";
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
@@ -128,7 +128,7 @@ function error(titulo, texto) {
 function pintar(d) {
   const mi = `${SITIO}/?ref=${d.folio}`;
   const invita =
-`Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Cumbres y todavía hay lugares.
+`Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Valle de Cumbres y todavía hay lugares.
 
 Son 5 días, del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $200 nada más por ir a la capacitación del martes. La playera, gorra y mandil los ponen ellos.
 
@@ -137,12 +137,12 @@ No piden experiencia, nomás INE y que puedas los 5 días completos.
 Si le entras, regístrate aquí y te dan tu folio de una vez:
 ${mi}
 
-La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. Llévate tu INE original.`;
+La cita es el martes 8 a las 4 de la tarde en el Fresko Valle de Cumbres, en Mitras Poniente. Llévate tu INE original.`;
 
   const cal = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" + encodeURIComponent(`Capacitación activación Cumbres · folio ${d.folio}`) +
     "&dates=20260908T220000Z/20260908T230000Z" +
-    "&location=" + encodeURIComponent("Fresko Cumbres, Av. Paseo de los Leones 1261, Cumbres Mediterráneo, Monterrey") +
+    "&location=" + encodeURIComponent("Fresko Valle de Cumbres, Fresko Valle de Cumbres — Mitras Poniente, 66035, Monterrey") +
     "&details=" + encodeURIComponent("Lleva tu INE original. Pantalón de mezclilla azul y tenis.");
 
   const hecho = d.confirmado === true;
@@ -167,8 +167,8 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
         <div class="v">Martes 8 de septiembre, 4:00 p.m.<small>Llega unos minutos antes</small></div></div></div>
       <div class="dato"><div class="ico">📍</div><div>
         <div class="k">Dónde</div>
-        <div class="v">Fresko Cumbres<small>Av. Paseo de los Leones 1261, Cumbres Mediterráneo</small>
-          <small>En camión: Ruta 40, esquina Pedro Infante y Leones</small></div></div></div>
+        <div class="v">Fresko Valle de Cumbres<small>Mitras Poniente, 66035</small>
+          <small>En camión: Ruta Cumbres C29, bájate en Plaza Puerta de Hierro y camina 500 m sobre Av. Paseo de los Leones</small></div></div></div>
       <div class="dato"><div class="ico">🪪</div><div>
         <div class="k">Qué llevar</div>
         <div class="v">Tu INE original<small>Y tu folio ${esc(d.folio)}${d.talla ? ` · talla ${esc(d.talla)}` : ""}</small></div></div></div>
@@ -211,7 +211,7 @@ La cita es el martes 8 a las 4 de la tarde en el Fresko de Paseo de los Leones. 
   const btn = $("#redes");
   if (navigator.share) {
     btn.addEventListener("click", async () => {
-      try { await navigator.share({ title:"Activación Fresko Cumbres", text: invita, url: mi }); }
+      try { await navigator.share({ title:"Activación Fresko Valle de Cumbres", text: invita, url: mi }); }
       catch (e) { /* canceló */ }
     });
   } else {
