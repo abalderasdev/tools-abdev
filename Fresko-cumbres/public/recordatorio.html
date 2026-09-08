@@ -258,6 +258,11 @@ function msgUbicacion(c) {
     `🗓️ Hoy martes 8 de septiembre, 4:00 p.m.`,
     `🪪 Lleva tu INE original y tu folio ${c.folio}.`,
     ``,
+    c.confirmo
+      ? `Ya te tengo confirmado, solo era para que no te fueras a la tienda equivocada.`
+      : `Y confírmame que sí vienes, es un solo clic 👇`,
+    c.confirmo ? null : `${SITIO}/confirmo?f=${c.folio}`,
+    ``,
     `Una disculpa por el cambio. Nos vemos allá 🙌`,
     `— Alberto Balderas`
   );
