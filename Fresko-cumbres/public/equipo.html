@@ -143,9 +143,22 @@ function error(titulo, texto) {
         });
         const ds = await ses.json();
         token = ds.access_token || null;
-        if (!token) throw new Error(
-          da.msg || ds.error_description ||
-          "Ya existe una cuenta con ese correo. Escribe la contraseña que usaste, o pídele a Alberto que la restablezca.");
+        if (!token) {
+          const crudo = `${da.msg || ""} ${ds.error_description || ds.msg || ""}`.toLowerCase();
+          if (crudo.includes("not confirmed") || crudo.includes("confirmation")) {
+            throw new Error(
+              "Tu cuenta se creó, pero falta confirmar el correo. Revisa tu bandeja " +
+              "(y la carpeta de spam) y abre el enlace de confirmación; luego vuelve aquí. " +
+              "Si no te llegó, avísale a Alberto y él lo activa.");
+          }
+          if (crudo.includes("invalid login")) {
+            throw new Error(
+              "Ya existe una cuenta con ese correo y esa contraseña no coincide. " +
+              "Escribe la que usaste antes, o pídele a Alberto que la restablezca.");
+          }
+          throw new Error(da.msg || ds.error_description || ds.msg ||
+            "No se pudo crear tu acceso. Avísale a Alberto.");
+        }
       }
 
       // 2) conectar la cuenta con los permisos de la invitación
