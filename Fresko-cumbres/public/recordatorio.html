@@ -145,7 +145,6 @@ const CLAVE = "fresko_lista_sesion";
 const MARCADAS = "fresko_recordatorio_enviados";
 const SITIO = "https://fresko-cumbres.abdev.click";
 const MAPA = "https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7";
-const PRUEBA = ["030", "031"];
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
@@ -344,7 +343,7 @@ async function cargar() {
     traer("v_confirmacion?select=folio,nombre,telefono,confirmo&order=folio.asc"),
     Promise.resolve([])
   ]);
-  GENTE = gente.filter((c) => !PRUEBA.includes(c.folio));
+  GENTE = gente;
   const conf = GENTE.filter((c) => c.confirmo).length;
   $("#nConf").textContent = conf;
   $("#nTot").textContent = GENTE.length;

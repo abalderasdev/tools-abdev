@@ -14,7 +14,6 @@ create or replace function public.confirmar_cita(p jsonb) returns jsonb
 language plpgsql security definer set search_path to 'public' as $fn$
 declare v_f text := normalizar_folio(p->>'folio');
         v_c record; v_ya boolean;
-        v_prueba text[] := array['030','031'];
 begin
   if v_f is null then return jsonb_build_object('ok', false, 'motivo','FOLIO_INVALIDO'); end if;
   select * into v_c from candidatos where folio = v_f;
@@ -37,11 +36,8 @@ begin
     'nombre', split_part(v_c.nombre, ' ', 1),
     'nombre_completo', v_c.nombre,
     'talla', v_c.talla_playera,
-    'confirmados', (select count(*) from candidatos
-                     where confirmo_en is not null and estatus <> 'baja'
-                       and not (folio = any(v_prueba))),
-    'registrados', (select count(*) from candidatos
-                     where estatus <> 'baja' and not (folio = any(v_prueba))));
+    'confirmados', (select count(*) from candidatos where confirmo_en is not null and estatus <> 'baja'),
+    'registrados', (select count(*) from candidatos where estatus <> 'baja'));
 end; $fn$;
 
 grant execute on function public.confirmar_cita(jsonb) to anon, authenticated;
