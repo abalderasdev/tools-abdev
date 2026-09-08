@@ -128,6 +128,8 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
         Mandar su enlace</button>
       <button class="pes urgente" data-v="ubicacion" aria-selected="false" type="button">
         ⚠️ Aviso de ubicación</button>
+      <button class="pes urgente" data-v="transporte" aria-selected="false" type="button">
+        🚌 Transporte</button>
     </div>
 
     <p class="explica" id="explica"></p>
@@ -267,6 +269,33 @@ function msgUbicacion(c) {
   );
 }
 
+function msgTransporte(c) {
+  return pila(
+    `🚌 ${nombrePila(c.nombre)}, hay transporte gratis para la capacitación de hoy.`,
+    ``,
+    `Si se te complica llegar a la tienda, te llevamos desde:`,
+    `📍 PLAZA PUERTA DE HIERRO`,
+    `https://share.google/TXJc5oCQBOHcj26Oj`,
+    `(si no te abre, búscala como "Plaza Puerta de Hierro, Monterrey")`,
+    ``,
+    `🕞 Sale a las 3:30 p.m. y otra vuelta a las 3:45 p.m. No hay más salidas, no llegues tarde.`,
+    ``,
+    `Ahí busca a Rolando, lo reconoces por el uniforme.`,
+    `📱 Rolando Barrios: 55 8233 8504`,
+    ``,
+    `Te deja en FRESKO VALLE DE CUMBRES, Mitras Poniente, C.P. 66035.`,
+    ``,
+    `Si te queda mejor llegar directo a la tienda, también está perfecto 👇`,
+    MAPA,
+    ``,
+    `👉 Contéstame una sola palabra para saber cómo vienes:`,
+    `TRANSPORTE — si te subes en Puerta de Hierro`,
+    `DIRECTO — si llegas por tu cuenta`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
 const wa = (tel, texto) =>
   `https://wa.me/52${String(tel||"").replace(/\D/g,"").slice(-10)}?text=${encodeURIComponent(texto)}`;
 
@@ -275,13 +304,15 @@ const TEXTOS = {
   pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
   confirmados: "Estas ya confirmaron. El mensaje les dice que <b>ya las tienes consideradas</b> y les repite la hora, el lugar y qué llevar.",
   referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no.",
-  ubicacion: "⚠️ Aclara <b>a cuál Fresko</b> tienen que llegar. Va para <b>todos</b>, hayan confirmado o no."
+  ubicacion: "⚠️ Aclara <b>a cuál Fresko</b> tienen que llegar. Va para <b>todos</b>, hayan confirmado o no.",
+  transporte: "🚌 Avisa del <b>transporte gratis desde Plaza Puerta de Hierro</b> (salidas 3:30 y 3:45) y les pide contestar TRANSPORTE o DIRECTO. Va para <b>todos</b>."
 };
 
 function mensajeDe(c) {
   if (VISTA === "pendientes")   return msgPendiente(c);
   if (VISTA === "confirmados")  return msgConfirmado(c);
   if (VISTA === "ubicacion")    return msgUbicacion(c);
+  if (VISTA === "transporte")   return msgTransporte(c);
   return msgReferido(c);
 }
 
