@@ -103,6 +103,50 @@ tr.baja{opacity:.5}
  :root:not([data-theme="light"]) .b-asistio_cita{background:#1C3227;color:#6FBF89}
  :root:not([data-theme="light"]) .b-registrado{background:#1B2833;color:#7FA8CC}
  :root:not([data-theme="light"]) .b-baja{background:#3A211B;color:#E2705A}}
+/* ---------- expediente ---------- */
+.x-hit{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--linea);
+  border-radius:10px;padding:10px 13px;margin-bottom:7px;cursor:pointer;width:100%;text-align:left;font:inherit}
+.x-hit:hover{border-color:var(--verde)}
+.x-hit .f{font-weight:700;font-size:13.5px;color:var(--tinta-2);font-variant-numeric:tabular-nums;min-width:34px}
+.x-hit .n{flex:1;font-weight:600;font-size:15px}
+.x-hit .t{font-size:13px;color:var(--tinta-3);font-variant-numeric:tabular-nums}
+.x-cab{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;
+  background:var(--verde);color:#fff;border-radius:var(--radio);padding:18px 20px;margin:18px 0 0}
+.x-cab .folio{font-size:12px;font-weight:700;letter-spacing:.12em;color:#BFE6CB}
+.x-cab h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:25px;
+  margin:2px 0 6px;letter-spacing:-.02em;line-height:1.15}
+.x-cab .meta{font-size:14px;color:#DCEFE2}
+.x-cab .meta a{color:#fff;font-weight:600}
+.x-cab .der{margin-left:auto;text-align:right}
+.x-cab .tot{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;
+  font-variant-numeric:tabular-nums;line-height:1}
+.x-cab .tot small{display:block;font-size:12px;font-weight:400;letter-spacing:.08em;
+  text-transform:uppercase;color:#BFE6CB;margin-bottom:2px}
+.x-rej{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:14px}
+.x-bloque{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:16px 18px}
+.x-bloque h5{margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--tinta-3)}
+.x-par{display:flex;justify-content:space-between;gap:14px;padding:5px 0;font-size:14.5px;
+  border-bottom:1px solid var(--linea)}
+.x-par:last-child{border-bottom:none}
+.x-par dt{color:var(--tinta-2);flex:none}
+.x-par dd{margin:0;text-align:right;font-weight:600;overflow-wrap:anywhere}
+.x-par dd.falta{color:var(--tinta-3);font-weight:400;font-style:italic}
+.x-dinero dd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.x-nota{background:#FBEEDC;color:#8A3708;border-radius:10px;padding:11px 13px;font-size:14px;
+  line-height:1.5;margin-top:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .x-nota{background:#33240F;color:#E8B87A}}
+.x-ine{width:100%;border-radius:10px;border:1px solid var(--linea);display:block;margin-top:4px}
+.x-sinine{border:1px dashed var(--linea-2);border-radius:10px;padding:20px 14px;text-align:center;
+  color:var(--tinta-3);font-size:14px}
+.x-turno{display:flex;gap:12px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--linea);
+  font-size:14.5px}
+.x-turno:last-child{border-bottom:none}
+.x-turno .d{font-weight:700;min-width:96px}
+.x-turno .h{color:var(--tinta-2);font-variant-numeric:tabular-nums;flex:1}
+.x-turno .q{font-weight:600;font-variant-numeric:tabular-nums}
+.x-chip{display:inline-block;background:var(--arena);border:1px solid var(--linea);border-radius:99px;
+  padding:4px 11px;font-size:13px;font-weight:600;margin:0 6px 6px 0}
 .pestanas-wrap{border-bottom:1px solid var(--linea);background:var(--panel);position:sticky;top:0;z-index:4}
 .pestanas{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto}
 .pes{background:none;border:none;border-bottom:3px solid transparent;padding:13px 14px;font:inherit;
@@ -172,6 +216,7 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
     <button class="pes" data-v="reclutamiento" aria-selected="true" role="tab" type="button">Reclutamiento</button>
     <button class="pes" data-v="dinero" aria-selected="false" role="tab" type="button">Asistencias y dinero</button>
     <button class="pes" data-v="cuentas" aria-selected="false" role="tab" type="button">Estado de cuenta</button>
+    <button class="pes" data-v="expediente" aria-selected="false" role="tab" type="button">Expediente</button>
     <button class="pes" data-v="equipo" aria-selected="false" role="tab" type="button" id="pesEquipo" style="display:none">Equipo</button>
   </div></div>
 
@@ -226,6 +271,18 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
       <th style="width:90px">Jornadas</th><th style="width:90px">Capacitación</th>
       <th style="width:90px">Referidos</th><th style="width:95px">Puntualidad</th><th style="width:95px">Total</th>
     </tr></thead><tbody id="filasCuentas"></tbody></table></div>
+  </div>
+
+  <div class="wrap" id="vExpediente" style="display:none">
+    <h3>Expediente del trabajador</h3>
+    <p class="lede">Busca por folio, nombre o teléfono. Aquí está todo de esa persona:
+      sus datos, su INE, los días que trabajó y lo que se le debe.</p>
+    <div class="barra-busca">
+      <input type="search" id="qx" placeholder="Folio, nombre o teléfono…" aria-label="Buscar trabajador"
+             autocomplete="off">
+    </div>
+    <div id="xResultados"></div>
+    <div id="xFicha"></div>
   </div>
 
   <div class="wrap" id="vReclutamiento">
@@ -536,6 +593,196 @@ async function rpc(fn, body) {
 const fecha = (s) => new Date(s + "T12:00:00").toLocaleDateString("es-MX",
   { weekday:"long", day:"numeric", month:"long" });
 
+/* ---------------- expediente ---------------- */
+const cuando = (t) => t
+  ? new Date(t).toLocaleString("es-MX", { day:"numeric", month:"short", hour:"numeric", minute:"2-digit" })
+  : null;
+
+function par(etiqueta, valor) {
+  const vacio = valor === null || valor === undefined || valor === "";
+  return `<div class="x-par"><dt>${esc(etiqueta)}</dt>
+    <dd class="${vacio ? "falta" : ""}">${vacio ? "sin dato" : esc(valor)}</dd></div>`;
+}
+
+// La foto de INE vive en un bucket privado: hay que pedir una liga firmada.
+async function ligaINE(path) {
+  const s = leerSesion();
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/ine/${path}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}`, "Content-Type":"application/json" },
+    body: JSON.stringify({ expiresIn: 900 })
+  });
+  const d = await r.json();
+  if (!r.ok || !d.signedURL) throw new Error(d.message || "No se pudo abrir la foto");
+  return SUPABASE_URL + "/storage/v1" + d.signedURL;
+}
+
+function pintarExpediente(x) {
+  if (!x || x.no_existe) {
+    $("#xFicha").innerHTML = `<div class="x-bloque" style="margin-top:18px">
+      No hay nadie con el folio ${esc(x && x.folio || "")}.</div>`;
+    return;
+  }
+  const p = x.persona || {}, c = x.cuenta || {}, ine = x.ine || {}, cita = x.cita || {};
+  const t10 = String(p.telefono || "").replace(/\D/g, "").slice(-10);
+
+  const equipo = p.equipo
+    ? `<span class="x-chip" style="border-color:${esc(p.equipo_color||"#5A6B60")}">${esc(p.equipo)}</span>`
+    : `<span class="x-chip">Sin equipo</span>`;
+
+  const turnos = (x.turnos || []).length
+    ? x.turnos.map((t) => `<div class="x-turno">
+         <span class="d">${esc(fecha(t.dia).replace(/^\w/, (m) => m.toUpperCase()))}</span>
+         <span class="h">${esc(t.entrada || "—")} → ${esc(t.salida || "sin salida")}</span>
+         <span class="q">${t.horas != null ? esc(t.horas) + " h" : ""}</span>
+       </div>`).join("")
+    : `<p class="vacio">Todavía no tiene ningún día registrado.</p>`;
+
+  const bonos = (x.bonos || []).length
+    ? x.bonos.map((b) => par(
+        `${b.tipo === "capacitacion" ? "Capacitación" :
+           b.tipo === "referido"     ? "Referido " + (b.relacionado || "") :
+           b.tipo === "puntualidad"  ? "Puntualidad" : (b.concepto || "Otro")}` +
+        ` · ${b.estatus.replace("_", " ")}`,
+        pesos(b.monto))).join("")
+    : `<p class="vacio">Sin bonos registrados.</p>`;
+
+  const invitados = (x.invitados || []).length
+    ? x.invitados.map((i) => `<span class="x-chip">${esc(i.folio)} ${esc(i.nombre.split(" ")[0])}` +
+        `${i.llego ? " ✓" : ""}</span>`).join("")
+    : `<p class="vacio">No trajo a nadie.</p>`;
+
+  $("#xFicha").innerHTML = `
+    <div class="x-cab">
+      <div>
+        <div class="folio">FOLIO ${esc(x.folio)}</div>
+        <h4>${esc(p.nombre)}</h4>
+        <div class="meta">
+          ${t10 ? `<a href="https://wa.me/52${esc(t10)}">${tel(p.telefono)}</a> · ` : ""}
+          ${p.edad ? esc(p.edad) + " años · " : ""}
+          ${esc(p.colonia || "")}${p.municipio ? ", " + esc(p.municipio) : ""}
+        </div>
+      </div>
+      <div class="der">
+        <div class="tot"><small>Acumulado</small>${pesos(c.total)}</div>
+      </div>
+    </div>
+
+    ${p.estatus === "baja" ? `<div class="x-nota"><b>Dado de baja.</b>
+       No aparece en el estado de cuenta, así que los montos de abajo salen en cero.</div>` : ""}
+    ${p.notas ? `<div class="x-nota"><b>Nota interna:</b> ${esc(p.notas)}</div>` : ""}
+
+    <div class="x-rej">
+      <section class="x-bloque">
+        <h5>Sus datos</h5>
+        <dl style="margin:0">
+          ${par("Talla de playera", p.talla)}
+          ${par("Género", p.genero)}
+          ${par("Correo", p.correo)}
+          ${par("Experiencia", p.experiencia)}
+          ${par("Los 5 días", p.disponible_completa === null ? null
+                            : p.disponible_completa ? "Sí" : "No")}
+          ${par("Cómo se enteró", p.como_se_entero)}
+          ${par("Se registró", cuando(p.alta_en))}
+          ${par("Estatus", p.estatus)}
+        </dl>
+        <div style="margin-top:12px">${equipo}
+          ${p.punto ? `<span class="x-chip">Punto ${esc(p.punto)}</span>` : ""}</div>
+      </section>
+
+      <section class="x-bloque">
+        <h5>Identificación</h5>
+        <dl style="margin:0 0 12px">
+          ${par("Dijo tener INE", ine.declara_tener === null ? null : ine.declara_tener ? "Sí" : "No")}
+          ${par("Foto capturada", cuando(ine.capturada_en))}
+        </dl>
+        ${ine.tiene_foto
+          ? `<button class="btn-inv" type="button" id="btnINE" style="width:auto;padding:9px 16px">Ver la INE</button>
+             <div id="cajaINE"></div>`
+          : `<div class="x-sinine">No se le tomó foto de la INE.</div>`}
+      </section>
+
+      <section class="x-bloque">
+        <h5>Días trabajados</h5>
+        <dl style="margin:0 0 10px">
+          ${par("Capacitación", cita.asistio_capacitacion
+              ? "Asistió" + (cita.hora_registro ? " · " + cuando(cita.hora_registro) : "")
+              : "No asistió")}
+          ${par("Confirmó su lugar", cuando(cita.confirmo_en))}
+        </dl>
+        ${turnos}
+      </section>
+
+      <section class="x-bloque x-dinero">
+        <h5>Lo que se le debe</h5>
+        <dl style="margin:0">
+          ${par(`Jornadas (${c.dias_trabajados || 0} días)`, pesos(c.por_jornadas))}
+          ${par("Capacitación", pesos(c.por_capacitacion))}
+          ${par(`Referidos (${c.invitados_que_llegaron || 0})`, pesos(c.por_referidos))}
+          ${par("Puntualidad", pesos(c.por_puntualidad))}
+          ${par("Total", pesos(c.total))}
+        </dl>
+        <h5 style="margin-top:16px">Bonos capturados</h5>
+        <dl style="margin:0">${bonos}</dl>
+      </section>
+
+      <section class="x-bloque">
+        <h5>Referidos</h5>
+        <dl style="margin:0 0 12px">
+          ${par("Lo invitó", x.lo_invito ? `${x.lo_invito.folio} · ${x.lo_invito.nombre}` : null)}
+        </dl>
+        <div>${invitados}</div>
+      </section>
+    </div>`;
+
+  const bINE = $("#btnINE");
+  if (bINE) bINE.addEventListener("click", async () => {
+    bINE.disabled = true; bINE.textContent = "Abriendo…";
+    try {
+      const url = await ligaINE(ine.path);
+      $("#cajaINE").innerHTML = `<img class="x-ine" src="${esc(url)}"
+        alt="Credencial de elector de ${esc(p.nombre)}">`;
+      bINE.style.display = "none";
+    } catch (e) {
+      $("#cajaINE").innerHTML = `<div class="x-sinine">${esc(e.message)}</div>`;
+      bINE.disabled = false; bINE.textContent = "Ver la INE";
+    }
+  });
+}
+
+async function abrirExpediente(folio) {
+  $("#xResultados").innerHTML = "";
+  $("#qx").value = "";
+  $("#xFicha").innerHTML = `<p class="vacio" style="margin-top:18px">Abriendo…</p>`;
+  try { pintarExpediente(await rpc("expediente", { p_folio: folio })); }
+  catch (e) { $("#xFicha").innerHTML = `<div class="x-bloque" style="margin-top:18px">${esc(e.message)}</div>`; }
+}
+
+let _tx = null;
+function buscarExpediente(texto) {
+  clearTimeout(_tx);
+  const t = texto.trim();
+  if (t.length < 2) { $("#xResultados").innerHTML = ""; return; }
+  _tx = setTimeout(async () => {
+    try {
+      const lista = await rpc("buscar_candidato", { p_texto: t });
+      const arr = Array.isArray(lista) ? lista : [];
+      $("#xResultados").innerHTML = arr.length
+        ? arr.map((c) => `<button class="x-hit" type="button" data-abrir="${esc(c.folio)}">
+             <span class="f">${esc(c.folio)}</span>
+             <span class="n">${esc(c.nombre)}</span>
+             <span class="t">${tel(c.telefono)}</span></button>`).join("")
+        : `<p class="vacio">Nadie coincide con "${esc(t)}".</p>`;
+    } catch (e) { $("#xResultados").innerHTML = `<p class="vacio">${esc(e.message)}</p>`; }
+  }, 220);
+}
+
+$("#qx").addEventListener("input", (ev) => buscarExpediente(ev.target.value));
+$("#xResultados").addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-abrir]");
+  if (b) abrirExpediente(b.getAttribute("data-abrir"));
+});
+
 async function pintarDinero() {
   const d = await rpc("resumen_dias");
   const c = d.capacitacion, js = d.jornadas || [];
@@ -672,11 +919,13 @@ document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", asy
   $("#vReclutamiento").style.display = v === "reclutamiento" ? "block" : "none";
   $("#vDinero").style.display        = v === "dinero"        ? "block" : "none";
   $("#vCuentas").style.display       = v === "cuentas"       ? "block" : "none";
+  $("#vExpediente").style.display    = v === "expediente"    ? "block" : "none";
   $("#vEquipo").style.display        = v === "equipo"        ? "block" : "none";
   try {
     if (v === "dinero")  await pintarDinero();
     if (v === "cuentas") await pintarCuentas();
     if (v === "equipo")  await pintarEquipo();
+    if (v === "expediente") $("#qx").focus();
   } catch (e) { alert(e.message); }
 }));
 
