@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Pase de lista · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --ok-bg:#DCEFE2; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89; --ok-bg:#17331F;
+}}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89; --ok-bg:#17331F;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 56px}
+button{font:inherit;cursor:pointer}
+input,select{width:100%;padding:13px;font:inherit;font-size:16px;color:var(--tinta);background:var(--panel);
+  border:1.5px solid var(--linea-2);border-radius:var(--radio)}
+input:focus,select:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+label{display:block;font-weight:600;font-size:14.5px;margin:12px 0 6px}
+
+/* ---------- acceso ---------- */
+#acceso{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
+.caja{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:26px 24px}
+.caja h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.caja .sub{margin:0 0 18px;color:var(--tinta-2);font-size:14px}
+.principal{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:16.5px}
+.principal:disabled{opacity:.6}
+.msg{margin-top:12px;font-size:14px;font-weight:600;color:var(--error);display:none}
+.msg.on{display:block}
+
+/* ---------- encabezado ---------- */
+#app{display:none}
+header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+.head-in{max-width:560px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.h-tit{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFE6CB;font-weight:600}
+.marcador{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:32px;line-height:1;
+  font-variant-numeric:tabular-nums}
+.marcador small{font-size:14px;font-weight:400;color:#BFE6CB}
+.h-der{display:flex;gap:8px;align-items:center}
+.salir,.enlace{background:rgba(0,0,0,.25);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:99px;
+  padding:6px 13px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block}
+
+/* ---------- captura ---------- */
+.captura{background:var(--panel);border:1px solid var(--linea);border-radius:18px;
+  padding:18px 16px;margin-top:16px}
+.folio-fila{display:flex;gap:10px}
+#folio{flex:1;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:34px;
+  text-align:center;letter-spacing:.12em;padding:12px 10px;font-variant-numeric:tabular-nums}
+#registrar{width:132px;margin:0;flex:none;background:var(--verde);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:17px}
+#registrar:disabled{opacity:.55}
+.pista{margin:10px 2px 0;font-size:13.5px;color:var(--tinta-3)}
+
+.modos{display:flex;gap:8px;margin-top:14px}
+.modo{flex:1;padding:9px;border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta-2);
+  border-radius:99px;font-size:14px;font-weight:600}
+.modo[aria-pressed="true"]{background:var(--verde);border-color:var(--verde);color:#fff}
+
+/* ---------- tarjeta de resultado ---------- */
+.tarjeta{margin-top:14px;border-radius:16px;padding:16px;display:none;border:1.5px solid transparent}
+.tarjeta.on{display:block}
+.tarjeta.si{background:var(--ok-bg);border-color:var(--verde-2)}
+.tarjeta.rep{background:#FFF1DC;border-color:var(--naranja)}
+.tarjeta.no{background:#FAE5E0;border-color:var(--error)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tarjeta.rep{background:#33240F}
+  :root:not([data-theme="light"]) .tarjeta.no{background:#3A1712}}
+.t-folio{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--tinta-2)}
+.t-nombre{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;line-height:1.15;
+  margin:2px 0 6px;letter-spacing:-.02em}
+.t-datos{font-size:14.5px;color:var(--tinta-2)}
+.t-datos b{color:var(--tinta)}
+.t-pie{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.deshacer{background:transparent;border:1.5px solid var(--linea-2);color:var(--tinta-2);
+  border-radius:99px;padding:7px 15px;font-size:13.5px;font-weight:600}
+.alerta{font-size:13.5px;font-weight:600;color:var(--naranja)}
+
+/* ---------- pestañas y listas ---------- */
+.tabs{display:flex;gap:8px;margin:22px 0 12px}
+.tab{flex:1;padding:10px;border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta-2);
+  border-radius:99px;font-size:14px;font-weight:600}
+.tab[aria-selected="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--arena)}
+.tab .n{font-variant-numeric:tabular-nums}
+
+.fila{background:var(--panel);border:1px solid var(--linea);border-radius:12px;
+  padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:11px}
+.fila .f{font-weight:700;font-size:14px;color:var(--tinta-2);font-variant-numeric:tabular-nums;min-width:34px}
+.fila .n{flex:1;font-weight:600;font-size:15px;min-width:0;overflow-wrap:anywhere}
+.fila .h{font-size:13.5px;color:var(--tinta-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fila .eq{display:block;font-size:12.5px;color:var(--tinta-3);font-weight:500}
+.fila .quitar{background:transparent;border:none;color:var(--tinta-3);font-size:20px;line-height:1;
+  padding:2px 4px}
+.fila.falta .f,.fila.falta .n{color:var(--tinta-3)}
+.tel{color:var(--verde);text-decoration:none;font-size:13.5px;font-weight:600;white-space:nowrap}
+.vacio{background:var(--panel);border:1px dashed var(--linea-2);border-radius:12px;
+  padding:22px 16px;text-align:center;color:var(--tinta-3);font-size:14.5px}
+.oculto{display:none}
+
+.fecha{display:flex;gap:10px;align-items:center;margin-top:18px}
+.fecha label{margin:0;font-size:13.5px;color:var(--tinta-2);white-space:nowrap}
+.fecha input{padding:9px 11px;font-size:14.5px}
+
+.aviso{position:fixed;left:16px;right:16px;bottom:16px;max-width:528px;margin:0 auto;
+  background:var(--tinta);color:var(--arena);padding:13px 16px;border-radius:12px;
+  font-size:14.5px;font-weight:600;opacity:0;transform:translateY(12px);
+  transition:opacity .18s,transform .18s;pointer-events:none;z-index:20}
+.aviso.on{opacity:1;transform:none}
+.aviso.mal{background:var(--error);color:#fff}
+</style>
+</head>
+<body>
+
+<div id="acceso">
+  <form class="caja" id="fLogin">
+    <h1>Pase de lista</h1>
+    <p class="sub">Entra con tu correo y contraseña del equipo.</p>
+    <label for="email">Correo</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="pass">Contraseña</label>
+    <input id="pass" type="password" autocomplete="current-password" required>
+    <button class="principal" id="btnLogin" type="submit">Entrar</button>
+    <p class="msg" id="msgLogin"></p>
+  </form>
+</div>
+
+<div id="app">
+  <header>
+    <div class="head-in">
+      <div>
+        <div class="h-tit">Presentes hoy</div>
+        <div class="marcador"><span id="nPres">0</span><small> de <span id="nPlant">0</span></small></div>
+      </div>
+      <div class="h-der">
+        <a class="enlace" href="/puestos">Puestos</a>
+        <button class="salir" id="btnSalir" type="button">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="captura">
+      <form class="folio-fila" id="fPase">
+        <input id="folio" inputmode="numeric" autocomplete="off" enterkeyhint="done"
+               placeholder="000" maxlength="6" aria-label="Folio">
+        <button class="principal" id="registrar" type="submit">Registrar</button>
+      </form>
+      <p class="pista">Pregúntale su folio y tecléalo. También puedes escribir su nombre.</p>
+
+      <div class="modos">
+        <button class="modo" id="mEntrada" type="button" aria-pressed="true">Entrada</button>
+        <button class="modo" id="mSalida" type="button" aria-pressed="false">Salida</button>
+      </div>
+
+      <div class="tarjeta" id="tarjeta"></div>
+    </section>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tabPres" role="tab" aria-selected="true">
+        Ya llegaron <span class="n" id="cPres">0</span></button>
+      <button class="tab" id="tabFalta" role="tab" aria-selected="false">
+        Faltan <span class="n" id="cFalta">0</span></button>
+    </div>
+
+    <div id="listaPres"></div>
+    <div id="listaFalta" class="oculto"></div>
+
+    <div class="fecha">
+      <label for="dia">Día</label>
+      <input id="dia" type="date">
+    </div>
+  </div>
+</div>
+
+<div class="aviso" id="aviso"></div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const CLAVE = "fresko_sesion";
+
+const $  = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+
+let SESION = null;
+let TIPO   = "entrada";
+let DATOS  = { presentes: [], faltantes: [] };
+let ULTIMO = null;
+
+/* ---------------- sesión ---------------- */
+const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
+const leerSes = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
+  return (s && s.access_token && s.expira > Date.now()+30000) ? s : null; } catch(e){ return null; } };
+const borrar  = () => { try { sessionStorage.removeItem(CLAVE); } catch(e){} };
+
+async function entrar(email, password) {
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error_description || d.msg || "No se pudo iniciar sesión");
+  return { access_token:d.access_token, expira: Date.now() + (d.expires_in||3600)*1000 };
+}
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST",
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.msg || `error ${r.status}`);
+  return d;
+}
+
+function avisar(txt, mal) {
+  const a = $("#aviso");
+  a.textContent = txt;
+  a.className = "aviso on" + (mal ? " mal" : "");
+  clearTimeout(avisar._t);
+  avisar._t = setTimeout(() => a.classList.remove("on"), 3800);
+}
+
+/* ---------------- pintar ---------------- */
+function filaPresente(p) {
+  const eq = p.equipo ? `<span class="eq">${esc(p.equipo)}</span>` : "";
+  const sal = p.salida ? ` · salió ${esc(p.salida)}` : "";
+  return `<div class="fila">
+      <span class="f">${esc(p.folio)}</span>
+      <span class="n">${esc(p.nombre)}${eq}</span>
+      <span class="h">${esc(p.hora)}${sal}</span>
+      <button class="quitar" type="button" data-quitar="${esc(p.folio)}"
+              title="Quitar el registro de ${esc(p.nombre)}" aria-label="Quitar a ${esc(p.nombre)}">×</button>
+    </div>`;
+}
+
+function filaFalta(p) {
+  const eq  = p.equipo ? `<span class="eq">${esc(p.equipo)}</span>` : "";
+  const tel = p.telefono
+    ? `<a class="tel" href="https://wa.me/52${esc(String(p.telefono).replace(/\D/g,"").slice(-10))}">WhatsApp</a>` : "";
+  return `<div class="fila falta">
+      <span class="f">${esc(p.folio)}</span>
+      <span class="n">${esc(p.nombre)}${eq}</span>${tel}
+    </div>`;
+}
+
+function pintar(d) {
+  DATOS = d;
+  const pres = d.presentes || [], falta = d.faltantes || [];
+  $("#cPres").textContent  = pres.length;
+  $("#cFalta").textContent = falta.length;
+  $("#nPres").textContent  = pres.length;
+  $("#nPlant").textContent = pres.length + falta.length;
+
+  $("#listaPres").innerHTML = pres.length
+    ? pres.map(filaPresente).join("")
+    : `<div class="vacio">Todavía no pasas lista a nadie hoy. Teclea el primer folio arriba.</div>`;
+
+  $("#listaFalta").innerHTML = falta.length
+    ? falta.map(filaFalta).join("")
+    : `<div class="vacio">No falta nadie. Están todos.</div>`;
+}
+
+function tarjeta(r) {
+  const t = $("#tarjeta");
+  if (!r) { t.className = "tarjeta"; t.innerHTML = ""; return; }
+
+  if (!r.ok) {
+    const textos = {
+      NO_EXISTE:      `No existe el folio <b>${esc(r.folio||"")}</b>. Revísalo o dalo de alta en <a href="/lista">pasar lista</a>.`,
+      FOLIO_INVALIDO: "Escribe un folio con números, por ejemplo 046.",
+      DADO_DE_BAJA:   `<b>${esc(r.nombre||"")}</b> está dado de baja. No cuenta para hoy.`,
+      TIPO_INVALIDO:  "Elige entrada o salida."
+    };
+    t.className = "tarjeta on no";
+    t.innerHTML = `<div class="t-nombre">No se registró</div>
+      <div class="t-datos">${textos[r.motivo] || esc(r.motivo || "No se pudo registrar.")}</div>`;
+    return;
+  }
+
+  const datos = [
+    r.equipo ? `Equipo <b>${esc(r.equipo)}</b>` : null,
+    r.talla  ? `Talla <b>${esc(r.talla)}</b>`   : null
+  ].filter(Boolean).join(" · ");
+
+  const aviso = !r.fue_capacitacion
+    ? `<span class="alerta">No fue a la capacitación</span>` : "";
+
+  t.className = "tarjeta on " + (r.repetido ? "rep" : "si");
+  t.innerHTML = `
+    <div class="t-folio">FOLIO ${esc(r.folio)}</div>
+    <div class="t-nombre">${esc(r.nombre)}</div>
+    <div class="t-datos">
+      ${r.repetido ? `Ya tenía ${esc(r.tipo)} desde las <b>${esc(r.hora)}</b>`
+                   : `${r.tipo === "salida" ? "Salida" : "Entrada"} registrada a las <b>${esc(r.hora)}</b>`}
+      ${datos ? " · " + datos : ""}
+    </div>
+    <div class="t-pie">
+      <button class="deshacer" type="button" id="btnDeshacer">Deshacer</button>
+      ${aviso}
+    </div>`;
+
+  $("#btnDeshacer").addEventListener("click", deshacer);
+}
+
+/* ---------------- acciones ---------------- */
+async function cargar() {
+  const d = await rpc("pase_lista_dia", { p_dia: $("#dia").value || null });
+  pintar(d);
+}
+
+async function registrar(folio) {
+  const r = await rpc("pase_lista", { p: { folio, tipo: TIPO, dia: $("#dia").value || null } });
+  ULTIMO = r.ok ? { folio: r.folio, tipo: r.tipo, nombre: r.nombre } : null;
+  tarjeta(r);
+  if (r.ok) {
+    avisar(r.repetido ? `${r.nombre} ya estaba registrado` : `✓ ${r.nombre}`);
+    await cargar();
+  } else {
+    avisar("No se registró", true);
+  }
+}
+
+async function deshacer() {
+  if (!ULTIMO) return;
+  const r = await rpc("deshacer_pase", { p: { folio: ULTIMO.folio, tipo: ULTIMO.tipo, dia: $("#dia").value || null } });
+  tarjeta(null);
+  avisar(r.ok ? `Se quitó a ${r.nombre}` : "Ya no estaba registrado", !r.ok);
+  ULTIMO = null;
+  await cargar();
+}
+
+async function porNombre(texto) {
+  const lista = await rpc("buscar_candidato", { p_texto: texto });
+  const arr = Array.isArray(lista) ? lista : (lista && lista.resultados) || [];
+  if (!arr.length) { avisar(`Nadie se llama así: "${texto}"`, true); return; }
+  if (arr.length > 1) {
+    const t = $("#tarjeta");
+    t.className = "tarjeta on rep";
+    t.innerHTML = `<div class="t-nombre">¿Cuál de ellos?</div>` +
+      arr.slice(0, 6).map((p) => `<div class="fila">
+          <span class="f">${esc(p.folio)}</span>
+          <span class="n">${esc(p.nombre)}</span>
+          <button class="deshacer" type="button" data-elige="${esc(p.folio)}">Es este</button>
+        </div>`).join("");
+    return;
+  }
+  await registrar(arr[0].folio);
+}
+
+/* ---------------- eventos ---------------- */
+$("#fPase").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const txt = $("#folio").value.trim();
+  if (!txt) return;
+  const b = $("#registrar");
+  b.disabled = true;
+  try {
+    if (/\d/.test(txt)) await registrar(txt);
+    else await porNombre(txt);
+    $("#folio").value = "";
+  } catch (e) { avisar(e.message, true); }
+  b.disabled = false;
+  $("#folio").focus();
+});
+
+$("#tarjeta").addEventListener("click", async (ev) => {
+  const f = ev.target.getAttribute && ev.target.getAttribute("data-elige");
+  if (!f) return;
+  try { await registrar(f); $("#folio").value = ""; $("#folio").focus(); }
+  catch (e) { avisar(e.message, true); }
+});
+
+$("#listaPres").addEventListener("click", async (ev) => {
+  const f = ev.target.getAttribute && ev.target.getAttribute("data-quitar");
+  if (!f) return;
+  ULTIMO = { folio: f, tipo: "entrada" };
+  try { await deshacer(); } catch (e) { avisar(e.message, true); }
+});
+
+function modo(t) {
+  TIPO = t;
+  $("#mEntrada").setAttribute("aria-pressed", String(t === "entrada"));
+  $("#mSalida").setAttribute("aria-pressed",  String(t === "salida"));
+  $("#registrar").textContent = t === "salida" ? "Salida" : "Registrar";
+  $("#folio").focus();
+}
+$("#mEntrada").addEventListener("click", () => modo("entrada"));
+$("#mSalida").addEventListener("click",  () => modo("salida"));
+
+function pestana(cual) {
+  const p = cual === "pres";
+  $("#tabPres").setAttribute("aria-selected", String(p));
+  $("#tabFalta").setAttribute("aria-selected", String(!p));
+  $("#listaPres").classList.toggle("oculto", !p);
+  $("#listaFalta").classList.toggle("oculto", p);
+}
+$("#tabPres").addEventListener("click",  () => pestana("pres"));
+$("#tabFalta").addEventListener("click", () => pestana("falta"));
+
+$("#dia").addEventListener("change", async () => {
+  tarjeta(null);
+  try { await cargar(); } catch (e) { avisar(e.message, true); }
+});
+
+$("#btnSalir").addEventListener("click", () => { borrar(); location.reload(); });
+
+$("#fLogin").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnLogin"), m = $("#msgLogin");
+  m.className = "msg"; b.disabled = true; b.textContent = "Entrando…";
+  try {
+    SESION = await entrar($("#email").value.trim(), $("#pass").value);
+    guardar(SESION);
+    await arrancar();
+  } catch (e) {
+    m.className = "msg on"; m.textContent = e.message;
+    b.disabled = false; b.textContent = "Entrar";
+  }
+});
+
+async function arrancar() {
+  $("#acceso").style.display = "none";
+  $("#app").style.display = "block";
+  try { await cargar(); }
+  catch (e) {
+    if (/SIN_PERMISO/.test(e.message)) {
+      $("#app").style.display = "none";
+      $("#acceso").style.display = "flex";
+      $("#fLogin").innerHTML = `<h1>Sin permiso</h1>
+        <p class="sub">Tu cuenta no tiene acceso a pasar lista. Pídele a Alberto que te dé de alta.</p>`;
+      return;
+    }
+    avisar(e.message, true);
+  }
+  $("#folio").focus();
+}
+
+(async () => {
+  const hoy = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+  $("#dia").value = hoy;
+  SESION = leerSes();
+  if (SESION) await arrancar();
+})();
+</script>
+</body>
+</html>
