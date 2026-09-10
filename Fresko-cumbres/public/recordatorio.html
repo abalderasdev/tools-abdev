@@ -120,7 +120,11 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 
   <div class="wrap">
     <div class="pestanas">
-      <button class="pes" data-v="pendientes" aria-selected="true" type="button">
+      <button class="pes" data-v="gracias" aria-selected="true" type="button">
+        🙌 Gracias, ya vienen <span class="n" id="cGrac"></span></button>
+      <button class="pes" data-v="unete" aria-selected="false" type="button">
+        📣 Invitar a unirse <span class="n" id="cUne"></span></button>
+      <button class="pes" data-v="pendientes" aria-selected="false" type="button">
         Por confirmar <span class="n" id="cPend"></span></button>
       <button class="pes" data-v="confirmados" aria-selected="false" type="button">
         Ya confirmaron <span class="n" id="cConf"></span></button>
@@ -150,7 +154,7 @@ const MAPA = "https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7";
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
-let SESION = null, GENTE = [], VISTA = "pendientes";
+let SESION = null, GENTE = [], VISTA = "gracias";
 
 const leerMarcas = () => { try { return JSON.parse(localStorage.getItem(MARCADAS) || "{}"); } catch(e){ return {}; } };
 const marcar = (k) => { try { const m = leerMarcas(); m[k] = Date.now(); localStorage.setItem(MARCADAS, JSON.stringify(m)); } catch(e){} };
@@ -269,6 +273,51 @@ function msgUbicacion(c) {
   );
 }
 
+// Para quienes ya están en el equipo: agradecer y recordar la jornada de hoy.
+function msgGracias(c) {
+  return pila(
+    `¡Gracias ${nombrePila(c.nombre)}! 🙌`,
+    ``,
+    `Qué bueno que te sumaste. En un momento nos vemos.`,
+    ``,
+    `🕘 Hoy de 9:00 a.m. a 3:00 p.m.`,
+    `📍 FRESKO VALLE DE CUMBRES — Mitras Poniente, 66035`,
+    ``,
+    `Ve con pantalón de mezclilla azul y tenis. Nosotros te damos playera, gorra y mandil, y el agua corre por nuestra cuenta.`,
+    ``,
+    `Ten a la mano tu folio ${c.folio} para pasar lista al llegar.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
+// Para quienes se registraron pero nunca llegaron: invitarlos a entrar.
+function msgUnete(c) {
+  return pila(
+    `Hola ${nombrePila(c.nombre)}, ¿todavía te interesa? 👋`,
+    ``,
+    `La activación del Fresko Valle de Cumbres ya arrancó y sigo abriendo lugares hasta el domingo 13.`,
+    ``,
+    `💵 $400 por día, te los pago a la mañana siguiente.`,
+    `➕ $50 por cada día que llegues puntual y $50 por cada persona que traigas, los dos al cierre.`,
+    `🕘 De 9:00 a.m. a 3:00 p.m.`,
+    ``,
+    `📍 FRESKO VALLE DE CUMBRES`,
+    `Mitras Poniente, C.P. 66035, Monterrey`,
+    `https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7`,
+    ``,
+    `🚌 En camión: Ruta Cumbres C29, te bajas en Plaza Puerta de Hierro y caminas 500 metros sobre Av. Paseo de los Leones.`,
+    ``,
+    `Vas con pantalón de mezclilla azul, tenis y tu INE original. Playera, gorra, mandil y agua los pone la empresa.`,
+    ``,
+    `Tu folio es el ${c.folio}.`,
+    ``,
+    `Si le entras, contéstame "VOY" y te digo desde qué día te puedo meter.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
 function msgTransporte(c) {
   return pila(
     `🚌 ${nombrePila(c.nombre)}, hay transporte gratis para la capacitación de hoy.`,
@@ -301,6 +350,8 @@ const wa = (tel, texto) =>
 
 /* ---------- pintar ---------- */
 const TEXTOS = {
+  gracias: "Los que <b>sí llegaron a la capacitación</b>. El mensaje les agradece y les recuerda la jornada de hoy: horario, lugar, cómo ir vestidos y su folio para pasar lista.",
+  unete: "Se registraron pero <b>nunca llegaron</b>. El mensaje los invita a entrar todavía, con los $400 por día y los bonos, y les pide contestar <b>VOY</b> para que tú les digas desde qué día los metes.",
   pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
   confirmados: "Estas ya confirmaron. El mensaje les dice que <b>ya las tienes consideradas</b> y les repite la hora, el lugar y qué llevar.",
   referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no.",
@@ -309,6 +360,8 @@ const TEXTOS = {
 };
 
 function mensajeDe(c) {
+  if (VISTA === "gracias")      return msgGracias(c);
+  if (VISTA === "unete")        return msgUnete(c);
   if (VISTA === "pendientes")   return msgPendiente(c);
   if (VISTA === "confirmados")  return msgConfirmado(c);
   if (VISTA === "ubicacion")    return msgUbicacion(c);
@@ -322,11 +375,16 @@ function pintar() {
   let l;
   if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
   else if (VISTA === "confirmados") l = GENTE.filter((c) => c.confirmo);
+  else if (VISTA === "gracias") l = GENTE.filter((c) => c.asistio);
+  else if (VISTA === "unete") l = GENTE.filter((c) => !c.asistio);
   else l = GENTE;
 
   if (!l.length) {
     $("#lista").innerHTML = `<div class="vacio">${
-      VISTA === "pendientes" ? "¡Ya confirmaron todos! 🎉" : "Todavía nadie por aquí."}</div>`;
+      VISTA === "pendientes" ? "¡Ya confirmaron todos! 🎉" :
+      VISTA === "gracias"    ? "Todavía nadie pasó por la capacitación." :
+      VISTA === "unete"      ? "Todos los registrados ya están dentro. 🎉" :
+      "Todavía nadie por aquí."}</div>`;
     return;
   }
 
@@ -371,7 +429,7 @@ document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", () 
 
 async function cargar() {
   const [gente, par] = await Promise.all([
-    traer("v_confirmacion?select=folio,nombre,telefono,confirmo&order=folio.asc"),
+    traer("v_confirmacion?select=folio,nombre,telefono,confirmo,asistio&order=folio.asc"),
     Promise.resolve([])
   ]);
   GENTE = gente;
@@ -380,6 +438,9 @@ async function cargar() {
   $("#nTot").textContent = GENTE.length;
   $("#cConf").textContent = conf;
   $("#cPend").textContent = GENTE.length - conf;
+  const equipo = GENTE.filter((c) => c.asistio).length;
+  $("#cGrac").textContent = equipo;
+  $("#cUne").textContent  = GENTE.length - equipo;
   pintar();
 }
 
