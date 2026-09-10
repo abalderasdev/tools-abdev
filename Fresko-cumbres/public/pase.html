@@ -92,6 +92,37 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
   border-radius:99px;padding:7px 15px;font-size:13.5px;font-weight:600}
 .alerta{font-size:13.5px;font-weight:600;color:var(--naranja)}
 
+/* ---------- ayer y pago ---------- */
+.t-ayer{margin-top:10px;font-size:14.5px;font-weight:600}
+.t-ayer.si{color:var(--verde)}
+.t-ayer.no{color:var(--tinta-2)}
+.pago{margin-top:12px;padding:14px;border-radius:12px;background:var(--panel);
+  border:1.5px solid var(--linea-2)}
+.pago.debe{border-color:var(--naranja)}
+.pago.saldado{border-color:var(--verde-2)}
+.pago-tit{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tinta-3)}
+.pago-monto{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:38px;
+  line-height:1.05;font-variant-numeric:tabular-nums;margin:2px 0 2px}
+.pago.debe .pago-monto{color:var(--naranja)}
+.pago.saldado .pago-monto{color:var(--verde)}
+.pago-dias{font-size:13.5px;color:var(--tinta-2)}
+.pagar{width:100%;margin-top:12px;padding:15px;background:var(--naranja);color:#fff;border:none;
+  border-radius:var(--radio);font-weight:700;font-size:17px;display:flex;
+  align-items:center;justify-content:center;gap:10px}
+.pagar:disabled{opacity:.6}
+.pagar .caja{width:22px;height:22px;border:2.5px solid #fff;border-radius:5px;flex:none}
+.pago-hecho{display:flex;align-items:center;gap:9px;margin-top:12px;
+  font-size:15.5px;font-weight:700;color:var(--verde)}
+.pago-hecho .caja{width:22px;height:22px;border:2.5px solid var(--verde);border-radius:5px;
+  flex:none;display:flex;align-items:center;justify-content:center;color:var(--verde);
+  font-size:15px;line-height:1}
+.verFicha{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:600;
+  color:var(--verde);text-decoration:underline}
+.fila .debe{font-size:12.5px;font-weight:700;color:var(--naranja);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.fila .ayer-no{font-size:12px;color:var(--tinta-3);white-space:nowrap}
+
 /* ---------- pestañas y listas ---------- */
 .tabs{display:flex;gap:8px;margin:22px 0 12px}
 .tab{flex:1;padding:10px;border:1.5px solid var(--linea-2);background:var(--panel);color:var(--tinta-2);
@@ -230,6 +261,11 @@ async function rpc(fn, body) {
   return d;
 }
 
+const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-MX");
+const diaCorto = (s) => s
+  ? new Date(s + "T12:00:00").toLocaleDateString("es-MX", { weekday:"short", day:"numeric" })
+  : "";
+
 function avisar(txt, mal) {
   const a = $("#aviso");
   a.textContent = txt;
@@ -245,6 +281,7 @@ function filaPresente(p) {
   return `<div class="fila">
       <span class="f">${esc(p.folio)}</span>
       <span class="n">${esc(p.nombre)}${eq}</span>
+      ${Number(p.por_pagar) > 0 ? `<span class="debe">debe ${pesos(p.por_pagar)}</span>` : ""}
       <span class="h">${esc(p.hora)}${sal}</span>
       <button class="quitar" type="button" data-quitar="${esc(p.folio)}"
               title="Quitar el registro de ${esc(p.nombre)}" aria-label="Quitar a ${esc(p.nombre)}">×</button>
@@ -255,9 +292,11 @@ function filaFalta(p) {
   const eq  = p.equipo ? `<span class="eq">${esc(p.equipo)}</span>` : "";
   const tel = p.telefono
     ? `<a class="tel" href="https://wa.me/52${esc(String(p.telefono).replace(/\D/g,"").slice(-10))}">WhatsApp</a>` : "";
+  const ayer = p.vino_ayer === false ? `<span class="ayer-no">tampoco ayer</span>` : "";
   return `<div class="fila falta">
       <span class="f">${esc(p.folio)}</span>
-      <span class="n">${esc(p.nombre)}${eq}</span>${tel}
+      <span class="n">${esc(p.nombre)}${eq}</span>
+      ${Number(p.por_pagar) > 0 ? `<span class="debe">debe ${pesos(p.por_pagar)}</span>` : ayer}${tel}
     </div>`;
 }
 
@@ -303,6 +342,37 @@ function tarjeta(r) {
   const aviso = !r.fue_capacitacion
     ? `<span class="alerta">No fue a la capacitación</span>` : "";
 
+  // ¿Vino ayer? Es lo primero que Alberto pregunta al pagar.
+  const ay = r.ayer || {};
+  const ayer = ay.dia
+    ? (ay.vino
+        ? `<div class="t-ayer si">✓ Sí vino ayer (${esc(diaCorto(ay.dia))})</div>`
+        : `<div class="t-ayer no">✗ No vino ayer (${esc(diaCorto(ay.dia))})</div>`)
+    : "";
+
+  // Lo que se le debe: jornadas trabajadas antes de hoy y todavía sin pagar.
+  const debe = Number(r.total_por_pagar || 0);
+  const dias = r.por_pagar || [];
+  const pago = debe > 0
+    ? `<div class="pago debe">
+         <div class="pago-tit">Le debes</div>
+         <div class="pago-monto">${pesos(debe)}</div>
+         <div class="pago-dias">${dias.length} ${dias.length === 1 ? "jornada" : "jornadas"}:
+           ${dias.map((d) => esc(diaCorto(d.dia))).join(", ")}</div>
+         <button class="pagar" type="button" id="btnPagar">
+           <span class="caja"></span> Marcar pagado ${pesos(debe)}</button>
+       </div>`
+    : `<div class="pago saldado">
+         <div class="pago-tit">Le debes</div>
+         <div class="pago-monto">${pesos(0)}</div>
+         <div class="pago-dias">${
+           r.tipo === "salida" ? "Nada pendiente." :
+           ay.vino ? "El día de ayer ya está pagado. Lo de hoy se le paga mañana."
+                   : "No tiene jornadas anteriores sin pagar."}</div>
+         <button class="deshacer" type="button" id="btnDespagar"
+                 style="margin-top:10px">Quitar un pago</button>
+       </div>`;
+
   t.className = "tarjeta on " + (r.repetido ? "rep" : "si");
   t.innerHTML = `
     <div class="t-folio">FOLIO ${esc(r.folio)}</div>
@@ -312,12 +382,19 @@ function tarjeta(r) {
                    : `${r.tipo === "salida" ? "Salida" : "Entrada"} registrada a las <b>${esc(r.hora)}</b>`}
       ${datos ? " · " + datos : ""}
     </div>
+    ${ayer}
+    ${pago}
     <div class="t-pie">
-      <button class="deshacer" type="button" id="btnDeshacer">Deshacer</button>
+      <button class="deshacer" type="button" id="btnDeshacer">Deshacer pase</button>
       ${aviso}
-    </div>`;
+    </div>
+    <a class="verFicha" href="/dash?f=${esc(r.folio)}" target="_blank" rel="noopener">Ver su expediente completo</a>`;
 
   $("#btnDeshacer").addEventListener("click", deshacer);
+  const bp = $("#btnPagar");
+  if (bp) bp.addEventListener("click", () => pagar(r.folio, debe));
+  const bd = $("#btnDespagar");
+  if (bd) bd.addEventListener("click", () => despagar(r.folio));
 }
 
 /* ---------------- acciones ---------------- */
@@ -336,6 +413,32 @@ async function registrar(folio) {
   } else {
     avisar("No se registró", true);
   }
+}
+
+// Registra el pago de todo lo pendiente y vuelve a pintar la tarjeta
+// con el saldo ya en cero, para que se vea que quedó hecho.
+async function pagar(folio, monto) {
+  const b = $("#btnPagar");
+  if (b) { b.disabled = true; b.textContent = "Registrando…"; }
+  try {
+    const r = await rpc("marcar_pagado", { p: { folio, hoy: $("#dia").value || null } });
+    if (!r.ok) { avisar(r.motivo === "NADA_QUE_PAGAR" ? "No tenía nada pendiente" : "No se pudo registrar", true); }
+    else avisar(`✓ Pagado ${pesos(r.total)} a ${r.nombre}`);
+    tarjeta(await rpc("pase_lista", { p: { folio, tipo: TIPO, dia: $("#dia").value || null } }));
+    await cargar();
+  } catch (e) {
+    avisar(e.message, true);
+    if (b) { b.disabled = false; b.textContent = `Marcar pagado ${pesos(monto)}`; }
+  }
+}
+
+async function despagar(folio) {
+  try {
+    const r = await rpc("deshacer_pago", { p: { folio } });
+    avisar(r.ok ? `Se quitó el pago de ${r.nombre}` : "No había pago reciente que quitar", !r.ok);
+    tarjeta(await rpc("pase_lista", { p: { folio, tipo: TIPO, dia: $("#dia").value || null } }));
+    await cargar();
+  } catch (e) { avisar(e.message, true); }
 }
 
 async function deshacer() {

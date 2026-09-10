@@ -269,13 +269,14 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
       <div class="campo" id="c-compromisos">
         <div class="check">
           <input type="checkbox" id="disp">
-          <label for="disp">Puedo trabajar los <strong>5 días completos</strong>, del 9 al 13 de septiembre de 9:00 a 15:00 h.</label>
+          <label for="disp">Puedo los <strong>5 días completos</strong>, del 9 al 13 de septiembre de 9:00 a 15:00 h.
+            <span class="opt">Si no puedes todos, no la marques: igual te registramos y vas los días que puedas.</span></label>
         </div>
         <div class="check">
           <input type="checkbox" id="ine">
-          <label for="ine">Tengo <strong>INE vigente</strong> y puedo llevarla a la capacitación.</label>
+          <label for="ine">Tengo <strong>INE vigente</strong> y puedo llevarla.</label>
         </div>
-        <p class="err">Marca las dos casillas para continuar. Si no puedes los 5 días, escríbele a Alberto por WhatsApp.</p>
+        <p class="err">Necesitamos que marques la casilla de la INE para continuar.</p>
       </div>
 
       <div class="campo">
@@ -426,7 +427,7 @@ $("#f").addEventListener("submit", async ev => {
   ok = marcar("#c-telefono", tel.length !== 10) && ok;
   ok = marcar("#c-edad", !(edad >= 18 && edad <= 70)) && ok;
   ok = marcar("#c-colonia", val("#colonia").length < 3) && ok;
-  ok = marcar("#c-compromisos", !($("#disp").checked && $("#ine").checked)) && ok;
+  ok = marcar("#c-compromisos", !$("#ine").checked) && ok;
   ok = marcar("#c-aviso", !$("#aviso").checked) && ok;
 
   if (!ok) {
@@ -450,7 +451,7 @@ $("#f").addEventListener("submit", async ev => {
     municipio: val("#municipio"),
     talla_playera: radio("talla"),
     experiencia: radio("experiencia"),
-    disponible_completa: true,
+    disponible_completa: $("#disp").checked,
     tiene_ine: true,
     transporte: radio("transporte"),
     comentarios: val("#comentarios") || null,
@@ -502,14 +503,14 @@ function mostrarPase(d, p) {
   const INVITA =
 `Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Valle de Cumbres y todavía hay lugares.
 
-Son 5 días, del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $200 nada más por ir a la capacitación del martes. La playera y todo lo ponen ellos.
+Es del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $50 por cada día que llegues puntual. La playera, la gorra, el mandil y el agua los ponen ellos.
 
-No piden experiencia, nomás INE y que puedas los 5 días completos.
+No piden experiencia ni que vayas los 5 días: puedes ir nada más los días que puedas. Solo llevas tu INE original.
 
 Si le entras, regístrate aquí y te dan tu folio de una vez:
 ${MI_LIGA}
 
-La cita es el martes 8 a las 4 de la tarde en el Fresko Valle de Cumbres, en Mitras Poniente. Llévate tu INE original.`;
+Es en el Fresko Valle de Cumbres, en Mitras Poniente 66035.`;
 
   $("#waShare").href = "https://wa.me/?text=" + encodeURIComponent(INVITA);
 

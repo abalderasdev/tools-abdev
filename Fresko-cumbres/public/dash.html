@@ -417,6 +417,7 @@ async function cargar(sesion) {
   pintar();
   $("#acceso").style.display = "none";
   $("#panel").style.display = "block";
+  expedienteDeLaLiga();
 }
 
 /* ---------------- pintar ---------------- */
@@ -634,9 +635,17 @@ function pintarExpediente(x) {
     ? x.turnos.map((t) => `<div class="x-turno">
          <span class="d">${esc(fecha(t.dia).replace(/^\w/, (m) => m.toUpperCase()))}</span>
          <span class="h">${esc(t.entrada || "—")} → ${esc(t.salida || "sin salida")}</span>
-         <span class="q">${t.horas != null ? esc(t.horas) + " h" : ""}</span>
+         <span class="q" style="color:${t.pagado ? "var(--verde)" : "var(--naranja)"}">${
+           t.pagado ? "pagado" : "sin pagar"}</span>
        </div>`).join("")
     : `<p class="vacio">Todavía no tiene ningún día registrado.</p>`;
+
+  const pg = x.pagado || {};
+  const movs = (pg.movimientos || []).length
+    ? pg.movimientos.map((m) => par(
+        `${m.concepto === "jornada" ? "Jornada" : m.concepto} del ${esc(fecha(m.dia))}`,
+        pesos(m.monto))).join("")
+    : `<p class="vacio">Todavía no se le ha entregado nada.</p>`;
 
   const bonos = (x.bonos || []).length
     ? x.bonos.map((b) => par(
@@ -722,6 +731,11 @@ function pintarExpediente(x) {
           ${par("Puntualidad", pesos(c.por_puntualidad))}
           ${par("Total", pesos(c.total))}
         </dl>
+        <h5 style="margin-top:16px">Ya se le entregó</h5>
+        <dl style="margin:0">${movs}</dl>
+        ${pg.total ? `<div class="x-par" style="border-top:1.5px solid var(--linea);margin-top:6px;padding-top:8px">
+          <dt><b>Total entregado</b></dt><dd>${pesos(pg.total)}</dd></div>` : ""}
+
         <h5 style="margin-top:16px">Bonos capturados</h5>
         <dl style="margin:0">${bonos}</dl>
       </section>
@@ -775,6 +789,15 @@ function buscarExpediente(texto) {
         : `<p class="vacio">Nadie coincide con "${esc(t)}".</p>`;
     } catch (e) { $("#xResultados").innerHTML = `<p class="vacio">${esc(e.message)}</p>`; }
   }, 220);
+}
+
+// /dash?f=046 abre ese expediente de una vez (así entra el enlace de /pase).
+function expedienteDeLaLiga() {
+  const f = new URLSearchParams(location.search).get("f");
+  if (!f) return;
+  const b = document.querySelector('.pes[data-v="expediente"]');
+  if (b) b.click();
+  abrirExpediente(f);
 }
 
 $("#qx").addEventListener("input", (ev) => buscarExpediente(ev.target.value));

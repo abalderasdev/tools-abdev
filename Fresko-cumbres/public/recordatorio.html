@@ -291,15 +291,19 @@ function msgGracias(c) {
   );
 }
 
-// Para quienes se registraron pero nunca llegaron: invitarlos a entrar.
+// Para quienes se registraron pero nunca llegaron. El gancho es que
+// ya no hace falta comprometerse a los 5 días: vienen los que puedan.
 function msgUnete(c) {
   return pila(
-    `Hola ${nombrePila(c.nombre)}, ¿todavía te interesa? 👋`,
+    `${nombrePila(c.nombre)}, te aparté un lugar 👋`,
     ``,
-    `La activación del Fresko Valle de Cumbres ya arrancó y sigo abriendo lugares hasta el domingo 13.`,
+    `Te registraste para la activación del Fresko Valle de Cumbres y no alcanzaste a llegar. Todavía estás a tiempo.`,
     ``,
-    `💵 $400 por día, te los pago a la mañana siguiente.`,
-    `➕ $50 por cada día que llegues puntual y $50 por cada persona que traigas, los dos al cierre.`,
+    `Y quité el requisito que a lo mejor te frenó: *ya no tienes que venir los 5 días*. Ven los días que puedas, aunque sea uno.`,
+    ``,
+    `💵 $400 por cada día que trabajes. Te los pago a la mañana siguiente, en efectivo, cuando llegas.`,
+    `➕ $50 más por cada día que llegues puntual.`,
+    `➕ $50 por cada persona que traigas.`,
     `🕘 De 9:00 a.m. a 3:00 p.m.`,
     ``,
     `📍 FRESKO VALLE DE CUMBRES`,
@@ -308,11 +312,11 @@ function msgUnete(c) {
     ``,
     `🚌 En camión: Ruta Cumbres C29, te bajas en Plaza Puerta de Hierro y caminas 500 metros sobre Av. Paseo de los Leones.`,
     ``,
-    `Vas con pantalón de mezclilla azul, tenis y tu INE original. Playera, gorra, mandil y agua los pone la empresa.`,
+    `Llevas pantalón de mezclilla azul, tenis y tu INE original. Playera, gorra, mandil y agua los ponemos nosotros.`,
     ``,
-    `Tu folio es el ${c.folio}.`,
+    `Tu folio es el ${c.folio}, con ese te paso lista.`,
     ``,
-    `Si le entras, contéstame "VOY" y te digo desde qué día te puedo meter.`,
+    `Contéstame qué días puedes y te digo a qué hora te espero.`,
     ``,
     `— Alberto Balderas`
   );
