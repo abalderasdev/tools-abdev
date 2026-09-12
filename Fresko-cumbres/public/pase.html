@@ -117,11 +117,28 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 .pago-hecho .caja{width:22px;height:22px;border:2.5px solid var(--verde);border-radius:5px;
   flex:none;display:flex;align-items:center;justify-content:center;color:var(--verde);
   font-size:15px;line-height:1}
+.pago-resta{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14px;color:var(--tinta-2);margin-top:2px}
+.pago-resta b{font-variant-numeric:tabular-nums;color:var(--tinta)}
+.pago-resta.menos{padding-bottom:6px;border-bottom:1.5px solid var(--linea-2);margin-bottom:4px}
+.pago-resta.menos b{color:var(--naranja)}
+.ade-lista{margin-top:10px;display:grid;gap:6px}
+.ade{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--tinta-2);
+  background:var(--arena);border-radius:9px;padding:7px 10px}
+.ade > span:first-child{flex:1;min-width:0}
+.ade .cuando{color:var(--tinta-3);font-size:12.5px;white-space:nowrap}
+.ade .quitarAde{background:transparent;border:none;color:var(--tinta-3);font-size:18px;
+  line-height:1;padding:0 2px}
+.adelantar{width:100%;margin-top:10px;padding:13px;background:transparent;color:var(--verde);
+  border:1.5px solid var(--verde);border-radius:var(--radio);font-weight:700;font-size:15.5px}
+
 .verFicha{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:600;
   color:var(--verde);text-decoration:underline}
 .fila .debe{font-size:12.5px;font-weight:700;color:var(--naranja);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .fila .ayer-no{font-size:12px;color:var(--tinta-3);white-space:nowrap}
+.fila .ade-marca{font-size:12.5px;font-weight:700;color:var(--verde);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* ---------- pestañas y listas ---------- */
 .tabs{display:flex;gap:8px;margin:22px 0 12px}
@@ -281,7 +298,8 @@ function filaPresente(p) {
   return `<div class="fila">
       <span class="f">${esc(p.folio)}</span>
       <span class="n">${esc(p.nombre)}${eq}</span>
-      ${Number(p.por_pagar) > 0 ? `<span class="debe">debe ${pesos(p.por_pagar)}</span>` : ""}
+      ${Number(p.por_pagar) > 0 ? `<span class="debe">debe ${pesos(p.por_pagar)}</span>`
+        : Number(p.adelantado) > 0 ? `<span class="ade-marca">adelanto ${pesos(p.adelantado)}</span>` : ""}
       <span class="h">${esc(p.hora)}${sal}</span>
       <button class="quitar" type="button" data-quitar="${esc(p.folio)}"
               title="Quitar el registro de ${esc(p.nombre)}" aria-label="Quitar a ${esc(p.nombre)}">×</button>
@@ -350,28 +368,55 @@ function tarjeta(r) {
         : `<div class="t-ayer no">✗ No vino ayer (${esc(diaCorto(ay.dia))})</div>`)
     : "";
 
-  // Lo que se le debe: jornadas trabajadas antes de hoy y todavía sin pagar.
-  const debe = Number(r.total_por_pagar || 0);
-  const dias = r.por_pagar || [];
-  const pago = debe > 0
+  // Lo que se le debe: jornadas anteriores sin pagar, menos lo que ya se
+  // le adelantó. Lo que de verdad se le entrega es el neto.
+  const bruto = Number(r.total_por_pagar || 0);
+  const adel  = Number(r.adelantado || 0);
+  const neto  = Number(r.neto || 0);
+  const dias  = r.por_pagar || [];
+  const ades  = r.adelantos || [];
+
+  const lineaAdelanto = adel > 0
+    ? `<div class="pago-resta">
+         <span>Jornadas</span><b>${pesos(bruto)}</b></div>
+       <div class="pago-resta menos">
+         <span>Adelantos que le diste</span><b>− ${pesos(adel)}</b></div>`
+    : "";
+
+  const detalleAde = ades.length
+    ? `<div class="ade-lista">${ades.map((a) => `<div class="ade">
+         <span>${pesos(a.monto)}${a.motivo ? " · " + esc(a.motivo) : ""}</span>
+         <span class="cuando">${esc(a.cuando || "")}</span>
+         <button class="quitarAde" type="button" data-ade="${esc(a.id)}"
+                 aria-label="Quitar este adelanto">×</button></div>`).join("")}</div>`
+    : "";
+
+  const pago = neto > 0
     ? `<div class="pago debe">
-         <div class="pago-tit">Le debes</div>
-         <div class="pago-monto">${pesos(debe)}</div>
+         <div class="pago-tit">${adel > 0 ? "Entrégale" : "Le debes"}</div>
+         ${lineaAdelanto}
+         <div class="pago-monto">${pesos(neto)}</div>
          <div class="pago-dias">${dias.length} ${dias.length === 1 ? "jornada" : "jornadas"}:
            ${dias.map((d) => esc(diaCorto(d.dia))).join(", ")}</div>
+         ${detalleAde}
          <button class="pagar" type="button" id="btnPagar">
-           <span class="caja"></span> Marcar pagado ${pesos(debe)}</button>
+           <span class="caja"></span> Marcar pagado ${pesos(neto)}</button>
        </div>`
-    : `<div class="pago saldado">
-         <div class="pago-tit">Le debes</div>
-         <div class="pago-monto">${pesos(0)}</div>
+    : `<div class="pago ${adel > 0 ? "debe" : "saldado"}">
+         <div class="pago-tit">${adel > 0 ? "Ya cobró por adelantado" : "Le debes"}</div>
+         <div class="pago-monto">${pesos(adel > 0 ? adel : 0)}</div>
          <div class="pago-dias">${
+           adel > 0 ? "Le debe a la caja. Se le descuenta de sus próximas jornadas." :
            r.tipo === "salida" ? "Nada pendiente." :
            ay.vino ? "El día de ayer ya está pagado. Lo de hoy se le paga mañana."
                    : "No tiene jornadas anteriores sin pagar."}</div>
-         <button class="deshacer" type="button" id="btnDespagar"
-                 style="margin-top:10px">Quitar un pago</button>
+         ${detalleAde}
+         ${adel > 0 ? "" : `<button class="deshacer" type="button" id="btnDespagar"
+                 style="margin-top:10px">Quitar un pago</button>`}
        </div>`;
+
+  const botonAdelanto = `<button class="adelantar" type="button" id="btnAdelanto">
+      💵 Adelantar dinero</button>`;
 
   t.className = "tarjeta on " + (r.repetido ? "rep" : "si");
   t.innerHTML = `
@@ -384,6 +429,7 @@ function tarjeta(r) {
     </div>
     ${ayer}
     ${pago}
+    ${botonAdelanto}
     <div class="t-pie">
       <button class="deshacer" type="button" id="btnDeshacer">Deshacer pase</button>
       ${aviso}
@@ -392,9 +438,12 @@ function tarjeta(r) {
 
   $("#btnDeshacer").addEventListener("click", deshacer);
   const bp = $("#btnPagar");
-  if (bp) bp.addEventListener("click", () => pagar(r.folio, debe));
+  if (bp) bp.addEventListener("click", () => pagar(r.folio, neto));
   const bd = $("#btnDespagar");
   if (bd) bd.addEventListener("click", () => despagar(r.folio));
+  $("#btnAdelanto").addEventListener("click", () => adelantar(r.folio, r.nombre));
+  t.querySelectorAll("[data-ade]").forEach((b) =>
+    b.addEventListener("click", () => quitarAdelanto(r.folio, b.dataset.ade)));
 }
 
 /* ---------------- acciones ---------------- */
@@ -430,6 +479,32 @@ async function pagar(folio, monto) {
     avisar(e.message, true);
     if (b) { b.disabled = false; b.textContent = `Marcar pagado ${pesos(monto)}`; }
   }
+}
+
+// Entrega dinero por adelantado. Se le descuenta solo cuando se le
+// pague la jornada, así que aquí basta con dejarlo anotado.
+async function adelantar(folio, nombre) {
+  const txt = prompt(`¿Cuánto le vas a adelantar a ${nombre}?\n\nSolo el número, por ejemplo 200`);
+  if (txt === null) return;
+  const monto = Number(String(txt).replace(/[^\d.]/g, ""));
+  if (!monto || monto <= 0) { avisar("Escribe una cantidad, por ejemplo 200", true); return; }
+  const motivo = prompt("¿Para qué? (opcional — pasaje, comida, etc.)") || "";
+  try {
+    const r = await rpc("dar_adelanto", { p: { folio, monto, motivo } });
+    if (!r.ok) { avisar("No se pudo registrar el adelanto", true); return; }
+    avisar(`✓ Le adelantaste ${pesos(r.monto)} a ${r.nombre}`);
+    tarjeta(await rpc("pase_lista", { p: { folio, tipo: TIPO, dia: $("#dia").value || null } }));
+    await cargar();
+  } catch (e) { avisar(e.message, true); }
+}
+
+async function quitarAdelanto(folio, id) {
+  try {
+    const r = await rpc("deshacer_adelanto", { p: { folio, id } });
+    avisar(r.ok ? "Adelanto quitado" : "Ese adelanto ya se había descontado", !r.ok);
+    tarjeta(await rpc("pase_lista", { p: { folio, tipo: TIPO, dia: $("#dia").value || null } }));
+    await cargar();
+  } catch (e) { avisar(e.message, true); }
 }
 
 async function despagar(folio) {
