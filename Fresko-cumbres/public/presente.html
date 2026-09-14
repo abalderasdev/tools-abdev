@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Mi entrada y salida · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);min-height:100dvh;
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px 48px}
+button{font:inherit;cursor:pointer}
+
+header{background:var(--verde);color:#fff;padding:22px 18px 20px;
+  border-bottom:5px solid var(--naranja)}
+.head-in{max-width:460px;margin:0 auto}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:27px;
+  margin:0 0 3px;letter-spacing:-.02em}
+.sub{margin:0;color:#BFE6CB;font-size:14.5px}
+
+/* ---------- identificarse ---------- */
+.caja{background:var(--panel);border:1px solid var(--linea);border-radius:18px;
+  padding:22px 20px;margin-top:20px}
+label{display:block;font-weight:600;font-size:15px;margin:0 0 6px}
+.pista{margin:0 0 14px;color:var(--tinta-2);font-size:14px}
+input{width:100%;padding:14px;font:inherit;font-size:18px;color:var(--tinta);
+  background:var(--panel);border:1.5px solid var(--linea-2);border-radius:var(--radio);
+  font-variant-numeric:tabular-nums}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+.dos{display:flex;gap:10px}
+.dos > div{flex:1}
+#folio{text-align:center;letter-spacing:.14em;font-weight:700}
+.principal{width:100%;margin-top:16px;padding:16px;background:var(--verde);color:#fff;
+  border:none;border-radius:var(--radio);font-weight:700;font-size:17px}
+.principal:disabled{opacity:.55}
+
+/* ---------- tarjeta del día ---------- */
+#panel{display:none}
+.quien{margin-top:20px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:18px;padding:20px}
+.quien h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:25px;
+  margin:0 0 2px;letter-spacing:-.02em}
+.quien .eq{margin:0;color:var(--tinta-2);font-size:14.5px}
+.horario{margin:14px 0 0;padding:12px 14px;background:var(--arena);border-radius:12px;
+  font-size:14.5px;color:var(--tinta-2)}
+.horario b{color:var(--tinta)}
+
+.marcas{display:flex;gap:10px;margin-top:16px}
+.marca{flex:1;background:var(--arena);border-radius:12px;padding:13px;text-align:center}
+.marca .t{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--tinta-3)}
+.marca .h{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;
+  line-height:1.15;font-variant-numeric:tabular-nums;margin-top:2px}
+.marca.hecha .h{color:var(--verde)}
+.marca .h.vacio{color:var(--tinta-3)}
+
+.bono{margin-top:16px;padding:14px;border-radius:12px;background:#DCEFE2;color:#0B5D2E;
+  font-size:15px;font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bono{background:#17331F;color:#9BE0B4}}
+.bono b{font-family:"Bricolage Grotesque",sans-serif;font-size:19px}
+
+.acciones{display:grid;gap:10px;margin-top:18px}
+.grande{padding:20px;border:none;border-radius:16px;font-weight:700;font-size:19px;
+  font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.01em}
+.grande.entrada{background:var(--verde);color:#fff}
+.grande.salida{background:var(--naranja);color:#fff}
+.grande:disabled{opacity:.4}
+.grande.listo{background:var(--arena);color:var(--tinta-3);border:1.5px solid var(--linea-2)}
+
+.resultado{margin-top:16px;padding:16px;border-radius:14px;display:none;
+  font-size:15.5px;line-height:1.45;border:1.5px solid transparent}
+.resultado.on{display:block}
+.resultado.bien{background:#DCEFE2;border-color:var(--verde-2);color:#0B5D2E}
+.resultado.ojo{background:#FFF1DC;border-color:var(--naranja);color:#8A3708}
+.resultado.mal{background:#FAE5E0;border-color:var(--error);color:var(--error)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  .resultado.bien{background:#17331F;color:#9BE0B4}
+  .resultado.ojo{background:#33240F;color:#F2B77F}
+  .resultado.mal{background:#3A1712;color:#F0A091}}}
+.resultado .tit{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px;
+  display:block;margin-bottom:3px}
+
+.ayuda-gps{margin-top:14px;font-size:13.5px;color:var(--tinta-3);line-height:1.5}
+.salir{display:block;margin:22px auto 0;background:none;border:none;color:var(--tinta-3);
+  font-size:14px;text-decoration:underline}
+footer{margin-top:26px;font-size:12.5px;color:var(--tinta-3);line-height:1.5}
+</style>
+</head>
+<body>
+
+<header><div class="head-in">
+  <h1>Mi entrada y salida</h1>
+  <p class="sub">Regístralas desde aquí para ganar tus $50 de puntualidad.</p>
+</div></header>
+
+<div class="wrap">
+
+  <form class="caja" id="fEntrar">
+    <label for="folio">Tu folio</label>
+    <p class="pista">Los tres dígitos que te dimos al registrarte.</p>
+    <div class="dos">
+      <div><input id="folio" inputmode="numeric" maxlength="4" placeholder="000" autocomplete="off"></div>
+      <div><input id="tel4" inputmode="numeric" maxlength="4" placeholder="Últimos 4 de tu tel." autocomplete="off"></div>
+    </div>
+    <button class="principal" type="submit" id="btnEntrar">Continuar</button>
+    <p class="resultado" id="errId"></p>
+  </form>
+
+  <div id="panel">
+    <div class="quien">
+      <h2 id="nombre">—</h2>
+      <p class="eq" id="equipo"></p>
+      <div class="horario">Hoy el horario es de <b id="horario">1:00 pm a 7:00 pm</b>.
+        Marca tu entrada al llegar y tu salida al terminar.</div>
+
+      <div class="marcas">
+        <div class="marca" id="mEntrada">
+          <div class="t">Entrada</div><div class="h vacio" id="hEntrada">—</div>
+        </div>
+        <div class="marca" id="mSalida">
+          <div class="t">Salida</div><div class="h vacio" id="hSalida">—</div>
+        </div>
+      </div>
+
+      <div class="bono" id="bono"></div>
+    </div>
+
+    <div class="acciones">
+      <button class="grande entrada" type="button" id="btnEntrada">Llegué — marcar entrada</button>
+      <button class="grande salida"  type="button" id="btnSalida">Me voy — marcar salida</button>
+    </div>
+
+    <p class="resultado" id="res"></p>
+
+    <p class="ayuda-gps">Necesitamos tu ubicación para comprobar que estás en el punto.
+      Si te dice que estás lejos, camina hacia la tienda y vuelve a intentar.
+      Si el celular no te pide permiso, ábrelo desde Chrome o Safari, no desde WhatsApp.</p>
+
+    <button class="salir" type="button" id="btnSalir">No soy yo, cambiar de folio</button>
+  </div>
+
+  <footer>
+    Tu ubicación se usa solo en el momento de marcar, para saber que estás en el punto de trabajo.
+    No te rastreamos el resto del día.
+  </footer>
+</div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const CLAVE = "fresko_presente";
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+const cab = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json" };
+
+let YO = null;   // { folio, tel4 }
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST", headers:cab, body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.msg || `error ${r.status}`);
+  return d;
+}
+
+function aviso(el, tipo, titulo, texto) {
+  el.className = "resultado on " + tipo;
+  el.innerHTML = `<span class="tit">${esc(titulo)}</span>${esc(texto || "")}`;
+}
+
+/* ---------------- recordar quién es ---------------- */
+const guardar = (y) => { try { localStorage.setItem(CLAVE, JSON.stringify(y)); } catch(e){} };
+const leer    = () => { try { return JSON.parse(localStorage.getItem(CLAVE) || "null"); } catch(e){ return null; } };
+const borrar  = () => { try { localStorage.removeItem(CLAVE); } catch(e){} };
+
+/* ---------------- pintar el día ---------------- */
+function pintar(d) {
+  $("#nombre").textContent = d.nombre || "Hola";
+  $("#equipo").textContent = d.equipo || "";
+  if (d.horario) $("#horario").textContent = d.horario.replace(/:00/g, ":00");
+
+  const ent = d.entrada, sal = d.salida;
+  $("#hEntrada").textContent = ent || "—";
+  $("#hSalida").textContent  = sal || "—";
+  $("#hEntrada").classList.toggle("vacio", !ent);
+  $("#hSalida").classList.toggle("vacio", !sal);
+  $("#mEntrada").classList.toggle("hecha", !!ent);
+  $("#mSalida").classList.toggle("hecha", !!sal);
+
+  const be = $("#btnEntrada"), bs = $("#btnSalida");
+  be.disabled = !!ent; be.classList.toggle("listo", !!ent);
+  be.textContent = ent ? `Entrada registrada a las ${ent}` : "Llegué — marcar entrada";
+  bs.disabled = !!sal; bs.classList.toggle("listo", !!sal);
+  bs.textContent = sal ? `Salida registrada a las ${sal}` : "Me voy — marcar salida";
+
+  const dias = Number(d.dias_con_bono || 0);
+  const porDia = Number(d.bono_por_dia || 50);
+  $("#bono").innerHTML = dias > 0
+    ? `Llevas <b>${dias}</b> ${dias === 1 ? "día" : "días"} con puntualidad completa:
+       <b>$${(dias * porDia).toLocaleString("es-MX")}</b> de bono acumulado.`
+    : `Marca entrada <i>y</i> salida a tiempo para sumar tus $${porDia} del día.`;
+}
+
+async function refrescar() {
+  const d = await rpc("estado_presencia", { p_folio: YO.folio, p_tel4: YO.tel4 });
+  if (!d.ok) { salir(); return; }
+  pintar(d);
+}
+
+/* ---------------- ubicación ---------------- */
+function ubicacion() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error("Este teléfono no comparte ubicación."));
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude,
+                       precision: p.coords.accuracy }),
+      (e) => reject(new Error(
+        e.code === 1 ? "No nos diste permiso de ubicación. Actívalo y vuelve a intentar."
+                     : "No pudimos obtener tu ubicación. Sal a un lugar abierto e intenta otra vez.")),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  });
+}
+
+async function marcar(tipo) {
+  const btn = tipo === "entrada" ? $("#btnEntrada") : $("#btnSalida");
+  const antes = btn.textContent;
+  btn.disabled = true; btn.textContent = "Buscando tu ubicación…";
+  const res = $("#res");
+  res.className = "resultado";
+
+  try {
+    const u = await ubicacion();
+    btn.textContent = "Registrando…";
+    const d = await rpc("registrar_presencia", {
+      p: { folio: YO.folio, tel4: YO.tel4, tipo, lat: u.lat, lon: u.lon, precision: u.precision }
+    });
+
+    if (!d.ok) {
+      aviso(res, d.motivo === "FUERA_DEL_PUNTO" ? "ojo" : "mal",
+            d.motivo === "FUERA_DEL_PUNTO" ? "Todavía estás lejos" : "No se pudo registrar",
+            d.mensaje || "Inténtalo de nuevo.");
+      btn.disabled = false; btn.textContent = antes;
+      return;
+    }
+
+    aviso(res, d.a_tiempo ? "bien" : "ojo",
+          d.a_tiempo ? `Listo, ${d.nombre}` : "Quedó registrada, pero tarde",
+          d.mensaje);
+    await refrescar();
+  } catch (e) {
+    aviso(res, "mal", "No se pudo", e.message);
+    btn.disabled = false; btn.textContent = antes;
+  }
+}
+
+/* ---------------- entrar ---------------- */
+async function entrar(folio, tel4, silencioso) {
+  const d = await rpc("estado_presencia", { p_folio: folio, p_tel4: tel4 });
+  if (!d.ok) {
+    if (!silencioso) {
+      aviso($("#errId"), "mal", "No te encontramos",
+            "Revisa tu folio y los últimos 4 dígitos del teléfono con el que te registraste.");
+    }
+    return false;
+  }
+  YO = { folio: d.folio, tel4 };
+  guardar(YO);
+  $("#fEntrar").style.display = "none";
+  $("#panel").style.display = "block";
+  pintar(d);
+  return true;
+}
+
+function salir() {
+  borrar(); YO = null;
+  $("#panel").style.display = "none";
+  $("#fEntrar").style.display = "block";
+  $("#folio").value = ""; $("#tel4").value = "";
+}
+
+$("#fEntrar").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnEntrar");
+  const folio = $("#folio").value.trim(), tel4 = $("#tel4").value.trim();
+  if (!folio || tel4.replace(/\D/g,"").length !== 4) {
+    aviso($("#errId"), "mal", "Faltan datos",
+          "Escribe tu folio y los últimos 4 dígitos de tu teléfono.");
+    return;
+  }
+  b.disabled = true; b.textContent = "Buscando…";
+  try { await entrar(folio, tel4); }
+  catch (e) { aviso($("#errId"), "mal", "No se pudo", e.message); }
+  b.disabled = false; b.textContent = "Continuar";
+});
+
+$("#btnEntrada").addEventListener("click", () => marcar("entrada"));
+$("#btnSalida").addEventListener("click",  () => marcar("salida"));
+$("#btnSalir").addEventListener("click", salir);
+
+(async () => {
+  // El folio puede venir en la liga que le dimos al registrarse.
+  const f = new URLSearchParams(location.search).get("f");
+  if (f) $("#folio").value = f;
+
+  const y = leer();
+  if (y && y.folio && y.tel4) {
+    try { await entrar(y.folio, y.tel4, true); } catch (e) {}
+  }
+  if (!YO) ($("#folio").value ? $("#tel4") : $("#folio")).focus();
+})();
+</script>
+</body>
+</html>

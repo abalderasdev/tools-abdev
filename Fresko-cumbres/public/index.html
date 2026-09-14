@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Registro · Activación Cumbres</title>
-<meta name="description" content="Regístrate para la activación en calle del 9 al 13 de septiembre en Cumbres, Monterrey. $400 por día, $200 por la capacitación, $50 diarios de puntualidad y $50 por cada amigo que invites.">
+<meta name="description" content="Regístrate para la activación en calle del 14 al 24 de septiembre en Cumbres, Monterrey, de 1 a 7 pm. $400 por día, $50 diarios de puntualidad y $50 por cada amigo que invites. Sin capacitación: te registras y arrancas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -81,6 +81,15 @@ button.enviar:disabled{opacity:.55;cursor:progress}
   padding:16px;margin-bottom:18px}
 .nota-bono b{color:var(--naranja)}
 
+input[type=file]{width:100%;padding:13px;font:inherit;font-size:15.5px;background:#fff;
+  border:1.5px dashed var(--linea);border-radius:var(--radio)}
+.campo.malo input[type=file]{border-color:var(--error)}
+.ine-previa{margin-top:10px;display:flex;gap:12px;align-items:center}
+.ine-previa img{width:120px;height:78px;object-fit:cover;border-radius:10px;
+  border:1.5px solid var(--linea)}
+.ine-quitar{background:none;border:none;color:var(--verde);font:inherit;font-size:14.5px;
+  font-weight:600;text-decoration:underline;cursor:pointer;padding:0}
+
 #pase{display:none}
 .pase{background:#fff;border-radius:20px;overflow:hidden;margin-top:8px;
   box-shadow:0 18px 40px -24px rgba(11,93,46,.55)}
@@ -133,13 +142,12 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
 <header>
   <div class="wrap-h">
     <h1>Activación en calle<br>Cumbres, Monterrey</h1>
-    <p class="sub">Regístrate, recibe tu folio y te esperamos en la capacitación.</p>
+    <p class="sub">Regístrate, sube tu INE y recibe tu folio. Empiezas el mismo día.</p>
     <div class="hechos">
       <span class="hecho pago">$400 por día</span>
-      <span class="hecho">$200 por la capacitación</span>
       <span class="hecho">$50 diarios por puntualidad</span>
       <span class="hecho">$50 por cada amigo que invites</span>
-      <span class="hecho">9 al 13 de sept · 9 a 3</span>
+      <span class="hecho">14 al 24 de sept · 1 a 7 pm</span>
     </div>
   </div>
 </header>
@@ -261,22 +269,30 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
       </div>
 
       <div class="nota-bono">
-        La capacitación es el <b>martes 8 de septiembre a las 4:00 p.m. en Fresko Valle de Cumbres</b>.
-        Quien asiste se lleva <b>$200 ese mismo día</b>. El sueldo de cada jornada se paga
-        a la mañana siguiente, y los <b>$50 diarios de puntualidad</b> se entregan el último día.
+        La activación va del <b>lunes 14 al miércoles 24 de septiembre</b>, de
+        <b>1:00 a 7:00 de la tarde</b>. Cada jornada se paga <b>$400</b> a la mañana siguiente,
+        y los <b>$50 diarios de puntualidad</b> se entregan al final.
+        <b>No hay capacitación</b>: te registras y arrancas.
+      </div>
+
+      <div class="campo" id="c-ine">
+        <label for="ineFoto">Foto de tu INE</label>
+        <p class="ayuda">Del lado del frente, que se lea tu nombre. La usamos solo para
+          comprobar quién eres; nadie más que el coordinador puede verla.</p>
+        <input id="ineFoto" type="file" accept="image/*" capture="environment">
+        <div class="ine-previa" id="inePrevia" hidden>
+          <img id="ineImg" alt="Foto de tu INE">
+          <button type="button" class="ine-quitar" id="ineQuitar">Cambiar foto</button>
+        </div>
+        <p class="err">Necesitamos la foto de tu INE para darte folio.</p>
       </div>
 
       <div class="campo" id="c-compromisos">
         <div class="check">
           <input type="checkbox" id="disp">
-          <label for="disp">Puedo los <strong>5 días completos</strong>, del 9 al 13 de septiembre de 9:00 a 15:00 h.
+          <label for="disp">Puedo <strong>todos los días</strong>, del 14 al 24 de septiembre de 1:00 a 7:00 pm.
             <span class="opt">Si no puedes todos, no la marques: igual te registramos y vas los días que puedas.</span></label>
         </div>
-        <div class="check">
-          <input type="checkbox" id="ine">
-          <label for="ine">Tengo <strong>INE vigente</strong> y puedo llevarla.</label>
-        </div>
-        <p class="err">Necesitamos que marques la casilla de la INE para continuar.</p>
       </div>
 
       <div class="campo">
@@ -311,27 +327,27 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
       <div class="rasgado"></div>
       <div class="pase-cita">
         <h3 id="saludo">Te esperamos</h3>
-        <div class="dato"><b>Día</b><span>Martes 8 de septiembre</span></div>
-        <div class="dato"><b>Hora</b><span>4:00 p.m. — llega 15 min antes</span></div>
+        <div class="dato"><b>Días</b><span>Del 14 al 24 de septiembre</span></div>
+        <div class="dato"><b>Horario</b><span>1:00 a 7:00 de la tarde</span></div>
         <div class="dato"><b>Lugar</b><span>Fresko Valle de Cumbres, Monterrey</span></div>
         <div class="dato"><b>Contacto</b><span>Alberto Balderas · 55 6180 0423</span></div>
       </div>
       <div class="pase-pie">
-        <a class="acc wa" id="waConf" href="#">Confirmar por WhatsApp</a>
-        <a class="acc cal" id="calLink" href="#" target="_blank" rel="noopener">Agregar a mi calendario</a>
+        <a class="acc wa" id="waConf" href="#">Avisar por WhatsApp que ya me registré</a>
+        <a class="acc cal" id="linkPresente" href="/presente">Registrar mi entrada al llegar</a>
       </div>
     </div>
 
     <div class="espera" id="espera">
-      Ya se llenaron los lugares, pero quedaste en <b>lista de espera</b>. Preséntate igual el martes:
+      Ya se llenaron los lugares, pero quedaste en <b>lista de espera</b>. Preséntate igual:
       casi siempre se liberan lugares y entran los de la lista.
     </div>
 
     <div class="invita">
       <h4>Gana $50 por cada amigo que invites</h4>
       <p>Tu enlace ya lleva tu folio <b id="folioInvita">000</b>: quien se registre con él queda
-        ligado a ti solo. Por cada persona que llegue el martes, te damos <b>$50 extra</b>,
-        y se te pagan el último día. No tiene tope.</p>
+        ligado a ti solo. Por cada persona que se presente a trabajar, te damos <b>$50 extra</b>,
+        y se te pagan al final. No tiene tope.</p>
       <a class="acc" id="waShare" href="#">Invitar por WhatsApp</a>
       <button type="button" class="acc acc-2" id="shareRedes">Compartir en redes</button>
       <button type="button" class="acc acc-2" id="copiarLiga">Copiar mi enlace</button>
@@ -339,13 +355,15 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
     </div>
 
     <div class="llevar">
-      <h4>Lleva a la capacitación</h4>
+      <h4>Lleva cada día</h4>
       <ul>
         <li>INE original</li>
         <li>Tu folio (toma captura de esta pantalla)</li>
         <li>Pantalón de mezclilla azul y tenis</li>
       </ul>
-      <p class="uniforme-nota">La playera, la gorra y el mandil te los damos nosotros.</p>
+      <p class="uniforme-nota">La playera, la gorra, el mandil y el agua te los damos nosotros.
+        Al llegar y al irte, registra tu hora desde <a href="/presente">esta página</a>:
+        de ahí salen tus $50 de puntualidad.</p>
     </div>
   </div>
 
@@ -358,7 +376,7 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
 <script>
 const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
-const CAMPANA      = "FRESKO-CUMBRES-SEP26";
+const CAMPANA      = "FRESKO-CUMBRES-ETAPA2";
 const WHATSAPP     = "525561800423";
 
 const $ = s => document.querySelector(s);
@@ -427,7 +445,7 @@ $("#f").addEventListener("submit", async ev => {
   ok = marcar("#c-telefono", tel.length !== 10) && ok;
   ok = marcar("#c-edad", !(edad >= 18 && edad <= 70)) && ok;
   ok = marcar("#c-colonia", val("#colonia").length < 3) && ok;
-  ok = marcar("#c-compromisos", !$("#ine").checked) && ok;
+  ok = marcar("#c-ine", !INE_FOTO) && ok;
   ok = marcar("#c-aviso", !$("#aviso").checked) && ok;
 
   if (!ok) {
@@ -452,7 +470,7 @@ $("#f").addEventListener("submit", async ev => {
     talla_playera: radio("talla"),
     experiencia: radio("experiencia"),
     disponible_completa: $("#disp").checked,
-    tiene_ine: true,
+    tiene_ine: !!INE_FOTO,
     transporte: radio("transporte"),
     comentarios: val("#comentarios") || null,
     referido_por_folio: refValido || val("#refFolio") || null,
@@ -469,6 +487,16 @@ $("#f").addEventListener("submit", async ev => {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.message || "error");
+
+    // La foto se sube DESPUÉS: hasta aquí ya existe el folio, y el nombre
+    // del archivo lo lleva. Si algo falla, el registro no se pierde: la
+    // INE se puede capturar después en /lista.
+    if (INE_FOTO) {
+      btn.textContent = "Subiendo tu INE…";
+      try { await subirINE(data.folio); }
+      catch (e2) { console.error(e2); }
+    }
+
     mostrarPase(data, p);
   } catch (e) {
     console.error(e);
@@ -479,13 +507,92 @@ $("#f").addEventListener("submit", async ev => {
   }
 });
 
+/* ---------------- foto de la INE ---------------- */
+let INE_FOTO = null;   // Blob ya encogido, listo para subir
+
+// Los celulares sacan fotos de 4 MB o más y muchos traen datos contados.
+// 1400 px de ancho basta de sobra para leer una credencial.
+function encoger(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1400;
+      const esc = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * esc);
+      c.height = Math.round(img.height * esc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      c.toBlob((b) => b ? resolve(b) : reject(new Error("no se pudo procesar")),
+               "image/jpeg", 0.82);
+    };
+    img.onerror = () => reject(new Error("no se pudo leer la imagen"));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+$("#ineFoto").addEventListener("change", async (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  const campo = $("#c-ine");
+  try {
+    INE_FOTO = await encoger(f);
+    $("#ineImg").src = URL.createObjectURL(INE_FOTO);
+    $("#inePrevia").hidden = false;
+    $("#ineFoto").hidden = true;
+    campo.classList.remove("malo");
+  } catch (e) {
+    INE_FOTO = null;
+    campo.classList.add("malo");
+    campo.querySelector(".err").textContent =
+      "No pudimos leer esa imagen. Intenta con otra foto.";
+  }
+});
+
+$("#ineQuitar").addEventListener("click", () => {
+  INE_FOTO = null;
+  $("#ineFoto").value = "";
+  $("#ineFoto").hidden = false;
+  $("#inePrevia").hidden = true;
+});
+
+async function subirImagen(folio) {
+  const ruta = `registro/${folio}-${Date.now()}.jpg`;
+  // Sin x-upsert: sobrescribir exige permiso de UPDATE, que el público no
+  // tiene. El nombre ya lleva la hora exacta, así que no hay colisiones.
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/ine/${ruta}`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`,
+               "Content-Type": "image/jpeg" },
+    body: INE_FOTO
+  });
+  if (!r.ok) throw new Error(`no se pudo subir (${r.status})`);
+  return ruta;
+}
+
+async function subirINE(folio) {
+  const ruta = await subirImagen(folio);
+  await fetch(`${SUPABASE_URL}/rest/v1/rpc/guardar_ine`, {
+    method: "POST", headers: cab,
+    body: JSON.stringify({ p_folio: folio, p_path: ruta })
+  });
+}
+
 function mostrarPase(d, p) {
   const nombre = p.nombre;
   const folio = d.folio, nom = nombre.split(" ")[0];
   $("#f").style.display = "none";
   $("#folioTxt").textContent = folio;
   $("#folioInvita").textContent = folio;
-  $("#saludo").textContent = d.duplicado ? `${nom}, ya estabas registrado` : `Listo, ${nom}`;
+  // `regresa` = ya había trabajado antes: conserva el folio de siempre.
+  $("#saludo").textContent =
+    d.duplicado ? `${nom}, ya estabas anotado`
+    : d.regresa ? `Qué bueno tenerte de vuelta, ${nom}`
+    : `Listo, ${nom}`;
+  if (d.regresa) {
+    $("#saludo").insertAdjacentHTML("afterend",
+      `<p class="ayuda" style="margin:-8px 0 12px">Sigues con el mismo folio de siempre.</p>`);
+  }
   if (d.estatus === "lista_espera") $("#espera").style.display = "block";
 
   const lugar = [p.colonia, p.municipio].filter(Boolean).join(", ");
@@ -496,18 +603,18 @@ function mostrarPase(d, p) {
     `Talla de playera: ${p.talla_playera}\n` +
     `Vivo en: ${lugar}\n` +
     (p.referido_por_folio ? `Me invitó el folio: ${p.referido_por_folio}\n` : ``) +
-    `\nConfirmo la capacitación del martes 8 de septiembre a las 4:00 p.m. en Fresko Valle de Cumbres. Llevo mi INE original.`
+    `\nYa subí mi INE. Listo para presentarme de 1:00 a 7:00 pm en Fresko Valle de Cumbres.`
   );
 
   const MI_LIGA = `${LIGA}?ref=${folio}`;
   const INVITA =
 `Oye, ¿andas buscando trabajo esta semana? Voy a estar en la activación de la inauguración del Fresko Valle de Cumbres y todavía hay lugares.
 
-Es del 9 al 13 de septiembre, de 9 a 3 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $50 por cada día que llegues puntual. La playera, la gorra, el mandil y el agua los ponen ellos.
+Es del 14 al 24 de septiembre, de 1 a 7 de la tarde. Pagan $400 el día y te lo dan a la mañana siguiente, más $50 por cada día que llegues puntual. La playera, la gorra, el mandil y el agua los ponen ellos.
 
-No piden experiencia ni que vayas los 5 días: puedes ir nada más los días que puedas. Solo llevas tu INE original.
+No piden experiencia ni que vayas todos los días: puedes ir nada más los que puedas. No hay capacitación, te registras y arrancas.
 
-Si le entras, regístrate aquí y te dan tu folio de una vez:
+Te registras aquí desde el celular, subes la foto de tu INE y te dan tu folio al momento:
 ${MI_LIGA}
 
 Es en el Fresko Valle de Cumbres, en Mitras Poniente 66035.`;
@@ -550,12 +657,8 @@ Es en el Fresko Valle de Cumbres, en Mitras Poniente 66035.`;
     }
   });
 
-  $("#calLink").href =
-    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + encodeURIComponent(`Capacitación activación Cumbres · folio ${folio}`) +
-    "&dates=20260908T220000Z/20260908T230000Z" +
-    "&location=" + encodeURIComponent("Fresko Valle de Cumbres, Monterrey, N.L.") +
-    "&details=" + encodeURIComponent(`Folio ${folio}. Lleva tu INE original. Contacto: Alberto Balderas 55 6180 0423.`);
+  // Su folio va en la liga de presencia, para que no lo tenga que teclear.
+  $("#linkPresente").href = `/presente?f=${encodeURIComponent(folio)}`;
 
   const pase = $("#pase");
   pase.style.display = "block";
