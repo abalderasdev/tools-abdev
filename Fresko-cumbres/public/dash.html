@@ -329,6 +329,7 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
   </div>
 </div>
 
+<script src="/sesion.js"></script>
 <script>
 const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
@@ -347,46 +348,18 @@ let filtro = "todos", busca = "";
 let PERMISOS = {};
 
 async function rpcCon(sesion, fn, body) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
-    method:"POST",
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${sesion.access_token}`, "Content-Type":"application/json" },
-    body: JSON.stringify(body || {})
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
-  return d;
+  try { return await Sesion.rpc(fn, body); }
+  catch (e) { if (e.vencida) { location.reload(); throw new Error("Vuelve a entrar"); } throw e; }
 }
 
 /* ---------------- sesión ---------------- */
-function guardarSesion(s) {
-  try { sessionStorage.setItem(CLAVE_SESION, JSON.stringify(s)); } catch (e) {}
-}
-function leerSesion() {
-  try {
-    const s = JSON.parse(sessionStorage.getItem(CLAVE_SESION) || "null");
-    if (s && s.access_token && s.expira > Date.now() + 30000) return s;
-  } catch (e) {}
-  return null;
-}
-function borrarSesion() { try { sessionStorage.removeItem(CLAVE_SESION); } catch (e) {} }
+function guardarSesion() {}                       // Sesion ya la guarda
+function leerSesion() { return Sesion.hay() ? { email: Sesion.correo() } : null; }
+function borrarSesion() { Sesion.salir(); }
 
-async function entrar(email, password) {
-  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error_description || d.msg || d.message || "No se pudo iniciar sesión");
-  return { access_token: d.access_token, email: d.user && d.user.email, expira: Date.now() + (d.expires_in || 3600) * 1000 };
-}
-
-async function traer(tabla, qs, token) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}?${qs}`, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${token}`, Accept: "application/json" }
-  });
-  if (!r.ok) throw new Error(`${tabla}: ${r.status}`);
-  return r.json();
+async function traer(tabla, qs) {
+  try { return await Sesion.traer(`${tabla}?${qs}`); }
+  catch (e) { if (e.vencida) { location.reload(); throw new Error("Vuelve a entrar"); } throw e; }
 }
 
 async function cargar(sesion) {
@@ -407,10 +380,10 @@ async function cargar(sesion) {
   const hoy = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Monterrey" }))
     .toISOString().slice(0, 10);
   const [candidatos, bonos, parametros, asistencia] = await Promise.all([
-    traer("candidatos", "select=*&order=folio.asc", sesion.access_token),
-    traer("bonos", "select=*", sesion.access_token),
-    traer("parametros", `select=*&campana=eq.${CAMPANA}`, sesion.access_token),
-    traer("asistencia", `select=*&dia=eq.${hoy}&order=momento.desc`, sesion.access_token).catch(() => [])
+    traer("candidatos", "select=*&order=folio.asc"),
+    traer("bonos", "select=*"),
+    traer("parametros", `select=*&campana=eq.${CAMPANA}`),
+    traer("asistencia", `select=*&dia=eq.${hoy}&order=momento.desc`).catch(() => [])
   ]);
   DATOS = { candidatos, bonos, parametros: parametros[0] || {}, asistencia, email: sesion.email };
   $("#pesEquipo").style.display = "block";
@@ -581,7 +554,7 @@ function pintarTabla() {
 
 /* ---------------- pestañas: dinero y estado de cuenta ---------------- */
 async function rpc(fn, body) {
-  const s = leerSesion();
+  const s = { access_token: await Sesion.token() };
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
     method:"POST",
     headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}`, "Content-Type":"application/json" },
@@ -607,7 +580,7 @@ function par(etiqueta, valor) {
 
 // La foto de INE vive en un bucket privado: hay que pedir una liga firmada.
 async function ligaINE(path) {
-  const s = leerSesion();
+  const s = { access_token: await Sesion.token() };
   const r = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/ine/${path}`, {
     method:"POST",
     headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}`, "Content-Type":"application/json" },
@@ -866,7 +839,7 @@ $("#cardsDias").addEventListener("click", async (ev) => {
 
 let CUENTAS = [];
 async function pintarCuentas() {
-  const s = leerSesion();
+  const s = { access_token: await Sesion.token() };
   const r = await fetch(`${SUPABASE_URL}/rest/v1/v_estado_cuenta?select=*&order=folio.asc`, {
     headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}` }
   });
@@ -892,7 +865,7 @@ const nivel = (r) => r === "admin"
   : '<span class="badge b-lista_espera">Equipo</span>';
 
 async function pintarEquipo() {
-  const s = leerSesion();
+  const s = { access_token: await Sesion.token() };
   const [gente, invs] = await Promise.all([
     fetch(`${SUPABASE_URL}/rest/v1/dashboard_acceso?select=*&order=creado_en.asc`,
       { headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${s.access_token}` } }).then(r=>r.ok?r.json():[]),
@@ -981,7 +954,7 @@ $("#q").addEventListener("input", (e) => { busca = e.target.value.trim(); pintar
 
 /* sesión viva al recargar */
 (async () => {
-  const s = leerSesion();
+  const s = { access_token: await Sesion.token() };
   if (!s) return;
   try { await cargar(s); }
   catch (e) { if (e.aLista) location.href = "/lista"; else borrarSesion(); }

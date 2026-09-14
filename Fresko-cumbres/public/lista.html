@@ -216,6 +216,7 @@ h2{font-family:"Bricolage Grotesque",sans-serif;font-size:17px;margin:28px 0 8px
 
 <input type="file" id="fotoIne" accept="image/*" capture="environment" style="display:none">
 
+<script src="/sesion.js"></script>
 <script>
 const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
@@ -226,38 +227,21 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":
 const sel = (id) => document.getElementById(id);
 let SESION = null, TODOS = [], EQUIPOS = [], ULTIMA = [];
 
-const guardar = (s) => { try { sessionStorage.setItem(CLAVE, JSON.stringify(s)); } catch(e){} };
-const leer = () => { try { const s = JSON.parse(sessionStorage.getItem(CLAVE)||"null");
-  return (s && s.access_token && s.expira > Date.now()+30000) ? s : null; } catch(e){ return null; } };
-const borrar = () => { try { sessionStorage.removeItem(CLAVE); } catch(e){} };
+const guardar = () => {};                        // Sesion ya la guarda
+const leerSes = () => Sesion.hay() ? {} : null;
+const leer    = leerSes;
+const borrar  = () => Sesion.salir();
 
-async function entrar(email, password) {
-  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-    method:"POST", headers:{ apikey:SUPABASE_KEY, "Content-Type":"application/json" },
-    body: JSON.stringify({ email, password })
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error_description || d.msg || "No se pudo iniciar sesión");
-  return { access_token:d.access_token, expira: Date.now() + (d.expires_in||3600)*1000 };
-}
+async function entrar(email, password) { return Sesion.entrar(email, password); }
 
 async function rpc(fn, body) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
-    method:"POST",
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"application/json" },
-    body: JSON.stringify(body || {})
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
-  return d;
+  try { return await Sesion.rpc(fn, body); }
+  catch (e) { if (e.vencida) { location.reload(); throw new Error("Vuelve a entrar"); } throw e; }
 }
 
 async function tabla(qs) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/candidatos?${qs}`, {
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}` }
-  });
-  if (!r.ok) throw new Error(`candidatos ${r.status}`);
-  return r.json();
+  try { return await Sesion.traer(`candidatos?${qs}`); }
+  catch (e) { if (e.vencida) { location.reload(); throw new Error("Vuelve a entrar"); } throw e; }
 }
 
 function avisar(txt, tipo) {
@@ -502,9 +486,10 @@ $("#fotoIne").addEventListener("change", async (ev) => {
   try {
     const blob = await encoger(file);
     const path = `${folio}/${Date.now()}.jpg`;
+    const tk = await Sesion.token();
     const up = await fetch(`${SUPABASE_URL}/storage/v1/object/ine/${path}`, {
       method:"POST",
-      headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SESION.access_token}`, "Content-Type":"image/jpeg" },
+      headers: Sesion.cabeceras(tk, { "Content-Type":"image/jpeg" }),
       body: blob
     });
     if (!up.ok) {
