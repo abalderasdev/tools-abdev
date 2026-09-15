@@ -1024,7 +1024,7 @@ async function pintarPlantilla() {
   $("#e2Plantilla").innerHTML = pl.map((p) => `<tr>
       <td>${p.lugar}</td>
       <td><b>${esc(p.folio)}</b></td>
-      <td>${esc(p.nombre)}</td>
+      <td>${esc(p.nombre)}${p.puesto ? ' · <b style="color:var(--naranja)">' + esc(p.puesto) + '</b>' : ""}${Number(p.tarifa) !== Number(d.tarifa_base) ? " · " + pesos(p.tarifa) + "/día" : ""}</td>
       <td style="color:${color[p.papel]};font-weight:700">${esc(p.papel)}</td>
       <td>${p.estuvo_dia1 ? "✓" : "—"}</td>
       <td>${p.dias_antes > 0 ? esc(p.dias_antes) : "—"}</td>

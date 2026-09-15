@@ -96,8 +96,9 @@ pregunte "¿quién trabajó qué día?" lee esa vista, nunca las tablas.
 
 **Orden de la fila** (`v_prioridad_etapa2`), decidido por Alberto:
 1. Se presentó el primer día (14 de septiembre)
-2. Ya trabajó en la etapa anterior
-3. Ya está inscrito en esta etapa
+2. **Ya se inscribió a esta etapa** — quien levantó la mano va antes
+   que quien todavía no responde
+3. Ya trabajó en la etapa anterior
 4. Llegó primero
 
 Los primeros 15 son titulares, los 2 siguientes suplentes, el resto
@@ -124,7 +125,7 @@ terminar; ya existe la política de borrado para el personal.
 | Inscritos a Etapa 2 | 13 de 15 |
 | En la fila de prioridad | 93 |
 | Marcaron el día 1 | 7 |
-| Pagos registrados | 129 |
+| Pagos registrados | 169 — Etapa 1 liquidada |
 | Misiones escritas | 1 (sin publicar) |
 
 ### Tablas propias
@@ -147,52 +148,20 @@ fila), `v_confirmacion`, `v_estado_cuenta`.
 
 ## Lo que falta — plan de acción
 
-### 1. Decisión pendiente: quién ocupa los 17 lugares · URGENTE
-
-El orden actual da **9 de los 17 lugares a gente que no se ha inscrito**
-a la Etapa 2, porque "ya trabajó antes" pesa más que "ya está inscrito".
-Los cuatro que sí se registraron (folios 100, 101, 102, 082) quedaron
-fuera.
-
-Es lo que Alberto pidió al pie de la letra, pero hay que confirmarlo.
-Dos caminos:
-
-- **A)** Dejarlo. Premia lealtad; guarda lugares a quien no ha
-  confirmado que viene.
-- **B)** Que inscribirse sea requisito para ser titular o suplente, y
-  usar el orden completo solo para saber a quién llamar. Los que
-  trabajaron antes siguen teniendo prioridad, pero entre quienes
-  levantaron la mano. **Recomendado**, mandando primero la convocatoria
-  a esos 9 y dándoles un día.
-
-Si se elige B, el cambio es en `v_prioridad_etapa2`: filtrar por
-`inscrito` para asignar papel, conservando el orden para la reserva.
-
-### 2. Publicar la misión del día 15
+### 1. Publicar la misión del día 15
 Está escrita y en borrador. `/dash` → Etapa 2 → abajo. Botón "Ver como
 la verá el equipo" antes de publicar.
 
-### 3. Mandar la convocatoria
+### 2. Mandar la convocatoria
 `/recordatorio` → pestaña "🎯 Etapa 2 · convocar". Sale para los que
 trabajaron la Etapa 1 y no están inscritos. Alberto tiene un módulo
 aparte para enviar por WhatsApp.
 
-### 4. Folio 079 — David Didier
-Marcó presencia el día 1 **sin estar inscrito** a la Etapa 2. El sistema
-deja marcar a cualquiera con folio viejo: `registrar_presencia` valida
-identidad pero no inscripción. Decidir si se inscribe, y si se cierra el
-hueco (con el riesgo de dejar fuera a quien llegue sin inscribirse).
-
-### 5. Saldos de la Etapa 1
-Quedan personas con saldo pendiente y **un sobrepago de $900 a David
-Didier (079)**: se le pagaron 5 días y la asistencia registra 3. O se
-capturan los dos días faltantes, o quedó sobrepagado.
-
-### 6. Bonos de capacitación sin resolver
-**34 bonos de $200** siguen marcados "por pagar" ($6,800). Casi seguro se
-entregaron en efectivo el martes 8 y nunca se registraron. **No se
-tocaron a propósito**: marcarlos pagados sin confirmar sería inventar, y
-mostrarlos como deuda haría pagar dos veces. Alberto tiene que confirmar.
+### 3. Punto de encuentro — PENDIENTE DE COORDENADAS
+El equipo se coloca en **la entrada del fraccionamiento**, no en la
+puerta de la tienda. El geocerco (`puntos.cumbres-e2`) sigue apuntando
+a la tienda con 300 m de radio. Si la entrada queda fuera de ese radio,
+nadie podrá marcar entrada. **Falta el pin exacto.**
 
 ### 7. Agente conversacional
 `/milugar` ya resuelve la mayoría de las dudas sin IA. Para uno que
