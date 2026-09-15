@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B5D2E">
+<title>Mi lugar · Fresko Cumbres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0B5D2E; --verde-2:#2E9E4F; --naranja:#F2681F;
+  --arena:#FFF6EC; --panel:#fff; --tinta:#14231A; --tinta-2:#5A6B60; --tinta-3:#8A968D;
+  --linea:#E7DFD4; --linea-2:#D3C8B8; --error:#C2321B; --radio:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}}
+:root[data-theme="dark"]{
+  --arena:#12160F; --panel:#1A2018; --tinta:#EAF0E7; --tinta-2:#AFBCB0; --tinta-3:#7E8C81;
+  --linea:#2A332A; --linea-2:#3A463A; --verde:#6FBF89;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--arena);color:var(--tinta);min-height:100dvh;
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px 48px}
+button{font:inherit;cursor:pointer}
+
+header{background:var(--verde);color:#fff;padding:22px 18px 20px;
+  border-bottom:5px solid var(--naranja)}
+.head-in{max-width:460px;margin:0 auto}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:27px;
+  margin:0 0 3px;letter-spacing:-.02em}
+.sub{margin:0;color:#BFE6CB;font-size:14.5px}
+
+.caja{background:var(--panel);border:1px solid var(--linea);border-radius:18px;
+  padding:22px 20px;margin-top:20px}
+label{display:block;font-weight:600;font-size:15px;margin:0 0 6px}
+.pista{margin:0 0 14px;color:var(--tinta-2);font-size:14px}
+input{width:100%;padding:14px;font:inherit;font-size:18px;color:var(--tinta);
+  background:var(--panel);border:1.5px solid var(--linea-2);border-radius:var(--radio);
+  font-variant-numeric:tabular-nums}
+input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
+.dos{display:flex;gap:10px}
+.dos > div{flex:1}
+#folio{text-align:center;letter-spacing:.14em;font-weight:700}
+.principal{width:100%;margin-top:16px;padding:16px;background:var(--verde);color:#fff;
+  border:none;border-radius:var(--radio);font-weight:700;font-size:17px}
+.principal:disabled{opacity:.55}
+
+#panel{display:none}
+.tarjeta{margin-top:20px;border-radius:18px;padding:24px 20px;border:1.5px solid transparent}
+.tarjeta.titular{background:#DCEFE2;border-color:var(--verde-2);color:#0B5D2E}
+.tarjeta.suplente{background:#FFF1DC;border-color:var(--naranja);color:#8A3708}
+.tarjeta.reserva{background:var(--panel);border-color:var(--linea-2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  .tarjeta.titular{background:#17331F;color:#9BE0B4}
+  .tarjeta.suplente{background:#33240F;color:#F2B77F}}}
+.t-eti{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  opacity:.75}
+.t-tit{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:28px;
+  line-height:1.1;margin:5px 0 10px;letter-spacing:-.02em}
+.t-txt{font-size:15.5px;line-height:1.55;margin:0}
+.t-txt + .t-txt{margin-top:10px}
+
+.porque{margin-top:16px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:14px;padding:16px 18px}
+.porque h3{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tinta-3);margin:0 0 10px}
+.razon{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;
+  color:var(--tinta-2);margin-bottom:8px}
+.razon:last-child{margin-bottom:0}
+.razon .si{color:var(--verde);font-weight:700;flex:none}
+.razon .no{color:var(--tinta-3);flex:none}
+
+.datos{margin-top:16px;background:var(--panel);border:1px solid var(--linea);
+  border-radius:14px;padding:16px 18px;font-size:14.5px;color:var(--tinta-2)}
+.datos b{color:var(--tinta)}
+.acc{display:block;margin-top:12px;text-align:center;padding:15px;border-radius:var(--radio);
+  text-decoration:none;font-weight:700;font-size:16px;background:var(--verde);color:#fff}
+.acc.otro{background:transparent;color:var(--verde);border:1.5px solid var(--verde)}
+.malo{margin-top:14px;padding:14px;border-radius:12px;background:#FAE5E0;color:var(--error);
+  font-weight:600;font-size:15px;display:none}
+.malo.on{display:block}
+.salir{display:block;margin:22px auto 0;background:none;border:none;color:var(--tinta-3);
+  font-size:14px;text-decoration:underline}
+footer{margin-top:26px;font-size:12.5px;color:var(--tinta-3);line-height:1.55}
+</style>
+</head>
+<body>
+
+<header><div class="head-in">
+  <h1>Mi lugar</h1>
+  <p class="sub">Consulta cómo vas para esta activación.</p>
+</div></header>
+
+<div class="wrap">
+
+  <form class="caja" id="fEntrar">
+    <label for="folio">Tu folio</label>
+    <p class="pista">Los tres dígitos que te dimos al registrarte.</p>
+    <div class="dos">
+      <div><input id="folio" inputmode="numeric" maxlength="4" placeholder="000" autocomplete="off"></div>
+      <div><input id="tel4" inputmode="numeric" maxlength="4" placeholder="Últimos 4 de tu tel." autocomplete="off"></div>
+    </div>
+    <button class="principal" type="submit" id="btnVer">Ver mi lugar</button>
+    <p class="malo" id="err"></p>
+  </form>
+
+  <div id="panel">
+    <div class="tarjeta" id="tarjeta"></div>
+    <div class="porque" id="porque"></div>
+    <div class="datos" id="datos"></div>
+    <button class="salir" type="button" id="btnSalir">Consultar otro folio</button>
+  </div>
+
+  <footer>
+    El lugar lo decide el sistema con las mismas reglas para todos. Nadie lo aparta
+    pidiéndolo, y nadie lo pierde por no insistir.
+  </footer>
+</div>
+
+<script>
+const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
+const GRUPO = "https://chat.whatsapp.com/HU9nePfKDT0E0CgcNIbfRd";
+const CLAVE = "fresko_milugar";
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
+const cab = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json" };
+const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-MX");
+const fecha = (s) => s ? new Date(s + "T12:00:00")
+  .toLocaleDateString("es-MX", { day:"numeric", month:"long" }) : "";
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method:"POST", headers:cab, body: JSON.stringify(body || {})
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.message || `error ${r.status}`);
+  return d;
+}
+
+// Los tres textos. A nadie se le dice "no": se le dice dónde está y
+// qué sigue. Quien está cubierto sigue en la fila, y eso vale para
+// las vacantes de esta activación y para las que vienen.
+function contenido(d) {
+  if (d.papel === "titular") {
+    return {
+      eti: "Tienes lugar",
+      tit: `${d.nombre}, vas dentro`,
+      txt: [
+        `Quedaste en el equipo de esta activación. Te esperamos de <b>${esc(d.horario)}</b>, del <b>${esc(fecha(d.desde))}</b> al <b>${esc(fecha(d.hasta))}</b>.`,
+        `Lleva tu INE y ponte pantalón de mezclilla azul y tenis. Lo demás lo ponemos nosotros.`
+      ]
+    };
+  }
+  if (d.papel === "suplente") {
+    return {
+      eti: "Eres suplente",
+      tit: `${d.nombre}, estás en la banca`,
+      txt: [
+        `Los lugares se llenaron, pero quedaste como <b>suplente</b>: eres de los primeros en entrar si alguien no llega.`,
+        `Si se abre un lugar te avisamos <b>con un día de anticipación</b>, nunca a última hora. Mantente pendiente del grupo.`
+      ]
+    };
+  }
+  return {
+    eti: "Por ahora está cubierto",
+    tit: `${d.nombre}, quedaste en la fila`,
+    txt: [
+      `Esta activación ya está cubierta — son solo ${d.lugares} lugares y ${d.suplentes} suplentes, y se asignaron con las mismas reglas para todos.`,
+      `Pero <b>no te borramos</b>. Quedas registrado para cubrir vacantes, entrar de suplente si se abre un lugar, y para las <b>próximas activaciones</b>, que ya están programadas.`,
+      `Cuando te toque, te avisamos <b>con un día de anticipación</b>. No tienes que estar preguntando.`
+    ]
+  };
+}
+
+function pintar(d) {
+  const c = contenido(d);
+  const t = $("#tarjeta");
+  t.className = "tarjeta " + d.papel;
+  t.innerHTML = `<div class="t-eti">${esc(c.eti)}</div>
+    <div class="t-tit">${esc(c.tit)}</div>
+    ${c.txt.map((p) => `<p class="t-txt">${p}</p>`).join("")}`;
+
+  // Por qué quedó ahí. Las mismas reglas, a la vista.
+  const r = [
+    [d.estuvo_dia1, "Estuviste el primer día"],
+    [d.dias_antes > 0, d.dias_antes > 0
+      ? `Ya trabajaste con nosotros: ${d.dias_antes} ${d.dias_antes === 1 ? "día" : "días"}`
+      : "Ya trabajaste con nosotros"],
+    [d.inscrito, "Ya estás inscrito en esta activación"]
+  ];
+  $("#porque").innerHTML = `<h3>Cómo se decide el lugar</h3>` +
+    r.map(([si, txt]) => `<div class="razon">
+        <span class="${si ? "si" : "no"}">${si ? "✓" : "○"}</span>
+        <span>${esc(txt)}</span></div>`).join("") +
+    `<div class="razon"><span class="no">○</span><span>Y si hay empate, quien llegó primero</span></div>`;
+
+  const acciones = d.papel === "titular"
+    ? `<a class="acc" href="/presente?f=${esc(d.folio)}">Marcar mi entrada al llegar</a>
+       <a class="acc otro" href="${GRUPO}" target="_blank" rel="noopener">Entrar al grupo del equipo</a>`
+    : `<a class="acc" href="${GRUPO}" target="_blank" rel="noopener">Entrar al grupo del equipo</a>
+       <p style="margin:10px 0 0;font-size:13.5px;color:var(--tinta-3)">Ahí avisamos cuando se abre un lugar.</p>`;
+
+  $("#datos").innerHTML =
+    `Folio <b>${esc(d.folio)}</b> · ${esc(d.evento || "")}<br>
+     ${pesos(d.pago)} por día, más ${pesos(d.bono)} diarios de puntualidad.
+     ${acciones}`;
+
+  $("#fEntrar").style.display = "none";
+  $("#panel").style.display = "block";
+}
+
+async function ver(folio, tel4, callado) {
+  const d = await rpc("mi_lugar", { p_folio: folio, p_tel4: tel4 });
+  if (!d.ok) {
+    if (!callado) {
+      $("#err").textContent = "No te encontramos. Revisa tu folio y los últimos 4 dígitos del teléfono con el que te registraste.";
+      $("#err").classList.add("on");
+    }
+    return false;
+  }
+  try { localStorage.setItem(CLAVE, JSON.stringify({ folio: d.folio, tel4 })); } catch (e) {}
+  pintar(d);
+  return true;
+}
+
+$("#fEntrar").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  $("#err").classList.remove("on");
+  const b = $("#btnVer");
+  const folio = $("#folio").value.trim(), tel4 = $("#tel4").value.trim();
+  if (!folio || tel4.replace(/\D/g,"").length !== 4) {
+    $("#err").textContent = "Escribe tu folio y los últimos 4 dígitos de tu teléfono.";
+    $("#err").classList.add("on");
+    return;
+  }
+  b.disabled = true; b.textContent = "Buscando…";
+  try { await ver(folio, tel4); }
+  catch (e) { $("#err").textContent = e.message; $("#err").classList.add("on"); }
+  b.disabled = false; b.textContent = "Ver mi lugar";
+});
+
+$("#btnSalir").addEventListener("click", () => {
+  try { localStorage.removeItem(CLAVE); } catch (e) {}
+  $("#panel").style.display = "none";
+  $("#fEntrar").style.display = "block";
+  $("#folio").value = ""; $("#tel4").value = "";
+});
+
+(async () => {
+  const f = new URLSearchParams(location.search).get("f");
+  if (f) $("#folio").value = f;
+  let y = null;
+  try { y = JSON.parse(localStorage.getItem(CLAVE) || "null"); } catch (e) {}
+  if (y && y.folio && y.tel4) { try { await ver(y.folio, y.tel4, true); } catch (e) {} }
+  if ($("#panel").style.display !== "block") {
+    ($("#folio").value ? $("#tel4") : $("#folio")).focus();
+  }
+})();
+</script>
+</body>
+</html>

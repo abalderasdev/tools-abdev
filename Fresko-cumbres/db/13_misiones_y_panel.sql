@@ -30,3 +30,18 @@
 -- `candidatos.disponible_refuerzo` sale de una casilla del registro:
 -- acepta quedar en refuerzos y que se le avise CON UN DÍA DE
 -- ANTICIPACIÓN, nunca a última hora.
+
+-- ------------------------------------------------------------
+-- La fila completa (prioridad_completa_y_reserva_v2)
+--
+-- `v_prioridad_etapa2` ahora cubre a TODOS los que tienen folio, no
+-- solo a los inscritos: si se abre una vacante hay que saber a quién
+-- llamar aunque no se haya reinscrito.
+--
+-- Orden: 1) se presentó el primer día, 2) ya trabajó antes,
+--        3) ya está inscrito, 4) llegó primero.
+--
+-- `mi_lugar(folio, tel4)` es lo que cada quien consulta de sí mismo
+-- en /milugar, sin contraseña. A nadie se le dice "no": se le dice
+-- que por ahora está cubierto y que sigue en la fila para vacantes,
+-- suplencias y las activaciones que vienen.
