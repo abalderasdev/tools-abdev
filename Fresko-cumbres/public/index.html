@@ -122,6 +122,7 @@ input[type=file]{width:100%;padding:13px;font:inherit;font-size:15.5px;backgroun
 .invita .acc-2:active{background:rgba(255,255,255,.15)}
 .invita .copiado{display:none;margin:11px 0 0;font-size:15px;font-weight:700;text-align:center}
 .invita .copiado.on{display:block}
+.nota-grupo{margin:-2px 0 4px;font-size:14px;color:#6C7A70;text-align:center;line-height:1.45}
 .uniforme-nota{margin:10px 0 0;font-size:14.5px;color:#6C7A70}
 .espera{margin-top:18px;background:#FFE9D9;border:1.5px solid var(--naranja);color:#8A3708;
   padding:16px;border-radius:var(--radio);font-size:15px;display:none}
@@ -338,8 +339,12 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
         <div class="dato"><b>Contacto</b><span>Alberto Balderas · 55 6180 0423</span></div>
       </div>
       <div class="pase-pie">
-        <a class="acc wa" id="waConf" href="#">Avisar por WhatsApp que ya me registré</a>
+        <a class="acc wa" id="linkGrupo" href="#" target="_blank" rel="noopener">
+          Entrar al grupo · Equipo MTY Activación</a>
+        <p class="nota-grupo">Ahí se publican las misiones del día y los avisos.
+          Entra ahora, es donde te vamos a buscar.</p>
         <a class="acc cal" id="linkPresente" href="/presente">Registrar mi entrada al llegar</a>
+        <a class="acc cal" id="waConf" href="#">Avisar a Alberto que ya me registré</a>
       </div>
     </div>
 
@@ -383,6 +388,8 @@ const SUPABASE_URL = "https://eykfdnoczpwjccunzfgh.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Q_fNBD3xtsMtsNtpp3h0wg_j3dkROng";
 const CAMPANA      = "FRESKO-CUMBRES-ETAPA2";
 const WHATSAPP     = "525561800423";
+// Grupo del equipo. Se le da a cada quien en cuanto tiene folio.
+const GRUPO        = "https://chat.whatsapp.com/HU9nePfKDT0E0CgcNIbfRd";
 
 const $ = s => document.querySelector(s);
 const val = id => ($(id).value || "").trim();
@@ -665,6 +672,7 @@ Es en el Fresko Valle de Cumbres, en Mitras Poniente 66035.`;
 
   // Su folio va en la liga de presencia, para que no lo tenga que teclear.
   $("#linkPresente").href = `/presente?f=${encodeURIComponent(folio)}`;
+  $("#linkGrupo").href = GRUPO;
 
   const pase = $("#pase");
   pase.style.display = "block";
