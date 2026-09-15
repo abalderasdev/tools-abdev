@@ -92,6 +92,13 @@ propósito, para no castigar al que se atrasó tantito.
 **Si la marca se acepta, es puntual.** La ventana *es* la puntualidad.
 Así nadie tiene que explicar por qué algo quedó registrado pero no contó.
 
+**Equipo D · Globos.** Didier (079) coordina, $800/día desde el 15 sep.
+Erick (103) está con los globos todo el día y tiene
+`marca_automatica`: se le registra entrada y salida solo cada día
+laborable, con puntualidad, sin pedirle que marque con GPS. Si le
+pasaron lista tarde a mano, esa marca se promueve a puntual — la
+decisión fue que no tiene que marcar, así que no debe costarle el bono.
+
 **Una marca a mano nunca da puntualidad.** Si el coordinador pasa lista
 tarde, eso no debe quitarle ni regalarle el bono a nadie.
 

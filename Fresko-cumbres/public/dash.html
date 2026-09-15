@@ -983,6 +983,9 @@ $("#fInvitar").addEventListener("submit", async (ev) => {
 let E2 = null;
 
 async function pintarEtapa2() {
+  // El equipo de globos no marca con GPS: se le llena su día solo.
+  // Se dispara al abrir el panel, que es lo que pasa cada jornada.
+  try { await rpc("aplicar_marcas_automaticas", {}); } catch (e) {}
   E2 = await rpc("resumen_etapa2", {});
   const g = E2.gente || [];
   const hoy = g.filter((p) => p.entrada);
