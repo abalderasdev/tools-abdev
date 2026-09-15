@@ -163,11 +163,11 @@ puerta de la tienda. El geocerco (`puntos.cumbres-e2`) sigue apuntando
 a la tienda con 300 m de radio. Si la entrada queda fuera de ese radio,
 nadie podrá marcar entrada. **Falta el pin exacto.**
 
-### 7. Agente conversacional
+### 4. Agente conversacional
 `/milugar` ya resuelve la mayoría de las dudas sin IA. Para uno que
 converse hace falta `ANTHROPIC_API_KEY` en Vercel y un endpoint.
 
-### 8. Pendientes menores
+### 5. Pendientes menores
 - Dos archivos de prueba en el bucket: `registro/099-test.jpg` y
   `registro/999-test.jpg`. Sin folio que los referencie.
 - Supabase tiene **"Confirm email" encendido**: cada invitación al panel
