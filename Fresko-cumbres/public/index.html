@@ -293,6 +293,11 @@ footer{margin-top:30px;font-size:13px;color:#8A968D;line-height:1.45}
           <label for="disp">Puedo <strong>todos los días</strong>, del 14 al 24 de septiembre de 1:00 a 7:00 pm.
             <span class="opt">Si no puedes todos, no la marques: igual te registramos y vas los días que puedas.</span></label>
         </div>
+        <div class="check">
+          <input type="checkbox" id="refuerzo" checked>
+          <label for="refuerzo">Si no alcanzo lugar, <strong>quiero quedar en la lista de refuerzos</strong>.
+            <span class="opt">Te avisamos con un día de anticipación cuando se necesite gente. Nunca a última hora.</span></label>
+        </div>
       </div>
 
       <div class="campo">
@@ -470,6 +475,7 @@ $("#f").addEventListener("submit", async ev => {
     talla_playera: radio("talla"),
     experiencia: radio("experiencia"),
     disponible_completa: $("#disp").checked,
+    disponible_refuerzo: $("#refuerzo").checked,
     tiene_ine: !!INE_FOTO,
     transporte: radio("transporte"),
     comentarios: val("#comentarios") || null,

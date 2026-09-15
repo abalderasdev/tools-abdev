@@ -292,7 +292,16 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
 
     <div class="cards" id="e2Cards"></div>
 
-    <h3 style="margin-top:22px">Quién está hoy</h3>
+    <h3 style="margin-top:22px">La plantilla</h3>
+    <p class="lede">El lugar lo decide el orden, no quién lo pida: primero quien estuvo
+      el día 1, luego quien ya trabajó antes, y al final quien se registró primero.</p>
+    <div class="tw"><table style="min-width:700px"><thead><tr>
+      <th style="width:48px">#</th><th style="width:58px">Folio</th><th>Nombre</th>
+      <th style="width:96px">Papel</th><th style="width:70px">Día 1</th>
+      <th style="width:80px">Días antes</th><th style="width:90px">Refuerzo</th>
+    </tr></thead><tbody id="e2Plantilla"></tbody></table></div>
+
+    <h3 style="margin-top:26px">Quién está hoy</h3>
     <div class="tw"><table style="min-width:720px"><thead><tr>
       <th style="width:58px">Folio</th><th>Nombre</th>
       <th style="width:92px">Entrada</th><th style="width:92px">Salida</th>
@@ -984,7 +993,24 @@ async function pintarEtapa2() {
       <td>${Number(p.debe) > 0 ? pesos(p.debe) : "—"}</td>
     </tr>`).join("") || '<tr><td colspan="7">Todavía no hay nadie inscrito.</td></tr>';
 
+  await pintarPlantilla();
   await pintarMisiones();
+}
+
+async function pintarPlantilla() {
+  const d = await rpc("plantilla_etapa2", {});
+  const pl = d.plantilla || [];
+  const noAcepta = '<span style="color:var(--error)">no acepta</span>';
+  const color = { titular: "var(--verde)", suplente: "var(--naranja)", refuerzo: "var(--tinta-3)" };
+  $("#e2Plantilla").innerHTML = pl.map((p) => `<tr>
+      <td>${p.lugar}</td>
+      <td><b>${esc(p.folio)}</b></td>
+      <td>${esc(p.nombre)}</td>
+      <td style="color:${color[p.papel]};font-weight:700">${esc(p.papel)}</td>
+      <td>${p.estuvo_dia1 ? "✓" : "—"}</td>
+      <td>${p.dias_antes > 0 ? esc(p.dias_antes) : "—"}</td>
+      <td>${p.papel !== "refuerzo" ? "" : (p.acepta_refuerzo ? "acepta" : noAcepta)}</td>
+    </tr>`).join("") || '<tr><td colspan="7">Todavía no hay nadie inscrito.</td></tr>';
 }
 
 async function pintarMisiones() {

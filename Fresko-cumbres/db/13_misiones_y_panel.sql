@@ -12,3 +12,21 @@
 -- ve hasta que se marca como publicada. `mision_del_dia()` es la única
 -- de estas funciones abierta al público, y solo devuelve la de hoy y
 -- solo si está publicada.
+
+-- ------------------------------------------------------------
+-- Titulares, suplentes y refuerzos (titulares_suplentes_y_refuerzos)
+--
+-- 15 titulares, 2 suplentes, el resto a refuerzos. El lugar no se
+-- pide: lo decide `v_prioridad_etapa2` con tres criterios, en peso:
+--
+--   1. Quien estuvo el 14 de septiembre, el primer día.
+--   2. Quien ya trabajó antes, en la Etapa 1 (y cuántos días).
+--   3. Quien se registró primero.
+--
+-- Los tres son hechos ya ocurridos, así que el orden no se mueve
+-- solo. Alguien nuevo solo sube si trabajó antes, que es justo lo
+-- que se quiere premiar.
+--
+-- `candidatos.disponible_refuerzo` sale de una casilla del registro:
+-- acepta quedar en refuerzos y que se le avise CON UN DÍA DE
+-- ANTICIPACIÓN, nunca a última hora.
