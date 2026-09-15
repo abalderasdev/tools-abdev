@@ -78,6 +78,14 @@ input:focus{outline:2px solid var(--verde-2);outline-offset:1px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bono{background:#17331F;color:#9BE0B4}}
 .bono b{font-family:"Bricolage Grotesque",sans-serif;font-size:19px}
 
+.mision{margin-top:16px;background:var(--tinta);color:var(--arena);border-radius:16px;padding:18px}
+.mision .m-eti{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--verde-2)}
+.mision h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:23px;
+  margin:4px 0 8px;letter-spacing:-.02em}
+.mision p{margin:0;font-size:15px;line-height:1.55;white-space:pre-line;opacity:.92}
+.mision .m-premio{margin-top:12px;padding:11px 13px;background:rgba(255,255,255,.1);
+  border-radius:10px;font-weight:700;font-size:14.5px;opacity:1}
 .acciones{display:grid;gap:10px;margin-top:18px}
 .grande{padding:20px;border:none;border-radius:16px;font-weight:700;font-size:19px;
   font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.01em}
@@ -144,6 +152,13 @@ footer{margin-top:26px;font-size:12.5px;color:var(--tinta-3);line-height:1.5}
       </div>
 
       <div class="bono" id="bono"></div>
+    </div>
+
+    <div class="mision" id="mision" hidden>
+      <div class="m-eti">Misión <span id="mNum"></span> · <span id="mHoy"></span></div>
+      <h3 id="mTit"></h3>
+      <p id="mTxt"></p>
+      <p class="m-premio" id="mPremio" hidden></p>
     </div>
 
     <div class="acciones">
@@ -240,6 +255,20 @@ function pintar(d) {
     : `Marca entrada <i>y</i> salida a tiempo para sumar tus $${porDia} del día.`;
 }
 
+async function pintarMision() {
+  try {
+    const m = await fetch(`${SUPABASE_URL}/rest/v1/rpc/mision_del_dia`,
+      { method:"POST", headers:cab, body:"{}" }).then(r => r.json());
+    if (!m || !m.hay) return;
+    $("#mNum").textContent = m.numero != null ? String(m.numero).padStart(2,"0") : "";
+    $("#mHoy").textContent = new Date().toLocaleDateString("es-MX",{weekday:"long", day:"numeric"});
+    $("#mTit").textContent = m.titulo;
+    $("#mTxt").textContent = m.texto;
+    if (m.premio) { $("#mPremio").textContent = "🏅 " + m.premio; $("#mPremio").hidden = false; }
+    $("#mision").hidden = false;
+  } catch (e) {}
+}
+
 async function refrescar() {
   const d = await rpc("estado_presencia", { p_folio: YO.folio, p_tel4: YO.tel4 });
   if (!d.ok) { salir(); return; }
@@ -308,6 +337,7 @@ async function entrar(folio, tel4, silencioso) {
   $("#fEntrar").style.display = "none";
   $("#panel").style.display = "block";
   pintar(d);
+  pintarMision();
   return true;
 }
 

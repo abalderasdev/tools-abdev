@@ -213,7 +213,8 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
   </div></header>
 
   <div class="pestanas-wrap"><div class="pestanas" role="tablist">
-    <button class="pes" data-v="reclutamiento" aria-selected="true" role="tab" type="button">Reclutamiento</button>
+    <button class="pes" data-v="etapa2" aria-selected="true" role="tab" type="button">Etapa 2 · hoy</button>
+    <button class="pes" data-v="reclutamiento" aria-selected="false" role="tab" type="button">Reclutamiento</button>
     <button class="pes" data-v="dinero" aria-selected="false" role="tab" type="button">Asistencias y dinero</button>
     <button class="pes" data-v="cuentas" aria-selected="false" role="tab" type="button">Estado de cuenta</button>
     <button class="pes" data-v="expediente" aria-selected="false" role="tab" type="button">Expediente</button>
@@ -285,7 +286,47 @@ footer{margin-top:38px;padding-top:14px;border-top:1px solid var(--linea);color:
     <div id="xFicha"></div>
   </div>
 
-  <div class="wrap" id="vReclutamiento">
+  <div class="wrap" id="vEtapa2">
+    <h3 id="e2Tit">Etapa 2</h3>
+    <p class="lede" id="e2Sub"></p>
+
+    <div class="cards" id="e2Cards"></div>
+
+    <h3 style="margin-top:22px">Quién está hoy</h3>
+    <div class="tw"><table style="min-width:720px"><thead><tr>
+      <th style="width:58px">Folio</th><th>Nombre</th>
+      <th style="width:92px">Entrada</th><th style="width:92px">Salida</th>
+      <th style="width:70px">Bono</th><th style="width:60px">Días</th>
+      <th style="width:96px">Se le debe</th>
+    </tr></thead><tbody id="e2Filas"></tbody></table></div>
+
+    <h3 style="margin-top:26px">Misión del día</h3>
+    <p class="lede">Escríbela con anticipación. Nadie la ve hasta que la publicas.</p>
+    <form class="card" id="fMision" style="max-width:640px">
+      <label for="mDia">Día</label>
+      <input id="mDia" type="date">
+      <label for="mNumero">Número</label>
+      <input id="mNumero" type="number" min="1" placeholder="1">
+      <label for="mTitulo">Título</label>
+      <input id="mTitulo" type="text" placeholder="Todos en línea">
+      <label for="mTexto">La misión</label>
+      <textarea id="mTexto" rows="7" placeholder="Tu misión, si decides aceptarla…"></textarea>
+      <label for="mPremioIn">Premio <span class="opt">(opcional)</span></label>
+      <input id="mPremioIn" type="text" placeholder="Bono de puntualidad del día: $50">
+      <label class="perm" style="margin-top:14px">
+        <input type="checkbox" id="mPublicada">
+        <span><b>Publicarla</b><br>Si la marcas, el equipo la ve en cuanto abra su página ese día.</span>
+      </label>
+      <button class="btn-inv" type="submit" id="btnMision">Guardar misión</button>
+      <div class="aviso-inv" id="avisoMision"></div>
+    </form>
+
+    <div class="tw" style="margin-top:18px"><table style="min-width:520px"><thead><tr>
+      <th style="width:110px">Día</th><th>Misión</th><th style="width:110px">Estado</th>
+    </tr></thead><tbody id="mFilas"></tbody></table></div>
+  </div>
+
+  <div class="wrap" id="vReclutamiento" style="display:none">
     <div class="tiles" id="tiles"></div>
 
     <div id="secHoy"></div>
@@ -391,6 +432,7 @@ async function cargar(sesion) {
   $("#acceso").style.display = "none";
   $("#panel").style.display = "block";
   expedienteDeLaLiga();
+  pintarEtapa2().catch(() => {});
 }
 
 /* ---------------- pintar ---------------- */
@@ -909,15 +951,101 @@ $("#fInvitar").addEventListener("submit", async (ev) => {
   finally { b.disabled = false; b.textContent = "Generar enlace de acceso"; }
 });
 
+/* ---------------- Etapa 2 ---------------- */
+let E2 = null;
+
+async function pintarEtapa2() {
+  E2 = await rpc("resumen_etapa2", {});
+  const g = E2.gente || [];
+  const hoy = g.filter((p) => p.entrada);
+  const conBono = g.filter((p) => p.bono_hoy).length;
+  const debe = g.reduce((a, p) => a + Number(p.debe || 0), 0);
+
+  $("#e2Tit").textContent = E2.evento || "Etapa 2";
+  $("#e2Sub").textContent =
+    `Del ${fecha(E2.desde)} al ${fecha(E2.hasta)}, de ${E2.horario}. ` +
+    `${pesos(E2.tarifa)} por día y ${pesos(E2.bono)} de puntualidad.`;
+
+  $("#e2Cards").innerHTML = [
+    ["Lugares", `${E2.inscritos} de ${E2.meta}`, Number(E2.libres) > 0 ? `${E2.libres} libres` : "Lleno"],
+    ["Aquí hoy", String(hoy.length), `de ${g.length} inscritos`],
+    ["Ganaron bono", String(conBono), "hoy"],
+    ["Por pagar", pesos(debe), "en total"]
+  ].map(([t, n, p]) => `<div class="card"><div class="c-tit">${esc(t)}</div>
+      <div class="c-num">${esc(n)}</div><div class="c-pie">${esc(p)}</div></div>`).join("");
+
+  $("#e2Filas").innerHTML = g.map((p) => `<tr>
+      <td><b>${esc(p.folio)}</b></td>
+      <td>${esc(p.nombre)}${p.tiene_ine ? "" : ' <span style="color:var(--naranja)">sin INE</span>'}</td>
+      <td>${p.entrada ? esc(p.entrada) : "—"}</td>
+      <td>${p.salida ? esc(p.salida) : "—"}</td>
+      <td>${p.bono_hoy ? "✓" : "—"}</td>
+      <td>${esc(p.dias)}</td>
+      <td>${Number(p.debe) > 0 ? pesos(p.debe) : "—"}</td>
+    </tr>`).join("") || '<tr><td colspan="7">Todavía no hay nadie inscrito.</td></tr>';
+
+  await pintarMisiones();
+}
+
+async function pintarMisiones() {
+  const d = await rpc("misiones_lista", {});
+  const ms = d.misiones || [];
+  $("#mFilas").innerHTML = ms.map((m) => `<tr>
+      <td>${esc(fecha(m.dia))}${m.es_hoy ? " <b>(hoy)</b>" : ""}</td>
+      <td><b>${esc(m.titulo)}</b></td>
+      <td>${m.publicada ? '<span style="color:var(--verde)">Publicada</span>'
+                        : '<span style="color:var(--naranja)">Borrador</span>'}</td>
+    </tr>`).join("") || '<tr><td colspan="3">Todavía no hay misiones escritas.</td></tr>';
+
+  // Carga en el formulario la de mañana, que es la que se escribe.
+  if (!$("#mDia").value) {
+    const man = new Date(d.hoy + "T12:00:00"); man.setDate(man.getDate() + 1);
+    const iso = man.toISOString().slice(0, 10);
+    const m = ms.find((x) => x.dia === iso);
+    $("#mDia").value = iso;
+    if (m) {
+      $("#mNumero").value = m.numero || "";
+      $("#mTitulo").value = m.titulo || "";
+      $("#mTexto").value = m.texto || "";
+      $("#mPremioIn").value = m.premio || "";
+      $("#mPublicada").checked = !!m.publicada;
+    }
+  }
+}
+
+$("#fMision").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#btnMision"), a = $("#avisoMision");
+  if (!$("#mTitulo").value.trim() || !$("#mTexto").value.trim()) {
+    a.className = "aviso-inv on err"; a.textContent = "Ponle título y texto."; return;
+  }
+  b.disabled = true;
+  try {
+    await rpc("guardar_mision", { p: {
+      dia: $("#mDia").value, numero: $("#mNumero").value,
+      titulo: $("#mTitulo").value, texto: $("#mTexto").value,
+      premio: $("#mPremioIn").value, publicada: $("#mPublicada").checked
+    }});
+    a.className = "aviso-inv on";
+    a.textContent = $("#mPublicada").checked
+      ? "✓ Publicada. El equipo ya puede verla ese día."
+      : "✓ Guardada como borrador. Nadie la ve todavía.";
+    await pintarMisiones();
+  } catch (e) { a.className = "aviso-inv on err"; a.textContent = e.message; }
+  finally { b.disabled = false; }
+});
+
 document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", async () => {
   document.querySelectorAll(".pes").forEach((x) => x.setAttribute("aria-selected", String(x===b)));
   const v = b.dataset.v;
+  $("#vEtapa2").style.display        = v === "etapa2"        ? "block" : "none";
   $("#vReclutamiento").style.display = v === "reclutamiento" ? "block" : "none";
   $("#vDinero").style.display        = v === "dinero"        ? "block" : "none";
   $("#vCuentas").style.display       = v === "cuentas"       ? "block" : "none";
   $("#vExpediente").style.display    = v === "expediente"    ? "block" : "none";
   $("#vEquipo").style.display        = v === "equipo"        ? "block" : "none";
   try {
+    if (v === "etapa2")  await pintarEtapa2();
     if (v === "dinero")  await pintarDinero();
     if (v === "cuentas") await pintarCuentas();
     if (v === "equipo")  await pintarEquipo();

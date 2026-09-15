@@ -1,0 +1,14 @@
+-- 13 · Misiones del día y panel de la Etapa 2
+--
+-- Aplicado por las migraciones:
+--   misiones_del_dia            tabla `misiones` + mision_del_dia() /
+--                               misiones_lista() / guardar_mision()
+--   resumen_etapa2              todo lo del día en una sola llamada
+--   v_confirmacion_trabajo_y_etapa
+--                               agrega dias_trabajados y en_etapa2, para
+--                               poder convocar solo a quien sí trabajó
+--
+-- La misión se escribe con anticipación y queda en borrador: nadie la
+-- ve hasta que se marca como publicada. `mision_del_dia()` es la única
+-- de estas funciones abierta al público, y solo devuelve la de hoy y
+-- solo si está publicada.

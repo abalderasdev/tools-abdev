@@ -120,7 +120,9 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 
   <div class="wrap">
     <div class="pestanas">
-      <button class="pes" data-v="gracias" aria-selected="true" type="button">
+      <button class="pes urgente" data-v="etapa2" aria-selected="true" type="button">
+        🎯 Etapa 2 · convocar <span class="n" id="cE2"></span></button>
+      <button class="pes" data-v="gracias" aria-selected="false" type="button">
         🙌 Gracias, ya vienen <span class="n" id="cGrac"></span></button>
       <button class="pes" data-v="unete" aria-selected="false" type="button">
         📣 Invitar a unirse <span class="n" id="cUne"></span></button>
@@ -263,6 +265,34 @@ function msgUbicacion(c) {
   );
 }
 
+// Para quienes SÍ trabajaron la Etapa 1. Son 32 y solo quedan unos
+// pocos lugares, así que el mensaje tiene que ser honesto con eso:
+// prometerle lugar a todos sería mentirles.
+function msgEtapa2(c) {
+  const d = Number(c.dias_trabajados || 0);
+  return pila(
+    `${nombrePila(c.nombre)}, va de nuevo 🎯`,
+    ``,
+    `Nos dieron la *segunda etapa* de la activación del Fresko Valle de Cumbres, y te busco a ti porque ya trabajaste conmigo${d > 0 ? ` — llevas ${d} ${d === 1 ? "día" : "días"} con nosotros` : ""}.`,
+    ``,
+    `📅 Del 14 al 24 de septiembre`,
+    `🕐 De 1:00 a 7:00 de la tarde (el horario cambió, ya no es en la mañana)`,
+    `💵 $400 por día, pagados a la mañana siguiente`,
+    `➕ $50 diarios de puntualidad`,
+    ``,
+    `Ahora la parte que te tengo que decir de frente: *solo nos pidieron 15 lugares, más 2 suplentes*. No alcanza para todos los que estuvieron.`,
+    ``,
+    `Van por orden de quien confirme. Si se llenan, quedas como suplente o te acomodo en otras funciones de la activación, que también se pagan.`,
+    ``,
+    `Tu folio sigue siendo el ${c.folio}. Regístrate aquí para apartar:`,
+    `${SITIO}/`,
+    ``,
+    `Es rápido: ya te conocemos, solo subes la foto de tu INE y quedas.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
 // Para quienes ya están en el equipo: agradecer y recordar la jornada de hoy.
 function msgGracias(c) {
   return pila(
@@ -344,6 +374,7 @@ const wa = (tel, texto) =>
 
 /* ---------- pintar ---------- */
 const TEXTOS = {
+  etapa2: "Los que <b>sí trabajaron</b> la Etapa 1 y todavía no están inscritos en la Etapa 2. El mensaje les dice el horario nuevo y que <b>solo hay 15 lugares + 2 suplentes</b>, sin prometerles lo que no hay.",
   gracias: "Los que <b>sí llegaron a la capacitación</b>. El mensaje les agradece y les recuerda la jornada de hoy: horario, lugar, cómo ir vestidos y su folio para pasar lista.",
   unete: "Se registraron pero <b>nunca llegaron</b>. El mensaje los invita a entrar todavía, con los $400 por día y los bonos, y les pide contestar <b>VOY</b> para que tú les digas desde qué día los metes.",
   pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
@@ -354,6 +385,7 @@ const TEXTOS = {
 };
 
 function mensajeDe(c) {
+  if (VISTA === "etapa2")       return msgEtapa2(c);
   if (VISTA === "gracias")      return msgGracias(c);
   if (VISTA === "unete")        return msgUnete(c);
   if (VISTA === "pendientes")   return msgPendiente(c);
@@ -367,7 +399,8 @@ function pintar() {
   $("#explica").innerHTML = TEXTOS[VISTA];
   const marcas = leerMarcas();
   let l;
-  if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
+  if (VISTA === "etapa2") l = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2);
+  else if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
   else if (VISTA === "confirmados") l = GENTE.filter((c) => c.confirmo);
   else if (VISTA === "gracias") l = GENTE.filter((c) => c.asistio);
   else if (VISTA === "unete") l = GENTE.filter((c) => !c.asistio);
