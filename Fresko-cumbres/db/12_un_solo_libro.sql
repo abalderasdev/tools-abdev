@@ -19,3 +19,20 @@
 -- Las definiciones vigentes se aplicaron por migración:
 --   un_solo_libro_de_jornadas
 --   pase_lista_por_campana_activa
+
+-- ------------------------------------------------------------
+-- Reglas de checada de la Etapa 2 (migración ventanas_de_checada_etapa2)
+--
+--   Entrada: desde la 1:00 pm, una hora de margen. Después ya no deja.
+--   Salida:  nunca antes de las 7:00 pm.
+--
+-- A la gente se le dice "30 minutos de tolerancia"; el margen real es
+-- de 60, a propósito, para no castigar al que se atrasó tantito.
+--
+-- Si la marca se acepta, es puntual: la ventana ES la puntualidad.
+-- Así nadie tiene que explicar por qué algo quedó registrado pero no
+-- contó.
+--
+-- `bono_dia` guarda los días acreditados a mano, con su motivo. Se usó
+-- el 14 de septiembre: fue el primer día y se les explicó el sistema
+-- sobre la marcha, así que la asistencia bastó.
