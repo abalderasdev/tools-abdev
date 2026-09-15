@@ -118,6 +118,11 @@ reserva. **A nadie se le dice "no"**: se le dice que está cubierto y que
 sigue en la fila para vacantes, suplencias y las próximas activaciones.
 Cuando le toque, se le avisa **con un día de anticipación**.
 
+**Folios de prueba.** `candidatos.es_prueba` marca los que Alberto usa
+para probar (hoy el 030). Siguen funcionando en todas las pantallas,
+pero quedan fuera de la fila, de la plantilla, de los conteos y de los
+mensajes. No se borran ni se dan de baja: se necesitan vivos.
+
 **La bitácora es privada.** La tabla `bitacora` tiene RLS activo y **cero
 políticas a propósito**: no se lee por la API con ninguna sesión, solo
 desde el editor SQL. Registra toda operación que cambia algo, con el
