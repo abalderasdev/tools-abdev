@@ -1,0 +1,21 @@
+-- 12 · Un solo libro de jornadas, y /pase sigue a la campaña activa
+--
+-- Quedaron dos tablas registrando lo mismo: `asistencia` (Etapa 1, la
+-- pasa el coordinador) y `presencia` (Etapa 2, la marca la persona con
+-- GPS). Con las dos vivas, los pagos de una etapa no veían la
+-- asistencia de la otra.
+--
+-- `v_jornadas` las une, y de ahí leen los pagos y el pase de lista.
+--
+-- /pase deja de asumir la Etapa 1: la plantilla ya no son "los que
+-- fueron a la capacitación" sino los inscritos de la campaña abierta.
+--
+-- Las marcas del coordinador se guardan en `presencia` con origen
+-- 'pase_lista'. Cuentan para el pago del día pero NO para el bono de
+-- puntualidad: ese lo gana la persona marcando desde su teléfono, en
+-- el punto y en hora. Si no, bastaría con que el coordinador pasara
+-- lista tarde para regalar o quitar bonos.
+--
+-- Las definiciones vigentes se aplicaron por migración:
+--   un_solo_libro_de_jornadas
+--   pase_lista_por_campana_activa
