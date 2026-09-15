@@ -120,7 +120,11 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 
   <div class="wrap">
     <div class="pestanas">
-      <button class="pes urgente" data-v="etapa2" aria-selected="true" type="button">
+      <button class="pes urgente" data-v="puente" aria-selected="true" type="button">
+        🇲🇽 16 no se trabaja <span class="n" id="cPuente"></span></button>
+      <button class="pes" data-v="refuerzo17" aria-selected="false" type="button">
+        ➕ Refuerzos jueves 17 <span class="n" id="cRef"></span></button>
+      <button class="pes urgente" data-v="etapa2" aria-selected="false" type="button">
         🎯 Etapa 2 · convocar <span class="n" id="cE2"></span></button>
       <button class="pes" data-v="gracias" aria-selected="false" type="button">
         🙌 Gracias, ya vienen <span class="n" id="cGrac"></span></button>
@@ -265,6 +269,51 @@ function msgUbicacion(c) {
   );
 }
 
+// Para el equipo que ya está dentro: el 16 es fiesta, se descansa.
+function msgPuente(c) {
+  return pila(
+    `${nombrePila(c.nombre)}, aviso importante 🇲🇽`,
+    ``,
+    `*Mañana miércoles 16 de septiembre NO se trabaja.* Es día feriado, descansamos todos.`,
+    ``,
+    `📅 Nos vemos el *jueves 17*`,
+    `🕐 Misma hora: llegando a la *1:00 pm*`,
+    `📍 En la entrada del fraccionamiento, sobre Av. Paseo de los Leones, junto al Fresko`,
+    ``,
+    c.vino_hoy
+      ? `Y te felicito: hoy marcaste a tiempo y tu bono de $50 ya está contado. Vamos bien.`
+      : `Hoy no te vi. Si algo se te complicó, avísame y lo vemos.`,
+    ``,
+    `El jueves marca tu entrada apenas llegues, entre la 1:00 y la 1:30, para que te cuente el bono.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
+// Para la reserva: hay lugar el jueves 17.
+function msgRefuerzo17(c) {
+  return pila(
+    `${nombrePila(c.nombre)}, te tengo lugar 👋`,
+    ``,
+    `Se abrió espacio en la activación del Fresko Cumbres y me acordé de ti.`,
+    ``,
+    `📅 *Jueves 17 de septiembre*`,
+    `🕐 De 1:00 a 7:00 de la tarde`,
+    `📍 Entrada del fraccionamiento, sobre Av. Paseo de los Leones, junto al Fresko`,
+    `💵 $400 el día, te los pago a la mañana siguiente`,
+    `➕ $50 más si llegas a tiempo`,
+    ``,
+    `Ojo: *mañana 16 no se trabaja*, es feriado. Es para el jueves.`,
+    ``,
+    `Tu folio es el ${c.folio}. Confírmame aquí y te aparto:`,
+    `${SITIO}/`,
+    ``,
+    `Ya te conocemos, solo subes tu INE y quedas.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
 // Para quienes SÍ trabajaron la Etapa 1. Son 32 y solo quedan unos
 // pocos lugares, así que el mensaje tiene que ser honesto con eso:
 // prometerle lugar a todos sería mentirles.
@@ -374,6 +423,8 @@ const wa = (tel, texto) =>
 
 /* ---------- pintar ---------- */
 const TEXTOS = {
+  puente: "Para <b>los 15 que ya están dentro</b>. Avisa que el <b>16 no se trabaja</b> y que se vuelve el jueves 17. A quien vino hoy lo felicita por su bono; a quien faltó le pregunta qué pasó, sin regañar.",
+  refuerzo17: "Los <b>siguientes en la fila</b> que todavía no se inscriben. Les ofrece lugar para el <b>jueves 17</b> y les aclara que el 16 es feriado.",
   etapa2: "Los que <b>sí trabajaron</b> la Etapa 1 y todavía no están inscritos en la Etapa 2. El mensaje les dice el horario nuevo y que <b>solo hay 15 lugares + 2 suplentes</b>, sin prometerles lo que no hay.",
   gracias: "Los que <b>sí llegaron a la capacitación</b>. El mensaje les agradece y les recuerda la jornada de hoy: horario, lugar, cómo ir vestidos y su folio para pasar lista.",
   unete: "Se registraron pero <b>nunca llegaron</b>. El mensaje los invita a entrar todavía, con los $400 por día y los bonos, y les pide contestar <b>VOY</b> para que tú les digas desde qué día los metes.",
@@ -385,6 +436,8 @@ const TEXTOS = {
 };
 
 function mensajeDe(c) {
+  if (VISTA === "puente")     return msgPuente(c);
+  if (VISTA === "refuerzo17") return msgRefuerzo17(c);
   if (VISTA === "etapa2")       return msgEtapa2(c);
   if (VISTA === "gracias")      return msgGracias(c);
   if (VISTA === "unete")        return msgUnete(c);
@@ -399,7 +452,9 @@ function pintar() {
   $("#explica").innerHTML = TEXTOS[VISTA];
   const marcas = leerMarcas();
   let l;
-  if (VISTA === "etapa2") l = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2);
+  if (VISTA === "puente") l = GENTE.filter((c) => c.en_etapa2);
+  else if (VISTA === "refuerzo17") l = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 25);
+  else if (VISTA === "etapa2") l = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2);
   else if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
   else if (VISTA === "confirmados") l = GENTE.filter((c) => c.confirmo);
   else if (VISTA === "gracias") l = GENTE.filter((c) => c.asistio);
@@ -464,6 +519,9 @@ async function cargar() {
   $("#nConf").textContent = conf;
   $("#nTot").textContent = GENTE.length;
   $("#cConf").textContent = conf;
+  const cP = $("#cPuente"), cR = $("#cRef");
+  if (cP) cP.textContent = GENTE.filter((c) => c.en_etapa2).length;
+  if (cR) cR.textContent = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 25).length;
   $("#cPend").textContent = GENTE.length - conf;
   const equipo = GENTE.filter((c) => c.asistio).length;
   $("#cGrac").textContent = equipo;

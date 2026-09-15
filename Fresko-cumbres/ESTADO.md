@@ -1,6 +1,6 @@
 # Fresko Cumbres — estado del proyecto
 
-Última actualización: **15 de septiembre de 2026**
+Última actualización: **15 de septiembre de 2026, tarde**
 
 Este archivo existe para que cualquiera —otra sesión de Claude, MiniMax,
 otro programador— entre en contexto leyendo un solo documento, sin que
@@ -79,6 +79,11 @@ paga. `/presente` es **solo** para el bono de puntualidad.
 siguiente**, nunca el mismo día. Por eso `/pase` muestra "le debes" al
 día siguiente.
 
+**Días de descanso.** `parametros.descansos` es un arreglo de fechas en
+las que no se trabaja aunque caigan dentro del rango. El 16 de
+septiembre está ahí. Sin eso, alguien podría marcar entrada un día
+feriado y generar una jornada que nadie trabajó.
+
 **Ventanas de checada (Etapa 2).** Entrada: de 1:00 a 2:00 pm — después
 ya no deja marcar. Salida: nunca antes de las 7:00 pm. **A la gente se le
 dice que hay 30 minutos de tolerancia; el sistema aguanta 60**, a
@@ -127,6 +132,7 @@ terminar; ya existe la política de borrado para el personal.
 | Marcaron el día 1 | 7 |
 | Pagos registrados | 169 — Etapa 1 liquidada |
 | Misiones escritas | 1 (sin publicar) |
+| **15 sep: marcaron a tiempo** | **12 de 15 inscritos** |
 
 ### Tablas propias
 `candidatos`, `participaciones`, `asistencia`, `presencia`, `pagos`,
