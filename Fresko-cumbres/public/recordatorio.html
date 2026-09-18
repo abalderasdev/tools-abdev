@@ -120,7 +120,9 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
 
   <div class="wrap">
     <div class="pestanas">
-      <button class="pes urgente" data-v="hoy" aria-selected="true" type="button">
+      <button class="pes urgente" data-v="quedan" aria-selected="true" type="button">
+        📅 Quedan días · a todos <span class="n" id="cQued"></span></button>
+      <button class="pes urgente" data-v="hoy" aria-selected="false" type="button">
         📣 Hoy · al equipo <span class="n" id="cHoy"></span></button>
       <button class="pes" data-v="sumarse" aria-selected="false" type="button">
         ➕ Que se sumen <span class="n" id="cSum"></span></button>
@@ -158,10 +160,13 @@ const CLAVE = "fresko_lista_sesion";
 const MARCADAS = "fresko_recordatorio_enviados";
 const SITIO = "https://fresko-cumbres.abdev.click";
 const MAPA = "https://maps.app.goo.gl/BKYH7zbtHEbzUeHd7";
+const GRUPO = "https://chat.whatsapp.com/HU9nePfKDT0E0CgcNIbfRd";
+const FIN = "2026-09-24";              // último día de la Etapa 2
+const DESCANSOS = ["2026-09-16"];      // días dentro del rango que no se trabajan
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
-let SESION = null, GENTE = [], VISTA = "gracias";
+let SESION = null, GENTE = [], VISTA = "quedan";
 
 const leerMarcas = () => { try { return JSON.parse(localStorage.getItem(MARCADAS) || "{}"); } catch(e){ return {}; } };
 const marcar = (k) => { try { const m = leerMarcas(); m[k] = Date.now(); localStorage.setItem(MARCADAS, JSON.stringify(m)); } catch(e){} };
@@ -274,6 +279,75 @@ function msgUbicacion(c) {
 function hoyTexto() {
   const d = new Date();
   return d.toLocaleDateString("es-MX", { weekday:"long", day:"numeric", month:"long" });
+}
+
+// "2026-09-24" en hora local. new Date("2026-09-24") la leería como UTC y en
+// Monterrey caería un día antes.
+function comoFecha(s) { const [a, m, d] = s.split("-").map(Number); return new Date(a, m - 1, d); }
+const enIso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+// Días de trabajo que faltan, contando hoy y saltándose los descansos. Se
+// calcula al vuelo para que el mensaje no envejezca de un día para otro.
+function diasQuedan() {
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const fin = comoFecha(FIN);
+  const descansos = new Set(DESCANSOS);
+  let n = 0;
+  for (const d = new Date(hoy); d <= fin; d.setDate(d.getDate() + 1)) {
+    if (!descansos.has(enIso(d))) n++;
+  }
+  return n;
+}
+
+function finTexto() {
+  return comoFecha(FIN).toLocaleDateString("es-MX", { weekday:"long", day:"numeric", month:"long" });
+}
+
+// Para todos: la activación sigue viva y todavía se puede entrar. Se adapta
+// según si la persona ya está inscrita o no.
+function msgQuedanDias(c) {
+  const n = diasQuedan();
+  const cabeza = pila(
+    `${nombrePila(c.nombre)}, seguimos en la calle 👋`,
+    ``,
+    `La activación del *Fresko Valle de Cumbres* no ha terminado: quedan *${n} ${n === 1 ? "día" : "días"} de trabajo*, hasta el ${finTexto()}. Se puede entrar cualquier día, no tienes que hacerlos todos.`,
+    ``,
+    `🕐 De 1:00 a 7:00 de la tarde`,
+    `📍 Entrada del fraccionamiento, sobre Av. Paseo de los Leones, junto al Fresko`,
+    `💵 $400 el día, en efectivo, a la mañana siguiente`,
+    `➕ $50 cada día que llegues a tiempo`,
+    `➕ $50 por cada persona que invites y se registre con tu folio`,
+    ``
+  );
+  const pasos = c.en_etapa2
+    ? pila(
+        `Tú ya estás dentro con el folio ${c.folio}. Solo llega y marca tu entrada aquí:`,
+        `${SITIO}/presente?f=${c.folio}`,
+        ``,
+        `Y aquí ves tus días, tu bono y tu lugar:`,
+        `${SITIO}/milugar?f=${c.folio}`,
+        ``,
+        `El grupo del equipo, por si todavía no estás:`,
+        GRUPO
+      )
+    : pila(
+        `*1) Apártate aquí.* Son dos minutos: subes tu INE desde el celular y te da tu folio al momento.`,
+        `${SITIO}/`,
+        ``,
+        `*2) Mira en qué lugar vas*, con tu folio ${c.folio} y los últimos 4 de tu teléfono.`,
+        `${SITIO}/milugar?f=${c.folio}`,
+        ``,
+        `*3) Éntrale al grupo del equipo*, ahí aviso todo.`,
+        GRUPO
+      );
+  return pila(
+    cabeza,
+    pasos,
+    ``,
+    `Lleva tu INE, pantalón de mezclilla azul y tenis. Playera, gorra, mandil y agua los ponemos nosotros.`,
+    ``,
+    `— Alberto Balderas`
+  );
 }
 
 // Para el equipo que ya está dentro.
@@ -432,7 +506,8 @@ const wa = (tel, texto) =>
 
 /* ---------- pintar ---------- */
 const TEXTOS = {
-  hoy: "Los <b>inscritos</b>. Les recuerda el horario y el punto, y les manda su enlace directo para <b>marcar entrada</b> y otro para <b>ver cómo van</b>.",
+  quedan: "Va para <b>todos</b>: avisa que la activación sigue y cuántos días de trabajo faltan. A quien ya está dentro le manda su enlace para marcar entrada; a quien no, las ligas de <b>registro</b>, <b>su lugar</b> y el <b>grupo del equipo</b>.",
+  hoy:"Los <b>inscritos</b>. Les recuerda el horario y el punto, y les manda su enlace directo para <b>marcar entrada</b> y otro para <b>ver cómo van</b>.",
   sumarse: "Los <b>siguientes en la fila</b> que aún no se inscriben. Les da las dos ligas: <b>registrarse</b> y <b>ver su lugar</b>, con las reglas a la vista.",
   etapa2: "Los que <b>sí trabajaron</b> la Etapa 1 y todavía no están inscritos en la Etapa 2. El mensaje les dice el horario nuevo y que <b>solo hay 15 lugares + 2 suplentes</b>, sin prometerles lo que no hay.",
   gracias: "Los que <b>sí llegaron a la capacitación</b>. El mensaje les agradece y les recuerda la jornada de hoy: horario, lugar, cómo ir vestidos y su folio para pasar lista.",
@@ -445,6 +520,7 @@ const TEXTOS = {
 };
 
 function mensajeDe(c) {
+  if (VISTA === "quedan")  return msgQuedanDias(c);
   if (VISTA === "hoy")     return msgHoy(c);
   if (VISTA === "sumarse") return msgSumarse(c);
   if (VISTA === "etapa2")       return msgEtapa2(c);
@@ -461,7 +537,8 @@ function pintar() {
   $("#explica").innerHTML = TEXTOS[VISTA];
   const marcas = leerMarcas();
   let l;
-  if (VISTA === "hoy") l = GENTE.filter((c) => c.en_etapa2);
+  if (VISTA === "quedan") l = GENTE;
+  else if (VISTA === "hoy") l = GENTE.filter((c) => c.en_etapa2);
   else if (VISTA === "sumarse") l = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 30);
   else if (VISTA === "etapa2") l = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2);
   else if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
@@ -520,7 +597,9 @@ document.querySelectorAll(".pes").forEach((b) => b.addEventListener("click", () 
 
 async function cargar() {
   const [gente, par] = await Promise.all([
-    traer("v_confirmacion?select=folio,nombre,telefono,confirmo,asistio&order=folio.asc"),
+    // Las pestañas filtran por en_etapa2, lugar y dias_trabajados: si no se
+    // piden aquí, llegan como undefined y esas listas salen vacías siempre.
+    traer("v_confirmacion?select=folio,nombre,telefono,confirmo,asistio,dias_trabajados,en_etapa2,vino_hoy,lugar&order=folio.asc"),
     Promise.resolve([])
   ]);
   GENTE = gente;
@@ -528,6 +607,9 @@ async function cargar() {
   $("#nConf").textContent = conf;
   $("#nTot").textContent = GENTE.length;
   $("#cConf").textContent = conf;
+  const cQ = $("#cQued"); if (cQ) cQ.textContent = GENTE.length;
+  const cE = $("#cE2");
+  if (cE) cE.textContent = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2).length;
   const cH = $("#cHoy"), cS = $("#cSum");
   if (cH) cH.textContent = GENTE.filter((c) => c.en_etapa2).length;
   if (cS) cS.textContent = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 30).length;
