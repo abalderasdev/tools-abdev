@@ -121,7 +121,7 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
   <div class="wrap">
     <div class="pestanas">
       <button class="pes urgente" data-v="quedan" aria-selected="true" type="button">
-        📅 Quedan días · a todos <span class="n" id="cQued"></span></button>
+        📅 Quedan días · ya trabajaron <span class="n" id="cQued"></span></button>
       <button class="pes urgente" data-v="hoy" aria-selected="false" type="button">
         📣 Hoy · al equipo <span class="n" id="cHoy"></span></button>
       <button class="pes" data-v="sumarse" aria-selected="false" type="button">
@@ -310,7 +310,7 @@ function msgQuedanDias(c) {
   const cabeza = pila(
     `${nombrePila(c.nombre)}, seguimos en la calle 👋`,
     ``,
-    `La activación del *Fresko Valle de Cumbres* no ha terminado: quedan *${n} ${n === 1 ? "día" : "días"} de trabajo*, hasta el ${finTexto()}. Se puede entrar cualquier día, no tienes que hacerlos todos.`,
+    `La activación del *Fresko Valle de Cumbres* no ha terminado: quedan *${n} ${n === 1 ? "día" : "días"} de trabajo*, hasta el ${finTexto()}. Te escribo a ti porque ya trabajaste con nosotros. Se puede entrar cualquier día, no tienes que hacerlos todos.`,
     ``,
     `🕐 De 1:00 a 7:00 de la tarde`,
     `📍 Entrada del fraccionamiento, sobre Av. Paseo de los Leones, junto al Fresko`,
@@ -331,6 +331,8 @@ function msgQuedanDias(c) {
         GRUPO
       )
     : pila(
+        `Te lo digo de frente: *quedan pocos lugares* y van por orden de quien se apunta. No te prometo uno, pero si te apartas hoy tienes con qué pelearlo, y quedas de primero para las suplencias y para lo que viene.`,
+        ``,
         `*1) Apártate aquí.* Son dos minutos: subes tu INE desde el celular y te da tu folio al momento.`,
         `${SITIO}/`,
         ``,
@@ -506,7 +508,7 @@ const wa = (tel, texto) =>
 
 /* ---------- pintar ---------- */
 const TEXTOS = {
-  quedan: "Va para <b>todos</b>: avisa que la activación sigue y cuántos días de trabajo faltan. A quien ya está dentro le manda su enlace para marcar entrada; a quien no, las ligas de <b>registro</b>, <b>su lugar</b> y el <b>grupo del equipo</b>.",
+  quedan: "Solo para <b>quien ya trabajó</b> con nosotros, en cualquiera de las dos etapas — quedan pocos lugares y no da para convocar a todo el padrón. Avisa cuántos días de trabajo faltan. A quien ya está dentro le manda su enlace para marcar entrada; a quien no, le dice de frente que los lugares son pocos y le da las ligas de <b>registro</b>, <b>su lugar</b> y el <b>grupo del equipo</b>.",
   hoy:"Los <b>inscritos</b>. Les recuerda el horario y el punto, y les manda su enlace directo para <b>marcar entrada</b> y otro para <b>ver cómo van</b>.",
   sumarse: "Los <b>siguientes en la fila</b> que aún no se inscriben. Les da las dos ligas: <b>registrarse</b> y <b>ver su lugar</b>, con las reglas a la vista.",
   etapa2: "Los que <b>sí trabajaron</b> la Etapa 1 y todavía no están inscritos en la Etapa 2. El mensaje les dice el horario nuevo y que <b>solo hay 15 lugares + 2 suplentes</b>, sin prometerles lo que no hay.",
@@ -537,7 +539,9 @@ function pintar() {
   $("#explica").innerHTML = TEXTOS[VISTA];
   const marcas = leerMarcas();
   let l;
-  if (VISTA === "quedan") l = GENTE;
+  // Solo quien ya trabajó con nosotros, en cualquiera de las dos etapas:
+  // quedan pocos lugares y no da para convocar a todo el padrón.
+  if (VISTA === "quedan") l = GENTE.filter((c) => Number(c.dias_totales) > 0);
   else if (VISTA === "hoy") l = GENTE.filter((c) => c.en_etapa2);
   else if (VISTA === "sumarse") l = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 30);
   else if (VISTA === "etapa2") l = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2);
@@ -599,7 +603,7 @@ async function cargar() {
   const [gente, par] = await Promise.all([
     // Las pestañas filtran por en_etapa2, lugar y dias_trabajados: si no se
     // piden aquí, llegan como undefined y esas listas salen vacías siempre.
-    traer("v_confirmacion?select=folio,nombre,telefono,confirmo,asistio,dias_trabajados,en_etapa2,vino_hoy,lugar&order=folio.asc"),
+    traer("v_confirmacion?select=folio,nombre,telefono,confirmo,asistio,dias_trabajados,dias_totales,en_etapa2,vino_hoy,lugar&order=folio.asc"),
     Promise.resolve([])
   ]);
   GENTE = gente;
@@ -607,7 +611,8 @@ async function cargar() {
   $("#nConf").textContent = conf;
   $("#nTot").textContent = GENTE.length;
   $("#cConf").textContent = conf;
-  const cQ = $("#cQued"); if (cQ) cQ.textContent = GENTE.length;
+  const cQ = $("#cQued");
+  if (cQ) cQ.textContent = GENTE.filter((c) => Number(c.dias_totales) > 0).length;
   const cE = $("#cE2");
   if (cE) cE.textContent = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2).length;
   const cH = $("#cHoy"), cS = $("#cSum");
