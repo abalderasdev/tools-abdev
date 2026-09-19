@@ -138,6 +138,8 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
         Ya confirmaron <span class="n" id="cConf"></span></button>
       <button class="pes" data-v="referidos" aria-selected="false" type="button">
         Mandar su enlace</button>
+      <button class="pes urgente" data-v="capacitacion" aria-selected="false" type="button">
+        📚 Vinieron al 8, aún pueden venir <span class="n" id="cCap"></span></button>
       <button class="pes urgente" data-v="ubicacion" aria-selected="false" type="button">
         ⚠️ Aviso de ubicación</button>
       <button class="pes urgente" data-v="transporte" aria-selected="false" type="button">
@@ -503,6 +505,35 @@ function msgTransporte(c) {
   );
 }
 
+// Para quienes vinieron a la capacitación pero nunca se presentaron. Ya
+// tiene su uniforme y la oportunidad de venir en cualquier momento hasta
+// el cierre de la activación.
+function msgCapacitacion(c) {
+  return pila(
+    `${nombrePila(c.nombre)}, te escribo porque viniste a la capacitación del 8 de septiembre.`,
+    ``,
+    `Sabemos que la vida es complicada y no todos los días se puede. Pero la activación sigue viva hasta el *24 de septiembre*, y todavía necesitamos gente.`,
+    ``,
+    `*Tú ya tienes tu uniforme* — lo recibiste el martes. Solo trae lo que le falta:`,
+    `👖 Pantalón de mezclilla azul`,
+    `👟 Tenis`,
+    ``,
+    `*El turno es de 1:00 a 7:00 de la tarde*, a partir de mañana domingo hasta el 24.`,
+    `📍 Entrada del fraccionamiento, sobre Av. Paseo de los Leones, junto al Fresko`,
+    ``,
+    `💵 $400 cada día, en efectivo a la mañana siguiente`,
+    `➕ $50 si llegas a tiempo (1:00 a 2:00)`,
+    `➕ $50 por cada persona que invites y se registre`,
+    ``,
+    `Si cambias de opinión y quieres intentarlo, solo ven. No hay que inscribirse ni confirmar nada. Llega, marca tu entrada desde tu celular aquí, y listo:`,
+    `${SITIO}/presente`,
+    ``,
+    `Eso es todo. Nos vemos en la calle.`,
+    ``,
+    `— Alberto Balderas`
+  );
+}
+
 const wa = (tel, texto) =>
   `https://wa.me/52${String(tel||"").replace(/\D/g,"").slice(-10)}?text=${encodeURIComponent(texto)}`;
 
@@ -517,6 +548,7 @@ const TEXTOS = {
   pendientes: "Estas personas <b>todavía no confirman</b>. El mensaje trae su enlace de un clic: en cuanto lo abran, quedan confirmadas y lo ves aquí al recargar.",
   confirmados: "Estas ya confirmaron. El mensaje les dice que <b>ya las tienes consideradas</b> y les repite la hora, el lugar y qué llevar.",
   referidos: "Mándale a cada quien <b>su enlace de referido</b> para que lo comparta en redes. Aplica para todos, hayan confirmado o no.",
+  capacitacion: "Vinieron a la <b>capacitación del 8</b> pero nunca se presentaron. Ya tienen <b>uniforme y la oportunidad</b> de venir en cualquier momento hasta el cierre de la activación. El mensaje les dice que pueden intentarlo sin inscripción ni confirmación.",
   ubicacion: "⚠️ Aclara <b>a cuál Fresko</b> tienen que llegar. Va para <b>todos</b>, hayan confirmado o no.",
   transporte: "🚌 Avisa del <b>transporte gratis desde Plaza Puerta de Hierro</b> (salidas 3:30 y 3:45) y les pide contestar TRANSPORTE o DIRECTO. Va para <b>todos</b>."
 };
@@ -530,6 +562,7 @@ function mensajeDe(c) {
   if (VISTA === "unete")        return msgUnete(c);
   if (VISTA === "pendientes")   return msgPendiente(c);
   if (VISTA === "confirmados")  return msgConfirmado(c);
+  if (VISTA === "capacitacion")  return msgCapacitacion(c);
   if (VISTA === "ubicacion")    return msgUbicacion(c);
   if (VISTA === "transporte")   return msgTransporte(c);
   return msgReferido(c);
@@ -548,6 +581,7 @@ function pintar() {
   else if (VISTA === "pendientes") l = GENTE.filter((c) => !c.confirmo);
   else if (VISTA === "confirmados") l = GENTE.filter((c) => c.confirmo);
   else if (VISTA === "gracias") l = GENTE.filter((c) => c.asistio);
+  else if (VISTA === "capacitacion") l = GENTE.filter((c) => c.asistio && Number(c.dias_totales) === 0);
   else if (VISTA === "unete") l = GENTE.filter((c) => !c.asistio);
   else l = GENTE;
 
@@ -615,6 +649,8 @@ async function cargar() {
   if (cQ) cQ.textContent = GENTE.filter((c) => Number(c.dias_totales) > 0).length;
   const cE = $("#cE2");
   if (cE) cE.textContent = GENTE.filter((c) => Number(c.dias_trabajados) > 0 && !c.en_etapa2).length;
+  const cCap = $("#cCap");
+  if (cCap) cCap.textContent = GENTE.filter((c) => c.asistio && Number(c.dias_totales) === 0).length;
   const cH = $("#cHoy"), cS = $("#cSum");
   if (cH) cH.textContent = GENTE.filter((c) => c.en_etapa2).length;
   if (cS) cS.textContent = GENTE.filter((c) => !c.en_etapa2 && c.lugar && c.lugar <= 30).length;
