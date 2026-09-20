@@ -87,6 +87,9 @@ header{background:var(--verde);color:#fff;padding:14px 16px;position:sticky;top:
   margin:2px 0 6px;letter-spacing:-.02em}
 .t-datos{font-size:14.5px;color:var(--tinta-2)}
 .t-datos b{color:var(--tinta)}
+.t-equipo{margin-top:10px;display:flex;align-items:center;gap:8px}
+.t-equipo label{font-size:13.5px;font-weight:600;color:var(--tinta-2)}
+.t-equipo select{width:auto;flex:1;padding:9px 11px;font-size:14.5px}
 .t-pie{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .deshacer{background:transparent;border:1.5px solid var(--linea-2);color:var(--tinta-2);
   border-radius:99px;padding:7px 15px;font-size:13.5px;font-weight:600}
@@ -249,9 +252,10 @@ const $  = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m]));
 
 let SESION = null;
-let TIPO   = "entrada";
-let DATOS  = { presentes: [], faltantes: [] };
-let ULTIMO = null;
+let TIPO    = "entrada";
+let DATOS   = { presentes: [], faltantes: [] };
+let ULTIMO  = null;
+let EQUIPOS = [];
 
 /* ---------------- sesión (ver sesion.js) ---------------- */
 const guardar = () => {};                       // Sesion ya la guarda
@@ -346,9 +350,19 @@ function tarjeta(r) {
   }
 
   const datos = [
-    r.equipo ? `Equipo <b>${esc(r.equipo)}</b>` : null,
     r.talla  ? `Talla <b>${esc(r.talla)}</b>`   : null
   ].filter(Boolean).join(" · ");
+
+  const opcionesEquipo = EQUIPOS.map((e) =>
+    `<option value="${e.id}" ${e.id === r.equipo_id ? "selected" : ""}>${esc(e.nombre)}</option>`
+  ).join("");
+  const selectorEquipo = `<div class="t-equipo">
+      <label for="selEquipo">Equipo</label>
+      <select id="selEquipo">
+        <option value="" ${!r.equipo_id ? "selected" : ""}>Sin equipo</option>
+        ${opcionesEquipo}
+      </select>
+    </div>`;
 
   const aviso = r.inscrito === false
     ? `<span class="alerta">No está inscrito en esta etapa</span>` : "";
@@ -420,6 +434,7 @@ function tarjeta(r) {
                    : `${r.tipo === "salida" ? "Salida" : "Entrada"} registrada a las <b>${esc(r.hora)}</b>`}
       ${datos ? " · " + datos : ""}
     </div>
+    ${selectorEquipo}
     ${ayer}
     ${pago}
     ${botonAdelanto}
@@ -437,6 +452,26 @@ function tarjeta(r) {
   $("#btnAdelanto").addEventListener("click", () => adelantar(r.folio, r.nombre));
   t.querySelectorAll("[data-ade]").forEach((b) =>
     b.addEventListener("click", () => quitarAdelanto(r.folio, b.dataset.ade)));
+
+  const se = $("#selEquipo");
+  if (se) se.addEventListener("change", () => cambiarEquipo(r, se));
+}
+
+async function cambiarEquipo(r, se) {
+  const antes = se.value;
+  se.disabled = true;
+  try {
+    const eq = await rpc("asignar_equipo", { p: { folio: r.folio, equipo_id: se.value || null } });
+    if (!eq.ok) { avisar("No se pudo cambiar el equipo", true); se.value = antes; return; }
+    r.equipo_id = eq.equipo_id || null;
+    r.equipo = eq.equipo || null;
+    avisar(`✓ ${eq.nombre} ahora en ${eq.equipo || "sin equipo"}`);
+    await cargar();
+  } catch (e) {
+    avisar(e.message, true);
+  } finally {
+    se.disabled = false;
+  }
 }
 
 /* ---------------- acciones ---------------- */
@@ -610,6 +645,9 @@ $("#fLogin").addEventListener("submit", async (ev) => {
 async function arrancar() {
   $("#acceso").style.display = "none";
   $("#app").style.display = "block";
+  try {
+    EQUIPOS = await rpc("equipos_lista");
+  } catch (e) { EQUIPOS = []; }
   try { await cargar(); }
   catch (e) {
     if (/SIN_PERMISO/.test(e.message)) {
