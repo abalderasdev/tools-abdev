@@ -12,6 +12,16 @@
         }
       ],
       "destination": "/dash.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "cuadre.fresko-cumbres.abdev.click"
+        }
+      ],
+      "destination": "/cuadre.html"
     }
   ],
   "headers": [
@@ -29,6 +39,36 @@
         {
           "key": "X-Frame-Options",
           "value": "SAMEORIGIN"
+        }
+      ]
+    },
+    {
+      "source": "/archivos-cuadre/(.*)",
+      "headers": [
+        {
+          "key": "Content-Disposition",
+          "value": "attachment"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/cuadre",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
         }
       ]
     }
